@@ -1,0 +1,8 @@
+{
+    "testString": "stringValue",
+    "testInteger": 123,
+    "testObject" : {
+        "testInnerString": "innerStringValue",
+        "testInnerInteger": 456
+    }
+}
