@@ -26,10 +26,8 @@ int main(int argc, char** argv) {
     Json::Reader reader;
     std::ifstream test("fatTrack.json", std::ifstream::binary);
 
-    bool parsingSuccessful = reader.parse(test, root, false );
-    
+    reader.parse(test, root, false );
 
     std::cout << styledWriter.write(root);
-
     return 0;
 }

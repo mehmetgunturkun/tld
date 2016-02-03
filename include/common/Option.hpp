@@ -2,7 +2,7 @@
 #define OPTION_H
 #include <stddef.h>
 
-template <class Type>
+template <typename Type>
 
 class Option {
     Type* item;
