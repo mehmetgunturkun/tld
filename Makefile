@@ -25,10 +25,6 @@ lib2_target  := libceng515++.a
 
 test_target := target
 
-# tool_sources := $(wildcard test/*.c)
-# tool_objects := $(patsubst %.c,%.o,$(tool_sources))
-# tool_targets := $(patsubst %.c,%-app,$(notdir $(tool_sources)))
-
 tool2_sources := $(wildcard test/*.cc)
 tool2_objects := $(patsubst %.cc,%.o,$(tool2_sources))
 tool2_targets := $(patsubst %.cc,$(test_target)/%-app,$(notdir $(tool2_sources)))
@@ -57,12 +53,6 @@ $(lib2_target) : $(lib2_objects) Makefile
 	@echo ----------------------------------------
 	@echo ... Built $@ ...
 	@echo ----------------------------------------
-
-# $(tool_targets): %-app: test/%.o $(lib_target) Makefile
-# 	$(CC) $(CCFLAGS) $< $(lib_target) $(LDFLAGS) -lm -o $@
-# 	@echo ----------------------------------------
-# 	@echo ... Built $@ ...
-# 	@echo ----------------------------------------
 
 $(tool2_targets): $(test_target)/%-app: test/%.o $(lib2_target) Makefile
 	$(CXX) $(CXXFLAGS) $< $(lib2_target) libjsoncpp.a $(lib_target) $(LDFLAGS) -o $@
