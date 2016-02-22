@@ -16,8 +16,5 @@ public:
     double variance;
     double overlap;
 
-    static double overlap(Box* b1, Box* b2) {
-        return 0.0;
-    }
 };
 #endif
