@@ -19,7 +19,10 @@ ARFLAGS = ruv
 
 lib2_sources := \
 	src/common/Config.cc \
-	src/core/Frame.cc
+	src/core/Frame.cc \
+	src/core/ScoredBox.cc \
+	src/tracker/TrackResult.cc \
+	src/tld/TLD.cc
 
 lib2_objects := $(patsubst %.cc,%.o,$(lib2_sources))
 lib2_target  := libceng515++.a

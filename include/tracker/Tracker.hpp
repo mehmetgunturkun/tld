@@ -7,6 +7,7 @@
 #include "tracker/TrackResult.hpp"
 
 class Tracker {
+public:
     TrackResult* track(Frame* prev, Frame* current, Box* boxOpt);
 };
 

@@ -12,9 +12,11 @@ public:
         item = _item;
         empty = false;
     }
+
     Option() {
         empty =true;
     }
+
     bool isEmpty() {
         return empty;
     }

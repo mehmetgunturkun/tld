@@ -5,23 +5,34 @@
 
 #include "core/Frame.hpp"
 #include "core/Box.hpp"
+#include "core/ScoredBox.hpp"
 
 #include "tracker/Tracker.hpp"
-#include "detector/Detector.hpp"
+#include "detector/CascadedSingleDetector.hpp"
 
 using namespace std;
 
 class TLD {
 private:
-    Option<Box>* integrate(Option<Box*> maybeCurrentBox, vector<Box*> candidateBoxList);
+    Option<Box>* integrate(Frame* current, TrackResult* trackResult, DetectResult* detectResult);
+    Box* combineClosestBoxes(TrackResult* trackResult, DetectResult* detectResult);
+    bool isThereMoreConfidentOneBox(TrackResult* trackResult, DetectResult* detectResult);
+    TrackResult* validate(Frame* current, TrackResult* trackResult);
+
+    double MIN_OVERLAP;
+    double MIN_VALIDATION_SCORE;
+
 public:
     Tracker* tracker;
-    Detector* detector;
+    CascadedSingleDetector* detector;
 
-    TLD(Tracker* t, Detector* d);
+    TLD(Tracker* t, CascadedSingleDetector* d);
 
     void init(Frame* firstFrame, Box* firstBox);
-    Option<Box>* process(Frame* prev, Frame* current, Option<Box>* prevBox);
+    TrackResult* track(Frame* prev, Frame* current, Option<Box>* maybePrevBox);
+    void learn(Frame* current, Box* trackedBox, DetectResult* detectResult);
+    DetectResult* detect(Frame* current);
+    Option<Box>* process(Frame* prev, Frame* current, Option<Box>* maybePrevBox);
 
 };
 #endif

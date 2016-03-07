@@ -2,12 +2,18 @@
 #define DETECTION_RESULT_HPP
 
 #include "core/Box.hpp"
+#include "core/ScoredBox.hpp"
 
 using namespace std;
 
 class DetectResult {
 public:
-    vector<Box*> all;
-    vector<Box*> detected;
+    bool isFailed;
+
+    int allSize;
+    vector<ScoredBox*> all;
+
+    int detectedSize;
+    vector<ScoredBox*> detected;
 };
 #endif
