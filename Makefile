@@ -22,6 +22,7 @@ lib2_sources := \
 	src/core/Frame.cc \
 	src/core/ScoredBox.cc \
 	src/tracker/TrackResult.cc \
+	src/tracker/Tracker.cc \
 	src/tld/TLD.cc
 
 lib2_objects := $(patsubst %.cc,%.o,$(lib2_sources))

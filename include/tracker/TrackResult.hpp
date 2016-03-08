@@ -14,6 +14,7 @@ public:
 
     TrackResult();
     TrackResult(ScoredBox* box);
+    TrackResult(Option<ScoredBox>* box);
     ScoredBox* getBox();
 };
 #endif
