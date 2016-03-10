@@ -20,6 +20,7 @@ ARFLAGS = ruv
 lib2_sources := \
 	src/common/Config.cc \
 	src/core/Frame.cc \
+	src/core/Displacement.cc \
 	src/core/ScoredBox.cc \
 	src/tracker/TrackResult.cc \
 	src/tracker/Tracker.cc \
