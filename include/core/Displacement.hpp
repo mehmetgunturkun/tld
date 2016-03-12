@@ -10,11 +10,13 @@ public:
     int pointId;
     tld::Point* source;
     tld::Point* target;
+    uchar state;
+    float error;
 
     double dx;
     double dy;
 
-    Displacement(int id, tld::Point* s, tld::Point* t);
+    Displacement(int id, tld::Point* s, tld::Point* t, uchar st, float err);
 
 };
 #endif

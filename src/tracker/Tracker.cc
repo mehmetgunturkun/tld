@@ -32,11 +32,12 @@ Flow* Tracker::computeFlow(Frame* src, Frame* target, vector<tld::Point*> srcPoi
     vector<Point2f> fromPoints;
     vector<Point2f> toPoints;
     vector<uchar> status(pointCount);
-    vector<float> error(pointCount);
+    vector<float> errors(pointCount);
 
     for (int i = 0; i < pointCount; i++) {
         tld::Point* point = srcPoints[i];
         fromPoints.push_back(point->underlying);
+        toPoints.push_back(point->underlying);
     }
 
     calcOpticalFlowPyrLK(src->flowPyramid,
@@ -44,7 +45,7 @@ Flow* Tracker::computeFlow(Frame* src, Frame* target, vector<tld::Point*> srcPoi
                          fromPoints,
                          toPoints,
                          status,
-                         error,
+                         errors,
                          *winSize,
                          5,
                          *termCriteria,
@@ -59,7 +60,7 @@ Flow* Tracker::computeFlow(Frame* src, Frame* target, vector<tld::Point*> srcPoi
         targetPoints.push_back(targetPoint);
     }
 
-    Flow* flow = new Flow(src, target, srcPoints, targetPoints);
+    Flow* flow = new Flow(src, target, srcPoints, targetPoints, status, errors);
     return flow;
 }
 

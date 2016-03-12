@@ -4,18 +4,28 @@
 Flow::Flow(Frame* s,
     Frame* t,
     vector<tld::Point*> op,
-    vector<tld::Point*> np) {
+    vector<tld::Point*> np,
+    vector<uchar> status,
+    vector<float> errors) {
          source = s;
          target = t;
+
          oldPoints = op;
          newPoints = np;
+         displacementCount = (int) oldPoints.size();
+         for (int i = 0; i < displacementCount; i++) {
+             tld::Point* srcPoint = oldPoints[i];
+             tld::Point* targetPoint = newPoints[i];
 
-         pointCount = (int) newPoints.size();
-         vector<Displacement*> displacementList;
-         for (int i = 0; i < pointCount; i++) {
-             tld::Point* newPoint = newPoints[i];
-             tld::Point* oldPoint = oldPoints[newPoint->id];
-             Displacement* displacement = new Displacement(newPoint->id, oldPoint, newPoint);
+             uchar state = status[i];
+             float error = errors[i];
+
+             Displacement* displacement = new Displacement(srcPoint->id,
+                 srcPoint,
+                 targetPoint,
+                 state,
+                 error
+             );
              displacementList.push_back(displacement);
          }
  }
