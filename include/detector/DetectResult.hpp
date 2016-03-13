@@ -1,6 +1,8 @@
 #ifndef DETECTION_RESULT_HPP
 #define DETECTION_RESULT_HPP
 
+#include <vector>
+
 #include "core/Box.hpp"
 #include "core/ScoredBox.hpp"
 
@@ -15,5 +17,7 @@ public:
 
     int detectedSize;
     vector<ScoredBox*> detected;
+
+    DetectResult();
 };
 #endif

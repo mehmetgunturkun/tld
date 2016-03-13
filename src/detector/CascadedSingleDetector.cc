@@ -5,11 +5,12 @@ void CascadedSingleDetector::init(Frame* frame, Box* box) {
 }
 
 DetectResult* CascadedSingleDetector::detect(Frame* frame) {
-    throw "NotImplemented!";
+    DetectResult* detectResult = new DetectResult();
+    return detectResult;
 }
 
 double CascadedSingleDetector::score(Frame* frame, Box* box) {
-    throw "NotImplemented!";
+    return 0.0;
 }
 
 void CascadedSingleDetector::learn(Frame* frame, Box* box, DetectResult* detectResult) {

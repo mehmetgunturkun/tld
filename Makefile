@@ -20,12 +20,16 @@ ARFLAGS = ruv
 lib2_sources := \
 	src/common/Config.cc \
 	src/core/Frame.cc \
+	src/core/Box.cc \
 	src/core/Displacement.cc \
 	src/core/ScoredBox.cc \
+	src/util/Dataset.cc \
 	src/tracker/Flow.cc \
 	src/tracker/FBFlow.cc \
 	src/tracker/TrackResult.cc \
 	src/tracker/Tracker.cc \
+	src/detector/DetectResult.cc \
+	src/detector/CascadedSingleDetector.cc \
 	src/tld/TLD.cc
 
 lib2_objects := $(patsubst %.cc,%.o,$(lib2_sources))
