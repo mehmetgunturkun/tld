@@ -49,12 +49,21 @@ public:
         return maybeBox;
     }
 
-    Box* move(float dx, float dy) {
-        return this;
-    }
+    Box* move(float dx, float dy);
 
     static double computeOverlap(Box* b1, Box* b2) {
         return 0.0;
+    }
+
+    string toString() {
+        stringstream ss;
+        ss  << "Box("
+            << id << ", "
+            << x1 << ", "
+            << y1 << ", "
+            << x2 << ", "
+            << y2 << ")";
+        return ss.str();
     }
 };
 #endif

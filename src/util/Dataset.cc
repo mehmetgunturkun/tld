@@ -30,7 +30,7 @@ vector<string> listImageFiles(string directory) {
         while(entry != NULL) {
             string fileName = string(entry->d_name);
              if (isImageFile(fileName)) {
-                 fileList.push_back(fileName);
+                 fileList.push_back(directory + "/" + fileName);
              }
              entry = readdir(pDIR);
          }
@@ -39,13 +39,14 @@ vector<string> listImageFiles(string directory) {
      return fileList;
 }
 
-Dataset::Dataset(string key) {
+Dataset::Dataset(string key, int skip) {
     string resourceString(RESOURCE_DIR);
     string sampleDirectory = resourceString + "/" + key;
     string sequenceDirectory = sampleDirectory + "/sequence";
 
     files = listImageFiles(sequenceDirectory);
     size =  (int) files.size();
+    processed = skip;
 
     string initDir = sampleDirectory + "/evaluations/init.txt";
     ifstream initFile(initDir);
@@ -61,16 +62,15 @@ Dataset::Dataset(string key) {
     }
 }
 
-Dataset::Dataset(string key, int skip) {
-
-}
-
 bool Dataset::hasNext() {
-    throw "NotImplemented!";
+    return processed < size;
 }
 
 Frame* Dataset::next() {
-    throw "NotImplemented!";
+    string imageFile = files[processed];
+    processed++;
+    Frame* frame = new Frame(imageFile);
+    return frame;
 }
 
 void Dataset::reset() {

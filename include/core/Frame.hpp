@@ -5,6 +5,7 @@
 
 class Frame {
 public:
+    string name;
     Mat* colored;
     Mat* grayscale;
     Mat* gaussian;
@@ -15,5 +16,12 @@ public:
     Frame(string fileName);
     int get(Point2f* point, int imageType = CV_LOAD_IMAGE_GAUSSIAN);
     int get(int x, int y, int imageType = CV_LOAD_IMAGE_GAUSSIAN);
+
+    string toString() {
+        stringstream ss;
+        ss  << "Frame("
+            << name << ")";
+        return ss.str();
+    }
 };
 #endif

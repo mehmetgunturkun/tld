@@ -26,8 +26,8 @@ public:
 
     Box* initBox;
 
-    Dataset(string dataKey);
     Dataset(string dataKey, int skip);
+    Dataset(string key):Dataset(key, 0) {}
 
     bool hasNext();
     Frame* next();

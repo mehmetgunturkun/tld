@@ -1,6 +1,7 @@
 #include "core/Frame.hpp"
 
 Frame::Frame(string fileName) {
+    name = fileName;
     colored = Image::imread(fileName, CV_LOAD_IMAGE_ANYCOLOR);
     int nrOfChannels = colored->channels();
     if (nrOfChannels == 1) {
