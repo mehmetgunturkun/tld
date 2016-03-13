@@ -3,6 +3,7 @@
 
 #include "opencv2/core/core.hpp"
 
+using namespace std;
 using namespace cv;
 
 namespace tld {
@@ -12,6 +13,14 @@ namespace tld {
         cv::Point2f underlying;
 
         Point(int id, Point2f underlying);
+
+        string toString() {
+            stringstream ss;
+            ss  << "Point("
+                << underlying.x << ", "
+                << underlying.y << ")";
+            return ss.str();
+        }
     };
 }
 #endif

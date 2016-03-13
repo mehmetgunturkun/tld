@@ -1,18 +1,24 @@
-#include <cstdlib>
-#include <cstdio>
-#include <cstring>
-#include <string.h>
-#include <iostream>
-#include <fstream>
-
-#include "core/Frame.hpp"
-
-#include "tld/TLD.hpp"
+#include "util/Dataset.hpp"
+#include "tracker/Tracker.hpp"
 
 int main(int argc, char** argv) {
-    Frame* frame = new Frame("resources/test.jpg");
-    Image::imshow("colored", frame->colored);
-    Image::imshow("gray", frame->grayscale);
-    Image::imshow("gaussian", frame->gaussian);
-    return 0;
+    Dataset* dataset = new Dataset("car");
+
+    Frame* firstFrame = dataset->next();
+    Box* firstBox = dataset->initBox;
+
+    Tracker* tracker = new Tracker();
+
+    while(dataset->hasNext()) {
+        printf("BOX >> %s\n", firstBox->toString().c_str());
+        Frame* secondFrame = dataset->next();
+        TrackResult* trackResult = tracker->track(firstFrame, secondFrame, firstBox);
+        if (trackResult->isFailed) {
+            return EXIT_FAILURE;
+        } else {
+            firstBox = trackResult->box->box;
+            firstFrame = secondFrame;
+        }
+    }
+    return EXIT_SUCCESS;
 }

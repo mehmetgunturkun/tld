@@ -8,13 +8,14 @@
 class TrackResult {
 public:
     bool isFailed;
-    Option<ScoredBox>* boxOpt;
+    ScoredBox* box;
 
     static TrackResult* empty;
 
     TrackResult();
-    TrackResult(ScoredBox* box);
-    TrackResult(Option<ScoredBox>* box);
+    TrackResult(ScoredBox* b);
+    TrackResult(Option<ScoredBox>* boxOpt);
+    
     ScoredBox* getBox();
 };
 #endif

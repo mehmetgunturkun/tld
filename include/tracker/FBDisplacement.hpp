@@ -14,6 +14,12 @@ public:
     float fbError;
     float nccError;
 
-    FBDisplacement(Displacement* fwd, Displacement* bwd, float fbe, float ncc);
+    FBDisplacement(Displacement* fwd, Displacement* bwd, float fbe, float ncc) {
+        forward = fwd;
+        backward = bwd;
+
+        fbError = fbe;
+        nccError = ncc;
+    };
 };
 #endif

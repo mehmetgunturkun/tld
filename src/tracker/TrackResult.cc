@@ -6,11 +6,20 @@ TrackResult::TrackResult() {
     isFailed = false;
 }
 
-TrackResult::TrackResult(ScoredBox* box) {
+TrackResult::TrackResult(ScoredBox* b) {
     isFailed = true;
-    boxOpt = new Option<ScoredBox>(box);
+    box = b;
+}
+
+TrackResult::TrackResult(Option<ScoredBox>* boxOpt) {
+    if (boxOpt->isDefined()) {
+        isFailed = false;
+        box = boxOpt->get();
+    } else {
+        isFailed = true;
+    }
 }
 
 ScoredBox* TrackResult::getBox() {
-    return boxOpt->get();
+    return box;
 }

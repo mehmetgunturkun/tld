@@ -21,6 +21,7 @@ lib2_sources := \
 	src/common/Config.cc \
 	src/core/Frame.cc \
 	src/core/Box.cc \
+	src/core/Point.cc \
 	src/core/Displacement.cc \
 	src/core/ScoredBox.cc \
 	src/util/Dataset.cc \

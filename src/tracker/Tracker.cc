@@ -1,4 +1,5 @@
 #include "tracker/Tracker.hpp"
+#define MARGIN 5
 
 Tracker::Tracker() {
     termCriteria = new TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, 20, 0.03);
@@ -13,7 +14,6 @@ TrackResult* Tracker::track(Frame* prev, Frame* current, Box* box) {
         Flow* backward = computeFlow(current, prev, forward->newPoints);
 
         FBFlow* fbFlow = new FBFlow(forward, backward);
-
         Option<ScoredBox>* maybeCurrentBox = fbFlow->estimate(box);
         TrackResult* trackResult = new TrackResult(maybeCurrentBox);
         return trackResult;
@@ -22,8 +22,25 @@ TrackResult* Tracker::track(Frame* prev, Frame* current, Box* box) {
     }
 }
 
+float computeStep(float start, float end, int pointCount) {
+    return ((end - MARGIN -1) - (start + MARGIN)) / (pointCount - 1);
+}
+
 vector<tld::Point*> Tracker::generatePoints(Box* box) {
-    throw "NotImplemented!";
+    vector<tld::Point*> points;
+    int id = 0;
+    float horizontalStep = computeStep(box->x1, box->x2, 10);
+    float verticalStep = computeStep(box->y1, box->y2, 10);
+    for (float j = MARGIN; j <= box->height - MARGIN; j = j + verticalStep) {
+        for (float i = MARGIN; i <= box->width - MARGIN; i = i + horizontalStep) {
+            Point2f point2f = Point2f(box->x1 + i, box->y1 +j);
+            tld::Point* point = new tld::Point(id, point2f);
+
+            points.push_back(point);
+            id++;
+        }
+    }
+    return points;
 }
 
 Flow* Tracker::computeFlow(Frame* src, Frame* target, vector<tld::Point*> srcPoints) {
@@ -65,5 +82,5 @@ Flow* Tracker::computeFlow(Frame* src, Frame* target, vector<tld::Point*> srcPoi
 }
 
 bool Tracker::isValid(Box* box, Frame* frame) {
-    throw "NotImplemented!";
+    return true;
 }

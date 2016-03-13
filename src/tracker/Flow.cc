@@ -16,7 +16,6 @@ Flow::Flow(Frame* s,
          for (int i = 0; i < displacementCount; i++) {
              tld::Point* srcPoint = oldPoints[i];
              tld::Point* targetPoint = newPoints[i];
-
              uchar state = status[i];
              float error = errors[i];
 

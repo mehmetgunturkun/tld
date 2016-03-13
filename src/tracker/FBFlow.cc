@@ -1,6 +1,6 @@
 #include "tracker/FBFlow.hpp"
 
-float FBFlow::FB_ERROR_LIMIT = 0.0;
+float FBFlow::FB_ERROR_LIMIT = 0.5;
 
 float computeFBError(tld::Point* src, tld::Point* target, tld::Point* fb) {
     float dy = fb->underlying.y - src->underlying.y;
@@ -52,17 +52,22 @@ FBFlow::FBFlow(Flow* forward, Flow* backward) {
 
             float fbError = computeFBError(srcPoint, targetPoint, fbPoint);
             float ncc = computeNCC(srcFrame, srcPoint, targetFrame, targetPoint);
+
+            fbErrors.push_back(fbError);
+            nccErrors.push_back(ncc);
+
             FBDisplacement* fbDisp = new FBDisplacement(fwdDisplacement, bwdDisplacement, fbError, ncc);
             initialDisplacements.push_back(fbDisp);
         }
     }
 
+
     float medFBE = median(fbErrors);
     float medNCC = median(nccErrors);
-
     if (medFBE > FB_ERROR_LIMIT) {
         isValid = false;
     } else {
+
         displacementCount = (int) initialDisplacements.size();
         for (int i = 0; i < displacementCount; i++) {
             FBDisplacement* fbDisp = initialDisplacements[i];
@@ -82,7 +87,7 @@ FBFlow::FBFlow(Flow* forward, Flow* backward) {
 }
 
 Option<ScoredBox>* FBFlow::estimate(Box* box) {
-    if (isValid) {
+    if (!isValid) {
         Option<ScoredBox>* none = new Option<ScoredBox>();
         return none;
     } else {

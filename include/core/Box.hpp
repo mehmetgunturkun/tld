@@ -34,10 +34,10 @@ public:
     static Option<Box>* parseFromLine(string line) {
         StringStream* stream = new StringStream(line, ',');
 
-        double x1 = stod(stream->next());
-        double y1 = stod(stream->next());
-        double x2 = stod(stream->next());
-        double y2 = stod(stream->next());
+        float x1 = stod(stream->next());
+        float y1 = stod(stream->next());
+        float x2 = stod(stream->next());
+        float y2 = stod(stream->next());
 
         if (isnan(x1) || isnan(x2) || isnan(y1) || isnan(y2)) {
             Option<Box>* none = new Option<Box>();
