@@ -31,6 +31,19 @@ public:
     Box();
     Box(int id, double x1, double y1, double x2, double y2);
 
+    Box* move(float dx, float dy);
+    Box* clone();
+    string toString() {
+        stringstream ss;
+        ss  << "Box("
+            << id << ", "
+            << x1 << ", "
+            << y1 << ", "
+            << x2 << ", "
+            << y2 << ")";
+        return ss.str();
+    }
+
     static Option<Box>* parseFromLine(string line) {
         StringStream* stream = new StringStream(line, ',');
 
@@ -49,21 +62,20 @@ public:
         return maybeBox;
     }
 
-    Box* move(float dx, float dy);
+    static Box* rounded(Box* box) {
+        Box* newBox = new Box(
+            box->id,
+            round(box->x1),
+            round(box->y1),
+            round(box->x1) +
+            round(box->width) - 1.0,
+            round(box->y1) + round(box->height) - 1.0
+        );
+        return newBox;
+    }
 
     static double computeOverlap(Box* b1, Box* b2) {
         return 0.0;
-    }
-
-    string toString() {
-        stringstream ss;
-        ss  << "Box("
-            << id << ", "
-            << x1 << ", "
-            << y1 << ", "
-            << x2 << ", "
-            << y2 << ")";
-        return ss.str();
     }
 };
 #endif
