@@ -2,6 +2,7 @@
 #define FRAME_HPP
 
 #include "core/Image.hpp"
+#include "core/IntegralImage.hpp"
 
 class Frame {
 public:
@@ -13,7 +14,7 @@ public:
     Mat* colored;
     Mat* grayscale;
     Mat* gaussian;
-    Mat* integral;
+    IntegralImage* integral;
 
     vector<Mat> flowPyramid;
 

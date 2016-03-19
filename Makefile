@@ -32,6 +32,7 @@ lib2_sources := \
 	src/tracker/Tracker.cc \
 	src/detector/DetectResult.cc \
 	src/detector/BoxIterator.cc \
+	src/detector/variance/VarianceClassifier.cc \
 	src/detector/CascadedSingleDetector.cc \
 	src/tld/TLD.cc
 
