@@ -24,6 +24,7 @@ lib2_sources := \
 	src/core/Point.cc \
 	src/core/Displacement.cc \
 	src/core/ScoredBox.cc \
+	src/core/IntegralImage.cc \
 	src/util/Dataset.cc \
 	src/tracker/Flow.cc \
 	src/tracker/FBFlow.cc \
