@@ -1,4 +1,4 @@
-#include "core/ScoredBox.hpp"
+#include "detector/ScoredBox.hpp"
 
 ScoredBox::ScoredBox(Box* _box) {
     box = _box;

@@ -3,7 +3,7 @@
 
 #include "common/Option.hpp"
 #include "core/Box.hpp"
-#include "core/ScoredBox.hpp"
+#include "detector/ScoredBox.hpp"
 
 class TrackResult {
 public:
@@ -15,7 +15,7 @@ public:
     TrackResult();
     TrackResult(ScoredBox* b);
     TrackResult(Option<ScoredBox>* boxOpt);
-    
+
     ScoredBox* getBox();
 };
 #endif

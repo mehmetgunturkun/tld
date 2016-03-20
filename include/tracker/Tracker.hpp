@@ -9,7 +9,6 @@
 
 #include "tracker/Flow.hpp"
 #include "tracker/FBFlow.hpp"
-#include "tracker/TrackResult.hpp"
 
 using namespace std;
 using namespace cv;
@@ -22,7 +21,7 @@ public:
     vector<tld::Point*> generatePoints(Box* box);
     Flow* computeFlow(Frame* src, Frame* target, vector<tld::Point*> points);
     bool isValid(Box* box, Frame* frame);
-    TrackResult* track(Frame* prev, Frame* current, Box* box);
+    Option<Box>* track(Frame* prev, Frame* current, Box* box);
     Tracker();
 };
 

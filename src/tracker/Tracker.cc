@@ -6,7 +6,7 @@ Tracker::Tracker() {
     winSize = new Size(4, 4);
 }
 
-TrackResult* Tracker::track(Frame* prev, Frame* current, Box* box) {
+Option<Box>* Tracker::track(Frame* prev, Frame* current, Box* box) {
     if (isValid(box, prev)) {
         vector<tld::Point*> points = generatePoints(box);
 
@@ -14,11 +14,11 @@ TrackResult* Tracker::track(Frame* prev, Frame* current, Box* box) {
         Flow* backward = computeFlow(current, prev, forward->newPoints);
 
         FBFlow* fbFlow = new FBFlow(forward, backward);
-        Option<ScoredBox>* maybeCurrentBox = fbFlow->estimate(box);
-        TrackResult* trackResult = new TrackResult(maybeCurrentBox);
-        return trackResult;
+        Option<Box>* maybeCurrentBox = fbFlow->estimate(box);
+        return maybeCurrentBox;
     } else {
-        return TrackResult::empty;
+        Option<Box>* failed = new Option<Box>();
+        return failed;
     }
 }
 

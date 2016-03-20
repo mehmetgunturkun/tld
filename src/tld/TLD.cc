@@ -21,21 +21,23 @@ TrackResult* TLD::track(Frame* prev, Frame* current, Option<Box>* maybePrevBox) 
         return TrackResult::empty;
     } else {
         Box* prevBox = maybePrevBox->get();
-        TrackResult* trackResult = tracker->track(prev, current, prevBox);
-        TrackResult* validatedTrackResult = validate(current, trackResult);
+        Option<Box>* maybeBox = tracker->track(prev, current, prevBox);
+        TrackResult* validatedTrackResult = validate(current, maybeBox);
         return validatedTrackResult;
     }
 }
 
-TrackResult* TLD::validate(Frame* current, TrackResult* trackResult) {
-    if (trackResult->isFailed) {
-        return trackResult;
+TrackResult* TLD::validate(Frame* current, Option<Box>* maybeBox) {
+    if (maybeBox->isEmpty()) {
+        return TrackResult::empty;
     } else {
-        ScoredBox* scoredBox = trackResult->getBox();
-        Box* box = scoredBox->box;
+        Box* box = maybeBox->get();
         double score = detector->score(current, box);
         if (score > MIN_VALIDATION_SCORE) {
+            //TODO Define appropriate key instead of UNDEFINED
+            ScoredBox* scoredBox = new ScoredBox(box);
             scoredBox->withScore("UNDEFINED", score);
+            TrackResult* trackResult = new TrackResult(scoredBox);
             return trackResult;
         } else {
             TrackResult* failedTrackResult = TrackResult::empty;

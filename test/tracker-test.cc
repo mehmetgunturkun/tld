@@ -12,11 +12,11 @@ int main(int argc, char** argv) {
     while(dataset->hasNext()) {
         printf("BOX >> %s\n", firstBox->toString().c_str());
         Frame* secondFrame = dataset->next();
-        TrackResult* trackResult = tracker->track(firstFrame, secondFrame, firstBox);
-        if (trackResult->isFailed) {
+        Option<Box>* trackResult = tracker->track(firstFrame, secondFrame, firstBox);
+        if (trackResult->isEmpty()) {
             return EXIT_FAILURE;
         } else {
-            firstBox = trackResult->box->box;
+            firstBox = trackResult->get();
             firstFrame = secondFrame;
         }
     }

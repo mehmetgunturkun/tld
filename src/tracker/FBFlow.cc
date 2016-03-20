@@ -86,9 +86,9 @@ FBFlow::FBFlow(Flow* forward, Flow* backward) {
     }
 }
 
-Option<ScoredBox>* FBFlow::estimate(Box* box) {
+Option<Box>* FBFlow::estimate(Box* box) {
     if (!isValid) {
-        Option<ScoredBox>* none = new Option<ScoredBox>();
+        Option<Box>* none = new Option<Box>();
         return none;
     } else {
         vector<float> dxList(displacementSize);
@@ -103,8 +103,7 @@ Option<ScoredBox>* FBFlow::estimate(Box* box) {
         float medX = median(dxList);
         float medY = median(dyList);
         Box* movedBox = box->move(medX, medY);
-        ScoredBox* scoredBox = new ScoredBox(movedBox);
-        Option<ScoredBox>* maybeMovedBox = new Option<ScoredBox>(scoredBox);
+        Option<Box>* maybeMovedBox = new Option<Box>(movedBox);
         return maybeMovedBox;
     }
 }

@@ -23,18 +23,18 @@ lib2_sources := \
 	src/core/Box.cc \
 	src/core/Point.cc \
 	src/core/Displacement.cc \
-	src/core/ScoredBox.cc \
 	src/core/IntegralImage.cc \
 	src/util/Dataset.cc \
 	src/util/Log.cc \
 	src/tracker/Flow.cc \
 	src/tracker/FBFlow.cc \
-	src/tracker/TrackResult.cc \
 	src/tracker/Tracker.cc \
+	src/detector/ScoredBox.cc \
 	src/detector/DetectResult.cc \
 	src/detector/BoxIterator.cc \
 	src/detector/variance/VarianceClassifier.cc \
 	src/detector/CascadedSingleDetector.cc \
+	src/tld/TrackResult.cc \
 	src/tld/TLD.cc
 
 lib2_objects := $(patsubst %.cc,%.o,$(lib2_sources))

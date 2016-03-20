@@ -2,9 +2,7 @@
 #define FB_FLOW_H
 
 #include "common/Option.hpp"
-
-#include "core/ScoredBox.hpp"
-
+#include "core/Box.hpp"
 #include "tracker/Flow.hpp"
 #include "tracker/FBDisplacement.hpp"
 
@@ -17,6 +15,6 @@ public:
     static float FB_ERROR_LIMIT;
 
     FBFlow(Flow* forward, Flow* backward);
-    Option<ScoredBox>* estimate(Box* box);
+    Option<Box>* estimate(Box* box);
 };
 #endif

@@ -5,8 +5,9 @@
 
 #include "core/Frame.hpp"
 #include "core/Box.hpp"
-#include "core/ScoredBox.hpp"
+#include "detector/ScoredBox.hpp"
 
+#include "tld/TrackResult.hpp"
 #include "tracker/Tracker.hpp"
 #include "detector/CascadedSingleDetector.hpp"
 
@@ -17,7 +18,7 @@ private:
     Option<Box>* integrate(Frame* current, TrackResult* trackResult, DetectResult* detectResult);
     Box* combineClosestBoxes(TrackResult* trackResult, DetectResult* detectResult);
     bool isThereMoreConfidentOneBox(TrackResult* trackResult, DetectResult* detectResult);
-    TrackResult* validate(Frame* current, TrackResult* trackResult);
+    TrackResult* validate(Frame* current, Option<Box>* trackResult);
 
     double MIN_OVERLAP;
     double MIN_VALIDATION_SCORE;
