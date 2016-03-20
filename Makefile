@@ -36,6 +36,7 @@ lib2_sources := \
 	src/detector/variance/VarianceClassifier.cc \
 	src/detector/ensemble/PixelComparison.cc \
 	src/detector/ensemble/BaseClassifier.cc \
+	src/detector/ensemble/EnsembleClassifier.cc \
 	src/detector/CascadedSingleDetector.cc \
 	src/tld/TrackResult.cc \
 	src/tld/TLD.cc

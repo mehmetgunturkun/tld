@@ -1,5 +1,5 @@
 #include "util/Random.hpp"
 
-int Random::mti = N+1;
+int Random::mti = RAND_N+1;
 
-unsigned long* Random::mt = (unsigned long*)malloc(sizeof(unsigned long) * N);
+unsigned long* Random::mt = (unsigned long*)malloc(sizeof(unsigned long) * RAND_N);

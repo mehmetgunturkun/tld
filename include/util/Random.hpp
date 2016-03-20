@@ -2,8 +2,8 @@
 #define RANDOM_GEN_H
 
 /* Period parameters */
-#define N 624
-#define M 397
+#define RAND_N 624
+#define RAND_M 397
 #define MATRIX_A 0x9908b0dfUL   /* constant vector a */
 #define UPPER_MASK 0x80000000UL /* most significant w-r bits */
 #define LOWER_MASK 0x7fffffffUL /* least significant r bits */
@@ -22,7 +22,7 @@ public:
     /* initializes mt[N] with a seed */
     static void init_genrand(unsigned long s) {
         mt[0]= s & 0xffffffffUL;
-        for (mti=1; mti<N; mti++) {
+        for (mti=1; mti<RAND_N; mti++) {
             mt[mti] =
             (1812433253UL * (mt[mti-1] ^ (mt[mti-1] >> 30)) + mti);
             /* See Knuth TAOCP Vol2. 3rd Ed. P.106 for multiplier. */
@@ -42,21 +42,21 @@ public:
         int i, j, k;
         init_genrand(19650218UL);
         i=1; j=0;
-        k = (N>key_length ? N : key_length);
+        k = (RAND_N>key_length ? RAND_N : key_length);
         for (; k; k--) {
             mt[i] = (mt[i] ^ ((mt[i-1] ^ (mt[i-1] >> 30)) * 1664525UL))
               + init_key[j] + j; /* non linear */
             mt[i] &= 0xffffffffUL; /* for WORDSIZE > 32 machines */
             i++; j++;
-            if (i>=N) { mt[0] = mt[N-1]; i=1; }
+            if (i>=RAND_N) { mt[0] = mt[RAND_N-1]; i=1; }
             if (j>=key_length) j=0;
         }
-        for (k=N-1; k; k--) {
+        for (k=RAND_N-1; k; k--) {
             mt[i] = (mt[i] ^ ((mt[i-1] ^ (mt[i-1] >> 30)) * 1566083941UL))
               - i; /* non linear */
             mt[i] &= 0xffffffffUL; /* for WORDSIZE > 32 machines */
             i++;
-            if (i>=N) { mt[0] = mt[N-1]; i=1; }
+            if (i>=RAND_N) { mt[0] = mt[RAND_N-1]; i=1; }
         }
 
         mt[0] = 0x80000000UL; /* MSB is 1; assuring non-zero initial array */
@@ -68,22 +68,22 @@ public:
         static unsigned long mag01[2]={0x0UL, MATRIX_A};
         /* mag01[x] = x * MATRIX_A  for x=0,1 */
 
-        if (mti >= N) { /* generate N words at one time */
+        if (mti >= RAND_N) { /* generate N words at one time */
             int kk;
 
-            if (mti == N+1)   /* if init_genrand() has not been called, */
+            if (mti == RAND_N+1)   /* if init_genrand() has not been called, */
                 init_genrand(5489UL); /* a default initial seed is used */
 
-            for (kk=0;kk<N-M;kk++) {
+            for (kk=0;kk<RAND_N-RAND_M;kk++) {
                 y = (mt[kk]&UPPER_MASK)|(mt[kk+1]&LOWER_MASK);
-                mt[kk] = mt[kk+M] ^ (y >> 1) ^ mag01[y & 0x1UL];
+                mt[kk] = mt[kk+RAND_M] ^ (y >> 1) ^ mag01[y & 0x1UL];
             }
-            for (;kk<N-1;kk++) {
+            for (;kk<RAND_N-1;kk++) {
                 y = (mt[kk]&UPPER_MASK)|(mt[kk+1]&LOWER_MASK);
-                mt[kk] = mt[kk+(M-N)] ^ (y >> 1) ^ mag01[y & 0x1UL];
+                mt[kk] = mt[kk+(RAND_M-RAND_N)] ^ (y >> 1) ^ mag01[y & 0x1UL];
             }
-            y = (mt[N-1]&UPPER_MASK)|(mt[0]&LOWER_MASK);
-            mt[N-1] = mt[M-1] ^ (y >> 1) ^ mag01[y & 0x1UL];
+            y = (mt[RAND_N-1]&UPPER_MASK)|(mt[0]&LOWER_MASK);
+            mt[RAND_N-1] = mt[RAND_M-1] ^ (y >> 1) ^ mag01[y & 0x1UL];
 
             mti = 0;
         }
