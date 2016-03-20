@@ -26,6 +26,7 @@ lib2_sources := \
 	src/core/IntegralImage.cc \
 	src/util/Dataset.cc \
 	src/util/Log.cc \
+	src/util/Random.cc \
 	src/tracker/Flow.cc \
 	src/tracker/FBFlow.cc \
 	src/tracker/Tracker.cc \
