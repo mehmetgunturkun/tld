@@ -20,24 +20,30 @@
         As an input, user gives a sequence of images and an initial box that contains an object of interest.
         Tracker tracks the initial box from frame to frame and Detector finds the candidate boxes containing the object. They both
         run independently and halt with possible individual errors. However, Integrator
-        evaluate two separate results from Tracker and Detector, validates, combines and generates a reasonable result.
-        Besides, it sends feedback to Detector in order to rule out false positives and false negatives if necessary to make model
-        more robust. This is why as long as the TLD tracks the object, learns more and more about it.
+        evaluate two separate results from Tracker and Detector, validates tracked box, combines with detected boxes
+        and generates a reasonable result.
+        Besides, it sends feedback to Detector in order to rule out false positives
+        and false negatives if necessary to make model more robust.
+        With this approach, it eliminates tracker's shift error by validation from Detector and uses Tracker
+        to make Detector learn new instances of object and avoid misclassification in further frames and .
+        This is why as long as the TLD tracks the object, learns more and more about it.
     \section{Tracker}
         \paragraph{}
-            Tracker takes two consequtive frames and a bounding box, containing the target object within the first image.
-            Tracker's main task is to estimate the location of the bounding box in the second frame or to decide whether the
-            target object is still visible. Basically, tracker generates points in the given bounding box,
-            tracks each point from first frame to second frame, filter the reliable ones and estimates
-            the overall displacement with reliable points.
+            Tracker, takes two consequtive frames (frame\textsubscript{0}, frame\textsubscript{1})
+            and a bounding box (box\textsubscript{0}), containing the target object within frame\textsubscript{0}.
+            Tracker's main task is to estimate the location of the bounding box in the second frame (box\textsubscript{0})
+            or to decide whether the target object is still visible. Basically, tracker generates points in the given
+            bounding box, tracks each point from first frame to second frame, filter the reliable ones and estimates
+            the displacement of the box with these points.
         \paragraph{Point Generation}
-            In order to generate points in the given box, we divide given box into 10 equals
+            In order to generate points in the given box, we divide the box into equal
             parts in both directions: x and y. Every corner that horizontal and vertical stripes meet, we generate
-            new point. As a result, we have 10x10 grid on the box and 100 points to track.
+            new point. For example if we divide the box into m parts horizontally and n parts vertically, as a result,
+            we have \textit{mxn} points
         \paragraph{Point Tracking}
-            TLD uses pyramidal Lucas-Kanade tracker, which is already implemented in OpenCV, to track each point from frame
+            TLD uses Pyramidal Lucas-Kanade tracker, which is already implemented in OpenCV, to track points from frame
             to frame. However, Lucas-Kanade Tracker, tracks the points only in one direction. To be more robust,
-            we track backward too and calculate the forward-backward error.
+            we track backward either and calculate the forward-backward error.
             \begin{gather}
                 track(frame_{0}, frame_{1}, point_{0}) = point_{1} \\
                 track(frame_{1}, frame_{0}, point_{1}) = point_{0}' \\
@@ -45,8 +51,8 @@
             \end{gather}
         \paragraph{Filtering Reliable Points}
             At this stage of tracking, we have tracked points with forward-backward error
-            for each point to point correspondences. Besides, forward-backward error, we compute
-            Nearest Normalized Correlation(NCC) for each correspondences as an additional metric.
+            for each \textit{point to point correspondences}. Besides, forward-backward error, we compute
+            Nearest Normalized Correlation(NCC) for each correspondences as an additional metric for filtering.
 
             With these metrics, we compute median value for forward-backward errors and NCC values, and filter out
             the correspondences that has larger fb\textsubscript{error} value than median\textsubscript{fbError} and
@@ -71,13 +77,14 @@
 
         \paragraph{Variance Classifier}
             is, computationally and logically, the simplest stage along the process.
-            For given box, it computes the variance of the intensity values of pixels which are inside of the box and
-            compares the variance value to the initial box. If the variance\textsubscript{box} is less than half of the  variance\textsubscript{initial box}
-            then it is eliminated.
+            For given box, it computes the variance of the pixel's intensity values which are inside of the box and
+            compares the variance value to the initial box. If the variance\textsubscript{box} is less than half of the
+            variance\textsubscript{initial box} then it is eliminated. This process eliminates the boxes from background, so that
+            computationally more complex proceses are not going to applied these patches.
 
         \paragraph{Ensemble Classifier} is the second classifier in the detection process. It has
-            \emph{n} base classifiers which store \emph{m} horizontal and vertical comparisons.
-            Every base classifier make these pixel comparisons and for each comparison it outputs a bit: 1 or 0
+            \emph{n} base classifiers which store \emph{m} horizontal and vertical pixel comparisons.
+            Every base classifier make these comparisons and for each comparison it outputs a bit: 1 or 0
             whether first pixel has higher value than the second.
             \textbf{As a result of all comparisons, on one box, we have an array of bits which has \emph{m} elements.
             Every base classifier stores how many positive and negative boxes which has generated same array of bits.}
