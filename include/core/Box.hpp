@@ -28,7 +28,7 @@ public:
     double variance;
     double overlap;
 
-    Box();
+    Box() {}
     Box(int id, double x1, double y1, double x2, double y2);
 
     Box* move(float dx, float dy);
@@ -78,4 +78,11 @@ public:
         return 0.0;
     }
 };
+
+struct OverlapOrdered {
+  bool operator() (Box* box1, Box* box2) {
+      return box1->overlap >= box2->overlap;
+  }
+};
+
 #endif

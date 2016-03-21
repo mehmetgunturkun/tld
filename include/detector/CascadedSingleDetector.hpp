@@ -6,8 +6,20 @@
 #include "detector/DetectResult.hpp"
 #include "detector/common/TrainingSet.hpp"
 #include "detector/BoxIterator.hpp"
+#include "common/BoundedPriorityQueue.hpp"
 
 class CascadedSingleDetector {
+private:
+    Frame* firstFrame;
+    Box* firstBox;
+
+    double positiveBoxOverlapThreshold;
+    double negativeBoxOverlapThreshold;
+    double varianceThreshold;
+
+    bool isPositive(Box* box);
+    bool isNegative(Box* box);
+
 public:
     void init(Frame* frame, Box* box);
     DetectResult* detect(Frame* frame);

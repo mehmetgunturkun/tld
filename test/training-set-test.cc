@@ -5,7 +5,23 @@
 #include "detector/ScoredBox.hpp"
 #include "detector/common/TrainingSet.hpp"
 
+#include "common/BoundedPriorityQueue.hpp"
+
+
+
 int main(int argc, char** argv) {
+    // std::priority_queue<int> queue;
+    // queue.comp(3,4);
+
+    BoundedPriorityQueue<Box, OverlapOrdered> queue = BoundedPriorityQueue<Box, OverlapOrdered>(3);
+    Box* b1 = new Box();
+    b1->overlap = 0.9;
+
+    Box* b2 = new Box();
+    b2->overlap = 0.1;
+
+    queue += b1;
+    queue += b2;
 
     vector<Box*> initialPositiveSamples;
     vector<Box*> initalNegativeSamples;

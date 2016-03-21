@@ -1,43 +1,48 @@
 #include "detector/CascadedSingleDetector.hpp"
 
-bool isPositive(Box* box) {
-    return true;
+bool CascadedSingleDetector::isPositive(Box* box) {
+    return (box->overlap > positiveBoxOverlapThreshold);
 }
 
-bool isNegative(Box* box) {
-    return true;
+bool CascadedSingleDetector::isNegative(Box* box) {
+    return (box->overlap < negativeBoxOverlapThreshold) && (box->variance > varianceThreshold);
 }
 
 void CascadedSingleDetector::init(Frame* frame, Box* box) {
-    BoundedPriorityQueue<Box*> positiveQueue = new BoundedPriorityQueue<Box*>(size = 10);
-    BoundedPriorityQueue<Box*> negativeQueue = new BoundedPriorityQueue<Box*>();
+    firstFrame = frame;
+    firstBox = box;
 
-    MeanVariance* initialMeanVariance = frame->integral->computeMeanVariance(
-        (int) box->x1,
-        (int) box->y1,
-        (int) box->width,
-        (int) box->height
+    positiveBoxOverlapThreshold = 0.6;
+    negativeBoxOverlapThreshold = 0.2;
+
+    MeanVariance* initialMeanVariance = firstFrame->integral->computeMeanVariance(
+        (int) firstBox->x1,
+        (int) firstBox->y1,
+        (int) firstBox->width,
+        (int) firstBox->height
     );
+    varianceThreshold = initialMeanVariance->variance * 0.5;
 
-    box->mean = initialMeanVariance->mean;
-    box->variance = initialMeanVariance->variance;
 
-    BoxIterator* boxIterator = new BoxIterator(frame, box, 10, 24);
+    BoundedPriorityQueue<Box, OverlapOrdered> positiveQueue = BoundedPriorityQueue<Box, OverlapOrdered>(10);
+    BoundedPriorityQueue<Box, OverlapOrdered> negativeQueue = BoundedPriorityQueue<Box, OverlapOrdered>(INT_MAX);
+
+    BoxIterator* boxIterator = new BoxIterator(firstFrame, firstBox, 10, 24);
     while (boxIterator->hasNext()) {
         Box* sampleBox = boxIterator->next();
 
         //Compute Overlap
-        double overlap = Box::computeOverlap(sampleBox, box);
+        double overlap = Box::computeOverlap(sampleBox, firstBox);
         sampleBox->overlap = overlap;
 
         //Check if positive
-        if (isPositive(box)) {
-            positiveQueue += box;
+        if (isPositive(sampleBox)) {
+            positiveQueue += sampleBox;
             continue;
         }
 
         //Compute Variance
-        MeanVariance* meanVariance = frame->integral->computeMeanVariance(
+        MeanVariance* meanVariance = firstFrame->integral->computeMeanVariance(
             (int) sampleBox->x1,
             (int) sampleBox->y1,
             (int) sampleBox->width,
@@ -48,26 +53,18 @@ void CascadedSingleDetector::init(Frame* frame, Box* box) {
         sampleBox->variance = meanVariance->variance;
 
         //Check if negative
-        if (isNegative(box)) {
+        if (isNegative(sampleBox)) {
             // Add to TrainingSetBuilder as positive
-            negativeQueue += box;
+            negativeQueue += sampleBox;
             continue;
         }
     }
 
     vector<Box*> positiveBoxList4Ensemble = positiveQueue.toVector();
     vector<Box*> negativeBoxList4Ensemble = negativeQueue.toVector();
-    TrainingSet<Box*> trainingSet4Ensemble = new TrainingSet<Box*>(
+    TrainingSet<Box> trainingSet4Ensemble = TrainingSet<Box>(
         positiveBoxList4Ensemble,
         negativeBoxList4Ensemble
-    );
-
-    Box* theClosestBox = positiveQueue.head();
-    vector<Box*> positiveBoxList4NN = { theClosestBox };
-    vector<Box*> negativeBoxList4NN = randomize(negativeBoxList, take = 10);
-    TrainingSet<Box*> trainingSet4NN = new TrainingSet<Box*>(
-        positiveBoxList4NN,
-        negativeBoxList4NN
     );
 }
 

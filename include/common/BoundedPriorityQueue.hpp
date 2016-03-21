@@ -1,6 +1,8 @@
 #ifndef BOUNDED_PRIORITY_QUEUE_H
 #define BOUNDED_PRIORITY_QUEUE_H
 
+#define UNBOUNDED -1
+
 #include <cstdlib>
 #include <cstdio>
 #include <vector>
@@ -26,6 +28,14 @@ public:
                 this->push(item);
             }
         }
+    }
+
+    vector<T*> toVector() {
+        return this->c;
+    }
+
+    T* head() {
+        return this->top();
     }
 };
 #endif
