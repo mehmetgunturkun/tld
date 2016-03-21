@@ -1,5 +1,9 @@
 #include "detector/CascadedSingleDetector.hpp"
 
+CascadedSingleDetector::CascadedSingleDetector() {
+    eClassifier = new EnsembleClassifier();
+}
+
 bool CascadedSingleDetector::isPositive(Box* box) {
     return (box->overlap > positiveBoxOverlapThreshold);
 }
@@ -63,9 +67,12 @@ void CascadedSingleDetector::init(Frame* frame, Box* box) {
     vector<Box*> positiveBoxList4Ensemble = positiveQueue.toVector();
     vector<Box*> negativeBoxList4Ensemble = negativeQueue.toVector();
     TrainingSet<Box> trainingSet4Ensemble = TrainingSet<Box>(
+        frame,
         positiveBoxList4Ensemble,
         negativeBoxList4Ensemble
     );
+
+    eClassifier->init(trainingSet4Ensemble);
 }
 
 DetectResult* CascadedSingleDetector::detect(Frame* frame) {

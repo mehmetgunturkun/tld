@@ -1,9 +1,12 @@
 #ifndef LEAF_H
 #define LEAF_H
 class Leaf {
-public:
     int nrOfPositives;
     int nrOfNegatives;
+public:
     double probability;
+
+    void incrementPositive();
+    void incrementNegative();
 };
 #endif

@@ -7,6 +7,7 @@
 #include "detector/ScoredBox.hpp"
 
 #include "detector/DetectResult.hpp"
+#include "detector/common/TrainingSet.hpp"
 #include "detector/ensemble/PixelComparison.hpp"
 #include "detector/ensemble/BaseClassifier.hpp"
 
@@ -17,7 +18,7 @@ private:
     vector<BaseClassifier*> baseClassifiers;
     int nrOfBaseClassifiers;
     int nrOfPixelComparisons;
-    
+
     double minimumPositiveThreshold;
     string classifierName;
     vector<BaseClassifier*> generateBaseClassifier();
@@ -25,7 +26,7 @@ private:
     vector<BaseClassifier*> shuffleComparisons(vector<PixelComparison*> allComparisons);
 public:
     EnsembleClassifier();
-    void init(Frame* frame, Box* box);
+    void init(TrainingSet<Box> ts);
     bool classify(Frame* frame, ScoredBox* box);
     void update(Frame* frame, Box* box, DetectResult* detectResult);
 };

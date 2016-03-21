@@ -8,6 +8,8 @@
 #include "detector/BoxIterator.hpp"
 #include "common/BoundedPriorityQueue.hpp"
 
+#include "detector/ensemble/EnsembleClassifier.hpp"
+
 class CascadedSingleDetector {
 private:
     Frame* firstFrame;
@@ -20,7 +22,10 @@ private:
     bool isPositive(Box* box);
     bool isNegative(Box* box);
 
+    EnsembleClassifier* eClassifier;
+
 public:
+    CascadedSingleDetector();
     void init(Frame* frame, Box* box);
     DetectResult* detect(Frame* frame);
     double score(Frame* frame, Box* box);

@@ -146,8 +146,22 @@ vector<BaseClassifier*> EnsembleClassifier::shuffleComparisons(vector<PixelCompa
     return classifiers;
 }
 
-void EnsembleClassifier::init(Frame* frame, Box* box) {
-    //TODO NotImplemented
+void EnsembleClassifier::init(TrainingSet<Box> ts) {
+    Frame* frame = ts.frame;
+    for (int bcId = 0; bcId < nrOfBaseClassifiers; bcId++) {
+        BaseClassifier* bc = baseClassifiers[bcId];
+        vector<Box*> positiveSamples = ts.positiveSamples;
+        for (int i = 0; i < ts.nrOfPositiveSamples; i++) {
+            Box* box = positiveSamples[i];
+            bc->init(frame, box, true);
+        }
+
+        vector<Box*> negativeSamples = ts.negativeSamples;
+        for (int i = 0; i < ts.nrOfNegativeSamples; i++) {
+            Box* box = positiveSamples[i];
+            bc->init(frame, box, false);
+        }
+    }
 }
 
 bool EnsembleClassifier::classify(Frame* frame, ScoredBox* scoreBox) {

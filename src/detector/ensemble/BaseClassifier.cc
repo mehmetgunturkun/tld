@@ -30,7 +30,13 @@ double BaseClassifier::getProbability(int binaryCode) {
 }
 
 void BaseClassifier::init(Frame* frame, Box* box, bool label) {
-    //TODO NotImplemented
+    int binaryCode = generateBinaryCode(frame, box);
+    Leaf* leaf = decisionTree[binaryCode];
+    if (label) {
+        leaf->incrementPositive();
+    } else {
+        leaf->incrementNegative();
+    }
 }
 
 void BaseClassifier::update(Frame* frame, ScoredBox* box, bool label) {

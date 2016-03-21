@@ -23,14 +23,16 @@ int main(int argc, char** argv) {
     queue += b1;
     queue += b2;
 
+    Frame* frame = new Frame("resources/test.jpg");
+
     vector<Box*> initialPositiveSamples;
     vector<Box*> initalNegativeSamples;
-    TrainingSet<Box>* initialTs= new TrainingSet<Box>(initialPositiveSamples, initalNegativeSamples);
+    TrainingSet<Box>* initialTs= new TrainingSet<Box>(frame, initialPositiveSamples, initalNegativeSamples);
     printf("There are %d positive, %d negative samples in TrainingSet\n", initialTs->nrOfPositiveSamples, initialTs->nrOfNegativeSamples);
 
     vector<ScoredBox*> positiveSamples;
     vector<ScoredBox*> negativeSamples;
-    TrainingSet<ScoredBox>* ts = new TrainingSet<ScoredBox>(positiveSamples, negativeSamples);
+    TrainingSet<ScoredBox>* ts = new TrainingSet<ScoredBox>(frame, positiveSamples, negativeSamples);
     printf("There are %d positive, %d negative samples in TrainingSet\n", ts->nrOfPositiveSamples, ts->nrOfNegativeSamples);
 
     return EXIT_SUCCESS;
