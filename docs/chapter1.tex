@@ -86,24 +86,33 @@
             \emph{n} base classifiers which store \emph{m} horizontal and vertical pixel comparisons.
             Every base classifier make these comparisons and for each comparison it outputs a bit: 1 or 0
             whether first pixel has higher value than the second.
-            \textbf{As a result of all comparisons, on one box, we have an array of bits which has \emph{m} elements.
-            Every base classifier stores how many positive and negative boxes which has generated same array of bits.}
-
+            \textbf{As a result of all comparisons, on one box, we have an array of bits which has \emph{m} elements.}
+        \paragraph{}
+            Every base classifier stores a table to keep the number of positive and negative boxes
+            for each binary code has been generated so far. When a new sample arrive to be classified,
+            every base classifier, calculates a probability for the sample box by
+            \begin{gather}
+                \#positive / (\#positive + \#negative)
+            \end{gather}
+        \paragraph{}
+            Ensemble Classifier, accumulates every probability from each base classifier and takes the average. This result
+            will be the score of the box. If this score is higher than the positive box threshold than it is classified otherwise
+            it is eliminated.
         \paragraph{Nearest Neighbor Classifier} is the last and, computationally, most intensive stage in the process.
-            An object model, which is simply two lists of bounding boxes that are labelled as positive and negative, is stored
-            within this classifier. When new box come to be classified, it compares the sample with all
+            An object model, which is simply two lists of bounding boxes that are labelled as positive and negative respectively,
+            is stored within this classifier. During the classification, it compares the sample with all
             boxes in positive and negative list and takes the highest normalized cross correlation value from both lists.
-            Divides them and if the score is higher than threshold then sample is classified as positive,
-            otherwise it is eliminated.
+            Computes a relative similarity score and if the score is higher than the threshold then sample is
+            classified as positive, otherwise it is eliminated.
     \section{Integrator (Learner)}
         \paragraph{}
-            Simply, Integrator takes the output of both component Tracker and Detector as input, validates, combines
+            Simply, Integrator takes the output of both component Tracker and Detector, as input, validates, combines
             and generates refined result. These discrete modules already have its own failure reasons
-            and peculiar errors like tracker can shift away from the object, detector also can misclassify some other objects. This is
-            where Integrator step in. It verifies tracker's result by detector. If the box that tracker produced is correlated with the object model
-            then it filters and refines the boxes that detector generated according to the tracker's result.
+            and peculiar errors such as Tracker can shift away from the object, Detector also can misclassify some other objects. This is
+            where Integrator steps in. It verifies tracker's result by detector. If the box, tracker produced, is correlated with the object model
+            then it filters and refines the boxes, detector generated, according to the tracker's result.
 
-            In the light of this brief introduction for learner modules there are four possible situations that integrator should cover:
+            In the light of this brief introduction for integrator module, there are four possible situations it should cover:
             \begin{enumerate}
                 \item Tracker cannot track the box or it is not validated and, also, Detector failed to detect.
                     In this case there is nothing much to proceed, so Integrator simply returns no box as a result.
@@ -119,8 +128,8 @@
                     and only one box that has higher NCC score than the tracker's result. If there is a box that meets these conditions
                     then we re-initialize the tracker with that box and move to next frame.
 
-                    However, if there is box further away from the tracked box and has lower \textbf{similarity???} then this means that
-                    detector misclassified some boxes. To avoid these misclassifications in future images and
+                    However, if there are boxes which are further away from the tracked box and has lower \textbf{similarity score},
+                    then this means that detector misclassified some boxes. To avoid these misclassifications in future frames and
                     make the object model more stable, we set labels of these misclassified boxes to negative,
                     tracked box as positive and update the object model with this training set.
             \end{enumerate}
