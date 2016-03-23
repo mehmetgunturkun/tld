@@ -18,6 +18,7 @@ double ObjectModel::computeRelativeScore(Patch* sample) {
 }
 
 double ObjectModel::computeConservativeScore(Patch* sample) {
+    //TODO NotImplemented
     return 0.0;
 }
 
@@ -42,13 +43,36 @@ double ObjectModel::computeNearestSimilarity(vector<Patch*> templatePatchList, i
 }
 
 double ObjectModel::computeSimilarity(Patch* templatePatch, Patch* samplePatch) {
-    return 0.0;
+    Mat* templateImg = templatePatch->data;
+    Mat* sampleImg = samplePatch->data;
+
+    float corr = 0.0;
+    float normTemplate = 0.0;
+    float normSample = 0.0;
+
+    for (int i = 0; i < Patch::HEIGHT; i++) {
+        for (int j = 0; j < Patch::WIDTH; j++) {
+            float templateVariance = templateImg->at<float>(i,j);
+            float sampleVariance = sampleImg->at<float>(i,j);
+
+            corr += templateVariance*sampleVariance;
+            normTemplate += templateVariance*templateVariance;
+            normSample += sampleVariance*sampleVariance;
+        }
+    }
+
+    float upper = corr;
+    float lower = sqrt(normTemplate * normSample);
+    float ncc = (upper / lower);
+    return 0.5 * (ncc + 1);
 }
 
 void ObjectModel::add(Patch* patch, bool label) {
     if (label) {
         positivePatchList.push_back(patch);
+        nrOfPositivePatches += 1;
     } else {
         negativePatchList.push_back(patch);
+        nrOfNegativePatches += 1;
     }
 }

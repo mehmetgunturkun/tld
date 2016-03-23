@@ -8,12 +8,11 @@
 
 class Patch {
 public:
-    static int WODTH;
+    static int WIDTH;
     static int HEIGHT;
 
-    Patch();
-    Patch(int* data);
+    Patch(Mat* data);
     Patch(Frame* frame, Box* box);
-    int* data;
+    Mat* data;
 };
 #endif

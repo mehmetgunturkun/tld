@@ -5,6 +5,8 @@
 #include <vector>
 #include <sstream>
 
+#include <unordered_map>
+
 using namespace std;
 
 class Vehicle {
@@ -41,6 +43,14 @@ public:
     }
 };
 
+
+class ClassificationDetails {};
+
+class EnsembleClassifierDetails: public ClassificationDetails {
+public:
+    int binaryCode;
+};
+
 int main(int argc, char** argv) {
     vector<Vehicle*> vehicles;
 
@@ -55,6 +65,15 @@ int main(int argc, char** argv) {
         string vehicleString = vehicle->toString();
         printf("This vehicle is %s\n", vehicleString.c_str());
     }
+
+    unordered_map<string, ClassificationDetails*> detailMap;
+
+    EnsembleClassifierDetails* ensembleDetails = new EnsembleClassifierDetails();
+    ensembleDetails->binaryCode = 6870;
+
+    ClassificationDetails* detailRet = detailMap["ensemble"] = ensembleDetails;
+    EnsembleClassifierDetails* ensembleDetailsRet = (EnsembleClassifierDetails*) detailRet;
+    printf("BC: %d\n", ensembleDetailsRet->binaryCode);
 
     return 0;
 }
