@@ -37,6 +37,9 @@ lib2_sources := \
 	src/detector/ensemble/PixelComparison.cc \
 	src/detector/ensemble/BaseClassifier.cc \
 	src/detector/ensemble/EnsembleClassifier.cc \
+	src/detector/nn/Patch.cc \
+	src/detector/nn/ObjectModel.cc \
+	src/detector/nn/NearestNeighborClassifier.cc \
 	src/detector/CascadedSingleDetector.cc \
 	src/tld/TrackResult.cc \
 	src/tld/TLD.cc

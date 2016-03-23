@@ -164,17 +164,22 @@ void EnsembleClassifier::init(TrainingSet<Box> ts) {
     }
 }
 
-bool EnsembleClassifier::classify(Frame* frame, ScoredBox* scoreBox) {
+double EnsembleClassifier::score(Frame* frame, Box* box) {
     double score = 0.0;
-    Box* box = scoreBox->box;
     for (int i = 0; i < nrOfBaseClassifiers; i++) {
         BaseClassifier* bc = baseClassifiers[i];
         score += bc->score(frame, box);
     }
+    return score > minimumPositiveThreshold;
+}
+
+bool EnsembleClassifier::classify(Frame* frame, ScoredBox* scoreBox) {
+    Box* box = scoreBox->box;
+    double score = this->score(frame, box);
     scoreBox->withScore(classifierName, score);
     return score > minimumPositiveThreshold;
 }
 
-void EnsembleClassifier::update(Frame* frame, Box* box, DetectResult* detectResult) {
+void EnsembleClassifier::update(TrainingSet<ScoredBox> ts) {
     //TODO NotImplemented
 }

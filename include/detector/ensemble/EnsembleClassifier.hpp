@@ -28,7 +28,8 @@ public:
     EnsembleClassifier();
     void init(TrainingSet<Box> ts);
     bool classify(Frame* frame, ScoredBox* box);
-    void update(Frame* frame, Box* box, DetectResult* detectResult);
+    double score(Frame* frame, Box* box);
+    void update(TrainingSet<ScoredBox> ts);
 };
 
 #endif

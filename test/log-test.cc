@@ -28,6 +28,18 @@ int main(int argc, char** argv) {
     period = Log::stopTimer("test100M");
     printf("Period => %g\n", period);
 
+
+    bool flag = false;
+
+    switch (flag) {
+        case true:
+            printf("True\n");
+            break;
+        case false:
+            printf("False\n");
+            break;
+    }
+
     Log::finalize();
     return 0;
 }
