@@ -6,12 +6,14 @@
 #include "detector/common/TrainingSet.hpp"
 
 #include "common/BoundedPriorityQueue.hpp"
-
+#include "util/Util.h"
 
 
 int main(int argc, char** argv) {
     // std::priority_queue<int> queue;
     // queue.comp(3,4);
+
+    println("Hello World!");
 
     BoundedPriorityQueue<Box, OverlapOrdered> queue = BoundedPriorityQueue<Box, OverlapOrdered>(3);
     Box* b1 = new Box();

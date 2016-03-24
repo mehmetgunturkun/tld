@@ -2,7 +2,7 @@
 #define TRAINING_SET_H
 #include <stddef.h>
 #include <vector>
-
+#include "util/Util.h"
 #include "core/Frame.hpp"
 
 using namespace std;
