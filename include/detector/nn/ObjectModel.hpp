@@ -7,6 +7,12 @@
 using namespace std;
 
 class ObjectModel {
+private:
+    double computeInitialPositiveSimilarity(Patch* sample);
+    double computePositiveSimilarity(Patch* sample);
+    double computeNegativeSimilarity(Patch* sample);
+    double computeNearestSimilarity(vector<Patch*> templatePatchList, int size, Patch* sample);
+    double computeSimilarity(Patch* templatePatch, Patch* samplePatch);
 public:
     int nrOfPositivePatches;
     vector<Patch*> positivePatchList;
@@ -18,10 +24,6 @@ public:
     double computeRelativeScore(Patch* sample);
     double computeConservativeScore(Patch* sample);
 
-    double computePositiveSimilarity(Patch* sample);
-    double computeNegativeSimilarity(Patch* sample);
-    double computeNearestSimilarity(vector<Patch*> templatePatchList, int size, Patch* sample);
-    double computeSimilarity(Patch* templatePatch, Patch* samplePatch);
 
     void add(Patch* patch, bool label);
 };

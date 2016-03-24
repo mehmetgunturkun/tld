@@ -18,8 +18,19 @@ double ObjectModel::computeRelativeScore(Patch* sample) {
 }
 
 double ObjectModel::computeConservativeScore(Patch* sample) {
-    //TODO NotImplemented
-    return 0.0;
+    double positiveNNSimilarity = computeInitialPositiveSimilarity(sample);
+    double negativeNNSimilarity = computeNegativeSimilarity(sample);
+
+    if ( positiveNNSimilarity == 0 && negativeNNSimilarity == 0) {
+        return 0.0;
+    } else {
+        double sim  = (negativeNNSimilarity / (positiveNNSimilarity + negativeNNSimilarity));
+        return sim;
+    }
+}
+
+double ObjectModel::computeInitialPositiveSimilarity(Patch* sample) {
+    return computeNearestSimilarity(positivePatchList, nrOfPositivePatches / 2, sample);
 }
 
 double ObjectModel::computePositiveSimilarity(Patch* sample) {
