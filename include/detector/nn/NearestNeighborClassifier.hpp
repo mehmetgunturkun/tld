@@ -3,7 +3,7 @@
 
 #include "core/Frame.hpp"
 #include "core/Box.hpp"
-#include "detector/ScoredBox.hpp"
+#include "detector/common/ScoredBox.hpp"
 #include "detector/common/TrainingSet.hpp"
 #include "detector/nn/Patch.hpp"
 #include "detector/nn/ObjectModel.hpp"

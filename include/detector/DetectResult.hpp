@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "core/Box.hpp"
-#include "detector/ScoredBox.hpp"
+#include "detector/common/ScoredBox.hpp"
 
 using namespace std;
 

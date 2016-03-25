@@ -5,7 +5,7 @@
 
 #include "core/Frame.hpp"
 #include "core/Box.hpp"
-#include "detector/ScoredBox.hpp"
+#include "detector/common/ScoredBox.hpp"
 
 #include "tld/TrackResult.hpp"
 #include "tracker/Tracker.hpp"

@@ -4,7 +4,7 @@
 #include "util/Random.hpp"
 #include "core/Frame.hpp"
 #include "core/Box.hpp"
-#include "detector/ScoredBox.hpp"
+#include "detector/common/ScoredBox.hpp"
 
 #include "detector/DetectResult.hpp"
 #include "detector/common/TrainingSet.hpp"

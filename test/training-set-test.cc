@@ -2,7 +2,7 @@
 #include <cstdio>
 
 #include "core/Box.hpp"
-#include "detector/ScoredBox.hpp"
+#include "detector/common/ScoredBox.hpp"
 #include "detector/common/TrainingSet.hpp"
 
 #include "common/BoundedPriorityQueue.hpp"

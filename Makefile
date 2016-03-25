@@ -30,7 +30,7 @@ lib2_sources := \
 	src/tracker/Flow.cc \
 	src/tracker/FBFlow.cc \
 	src/tracker/Tracker.cc \
-	src/detector/ScoredBox.cc \
+	src/detector/common/ScoredBox.cc \
 	src/detector/DetectResult.cc \
 	src/detector/BoxIterator.cc \
 	src/detector/variance/VarianceClassifier.cc \

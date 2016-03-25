@@ -3,7 +3,7 @@
 
 #include "common/Option.hpp"
 #include "core/Box.hpp"
-#include "detector/ScoredBox.hpp"
+#include "detector/common/ScoredBox.hpp"
 
 class TrackResult {
 public:
