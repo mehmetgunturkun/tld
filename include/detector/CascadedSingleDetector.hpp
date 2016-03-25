@@ -28,7 +28,7 @@ public:
     CascadedSingleDetector();
     void init(Frame* frame, Box* box);
     DetectResult* detect(Frame* frame);
-    double score(Frame* frame, Box* box);
+    ClassificationDetails* score(Frame* frame, Box* box);
     void learn(Frame* frame, Box* box, DetectResult* detectResult);
 };
 #endif

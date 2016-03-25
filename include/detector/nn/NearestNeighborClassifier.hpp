@@ -6,6 +6,7 @@
 #include "detector/common/ScoredBox.hpp"
 #include "detector/training/TrainingSet.hpp"
 #include "detector/nn/Patch.hpp"
+#include "detector/nn/NNClassificationDetails.hpp"
 #include "detector/nn/ObjectModel.hpp"
 
 class NearestNeighborClassifier {

@@ -15,14 +15,15 @@ private:
     vector<PixelComparison*> pixelComparisons;
     int nrOfComparisons;
     vector<Leaf*> decisionTree;
-
-    int generateBinaryCode(Frame* frame, Box* box);
-    double getProbability(int binaryCode);
 public:
+    int id;
     BaseClassifier(vector<PixelComparison*> comparisons);
     void init(Frame* frame, Box* box, bool label);
     double score(Frame* frame, Box* box);
     void update(Frame* frame, ScoredBox* box, bool label);
+
+    int generateBinaryCode(Frame* frame, Box* box);
+    double getProbability(int binaryCode);
 };
 
 #endif

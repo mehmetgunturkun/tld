@@ -8,6 +8,7 @@
 
 #include "detector/DetectResult.hpp"
 #include "detector/training/TrainingSet.hpp"
+#include "detector/ensemble/EnsembleClassificationDetails.hpp"
 #include "detector/ensemble/PixelComparison.hpp"
 #include "detector/ensemble/BaseClassifier.hpp"
 
@@ -28,7 +29,7 @@ public:
     EnsembleClassifier();
     void init(TrainingSet<Box> ts);
     bool classify(Frame* frame, ScoredBox* box);
-    double score(Frame* frame, Box* box);
+    EnsembleClassificationDetails* score(Frame* frame, Box* box);
     void update(TrainingSet<ScoredBox> ts);
 };
 

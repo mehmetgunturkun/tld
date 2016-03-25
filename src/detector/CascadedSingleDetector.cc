@@ -80,8 +80,9 @@ DetectResult* CascadedSingleDetector::detect(Frame* frame) {
     return detectResult;
 }
 
-double CascadedSingleDetector::score(Frame* frame, Box* box) {
-    return 0.0;
+ClassificationDetails* CascadedSingleDetector::score(Frame* frame, Box* box) {
+    ClassificationDetails* detail = new ClassificationDetails();
+    return detail;
 }
 
 void CascadedSingleDetector::learn(Frame* frame, Box* box, DetectResult* detectResult) {

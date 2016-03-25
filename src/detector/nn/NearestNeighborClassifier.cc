@@ -27,7 +27,8 @@ bool NearestNeighborClassifier::classify(Frame* frame, ScoredBox* scoredBox) {
     Box* box = scoredBox->box;
     Patch* sample = new Patch(frame, box);
     double score = model->computeRelativeScore(sample);
-    scoredBox->withScore("UNDEFINED", score);
+    NNClassificationDetails* detail = new NNClassificationDetails(sample, score);
+    scoredBox->withScore("UNDEFINED", detail);
     return score > minimumPositiveThreshold;
 }
 

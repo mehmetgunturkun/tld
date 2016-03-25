@@ -164,20 +164,23 @@ void EnsembleClassifier::init(TrainingSet<Box> ts) {
     }
 }
 
-double EnsembleClassifier::score(Frame* frame, Box* box) {
-    double score = 0.0;
+
+EnsembleClassificationDetails* EnsembleClassifier::score(Frame* frame, Box* box) {
+    EnsembleClassificationDetails* detail = new EnsembleClassificationDetails();
     for (int i = 0; i < nrOfBaseClassifiers; i++) {
         BaseClassifier* bc = baseClassifiers[i];
-        score += bc->score(frame, box);
+        int binaryCode = bc->generateBinaryCode(frame, box);
+        double bcScore = bc->getProbability(binaryCode);
+        detail->add(bc->id, binaryCode, bcScore);
     }
-    return score > minimumPositiveThreshold;
+    return detail;
 }
 
 bool EnsembleClassifier::classify(Frame* frame, ScoredBox* scoreBox) {
     Box* box = scoreBox->box;
-    double score = this->score(frame, box);
-    scoreBox->withScore(classifierName, score);
-    return score > minimumPositiveThreshold;
+    EnsembleClassificationDetails* detail = this->score(frame, box);
+    scoreBox->withScore("UNDEFINED", detail);
+    return detail->score > minimumPositiveThreshold;
 }
 
 void EnsembleClassifier::update(TrainingSet<ScoredBox> ts) {

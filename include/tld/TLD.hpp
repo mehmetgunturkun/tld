@@ -9,7 +9,9 @@
 
 #include "tld/TrackResult.hpp"
 #include "tracker/Tracker.hpp"
+#include "detector/nn/NNClassificationDetails.hpp"
 #include "detector/CascadedSingleDetector.hpp"
+
 
 using namespace std;
 

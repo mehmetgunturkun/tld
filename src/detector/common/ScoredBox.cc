@@ -4,4 +4,4 @@ ScoredBox::ScoredBox(Box* _box) {
     box = _box;
 }
 
-void ScoredBox::withScore(string scorerKey, double score) {}
+void ScoredBox::withScore(string scorerKey, ClassificationDetails* detail) {}

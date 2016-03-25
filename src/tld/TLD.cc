@@ -32,11 +32,11 @@ TrackResult* TLD::validate(Frame* current, Option<Box>* maybeBox) {
         return TrackResult::empty;
     } else {
         Box* box = maybeBox->get();
-        double score = detector->score(current, box);
-        if (score > MIN_VALIDATION_SCORE) {
+        ClassificationDetails* detail = detector->score(current, box);
+        if (detail->score > MIN_VALIDATION_SCORE) {
             //TODO Define appropriate key instead of UNDEFINED
             ScoredBox* scoredBox = new ScoredBox(box);
-            scoredBox->withScore("UNDEFINED", score);
+            scoredBox->withScore("UNDEFINED", detail);
             TrackResult* trackResult = new TrackResult(scoredBox);
             return trackResult;
         } else {
