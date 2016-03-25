@@ -7,7 +7,7 @@
 #include "detector/common/ScoredBox.hpp"
 
 #include "detector/DetectResult.hpp"
-#include "detector/common/TrainingSet.hpp"
+#include "detector/training/TrainingSet.hpp"
 #include "detector/ensemble/PixelComparison.hpp"
 #include "detector/ensemble/BaseClassifier.hpp"
 

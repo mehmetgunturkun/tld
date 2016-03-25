@@ -3,7 +3,7 @@
 
 #include "core/Box.hpp"
 #include "detector/common/ScoredBox.hpp"
-#include "detector/common/TrainingSet.hpp"
+#include "detector/training/TrainingSet.hpp"
 
 #include "common/BoundedPriorityQueue.hpp"
 #include "util/Util.h"

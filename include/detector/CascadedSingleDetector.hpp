@@ -4,7 +4,7 @@
 #include "core/Frame.hpp"
 #include "core/Box.hpp"
 #include "detector/DetectResult.hpp"
-#include "detector/common/TrainingSet.hpp"
+#include "detector/training/TrainingSet.hpp"
 #include "detector/BoxIterator.hpp"
 #include "common/BoundedPriorityQueue.hpp"
 
