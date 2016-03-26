@@ -2,6 +2,7 @@
 
 CascadedSingleDetector::CascadedSingleDetector() {
     eClassifier = new EnsembleClassifier();
+    nnClassifier = new NearestNeighborClassifier();
 }
 
 bool CascadedSingleDetector::isPositive(Box* box) {
@@ -71,8 +72,18 @@ void CascadedSingleDetector::init(Frame* frame, Box* box) {
         positiveBoxList4Ensemble,
         negativeBoxList4Ensemble
     );
-
     eClassifier->init(trainingSet4Ensemble);
+
+
+    vector<Box*> positiveBoxList4NN = { positiveQueue.head() };
+    vector<Box*> negativeBoxList4NN = Random::randomSample(negativeBoxList4Ensemble, 10);
+    TrainingSet<Box> trainingSet4NN = TrainingSet<Box>(
+        frame,
+        positiveBoxList4NN,
+        negativeBoxList4NN
+    );
+
+    nnClassifier->init(trainingSet4NN);
 }
 
 DetectResult* CascadedSingleDetector::detect(Frame* frame) {
@@ -86,5 +97,55 @@ ClassificationDetails* CascadedSingleDetector::score(Frame* frame, Box* box) {
 }
 
 void CascadedSingleDetector::learn(Frame* frame, Box* box, DetectResult* detectResult) {
-    throw "NotImplemented!";
+    vector<ScoredBox*> grid = detectResult->all;
+
+    BoundedPriorityQueue<ScoredBox, ScoredBoxOverlapOrdered> positiveQueue =
+        BoundedPriorityQueue<ScoredBox, ScoredBoxOverlapOrdered>(10);
+
+    BoundedPriorityQueue<ScoredBox, ScoredBoxOverlapOrdered> negativeQueue =
+        BoundedPriorityQueue<ScoredBox, ScoredBoxOverlapOrdered>(INT_MAX);
+
+    BoundedPriorityQueue<ScoredBox, ScoredBoxOverlapOrdered> negativeQueue4NN =
+        BoundedPriorityQueue<ScoredBox, ScoredBoxOverlapOrdered>(INT_MAX);
+
+    for (int i = 0; i < detectResult->allSize; i++) {
+        ScoredBox* sample = grid[i];
+
+        //Compute Overlap
+        Box* sampleBox = sample->box;
+        double overlap = Box::computeOverlap(sampleBox, firstBox);
+        sampleBox->overlap = overlap;
+
+        if (isPositive(sample->box)) {
+            positiveQueue += sample;
+            continue;
+        }
+
+        if (isNegative(sample->box) && sample->getScore("ensemble") >= 1) {
+            negativeQueue += sample;
+        }
+
+        if (sample->isDetected && sampleBox->overlap < 0.2) {
+            negativeQueue4NN += sample;
+        }
+    }
+
+    vector<ScoredBox*> positiveBoxList4Ensemble = positiveQueue.toVector();
+    vector<ScoredBox*> negativeBoxList4Ensemble = negativeQueue.toVector();
+    TrainingSet<ScoredBox> trainingSet4Ensemble = TrainingSet<ScoredBox>(
+        frame,
+        positiveBoxList4Ensemble,
+        negativeBoxList4Ensemble
+    );
+
+    eClassifier->update(trainingSet4Ensemble);
+
+    vector<ScoredBox*> positiveBoxList4NN = { positiveQueue.head() };
+    vector<ScoredBox*> negativeBoxList4NN = negativeQueue4NN.toVector();
+    TrainingSet<ScoredBox> trainingSet4NN = TrainingSet<ScoredBox>(
+        frame,
+        positiveBoxList4NN,
+        negativeBoxList4NN
+    );
+    nnClassifier->update(trainingSet4NN);
 }

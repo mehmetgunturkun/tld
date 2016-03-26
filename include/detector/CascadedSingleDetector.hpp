@@ -9,6 +9,7 @@
 #include "common/BoundedPriorityQueue.hpp"
 
 #include "detector/ensemble/EnsembleClassifier.hpp"
+#include "detector/nn/NearestNeighborClassifier.hpp"
 
 class CascadedSingleDetector {
 private:
@@ -23,7 +24,7 @@ private:
     bool isNegative(Box* box);
 
     EnsembleClassifier* eClassifier;
-
+    NearestNeighborClassifier* nnClassifier;
 public:
     CascadedSingleDetector();
     void init(Frame* frame, Box* box);

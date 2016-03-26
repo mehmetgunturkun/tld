@@ -7,6 +7,7 @@
 
 #include "detector/ensemble/Leaf.hpp"
 #include "detector/ensemble/PixelComparison.hpp"
+#include "detector/ensemble/EnsembleClassificationDetails.hpp"
 
 using namespace std;
 

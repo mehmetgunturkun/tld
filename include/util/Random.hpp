@@ -156,5 +156,10 @@ public:
         }
         return indexes;
     }
+
+    template <class T>
+    static vector<T> randomSample(vector<T> vector, int portion) {
+        return vector;
+    }
 };
 #endif

@@ -184,5 +184,19 @@ bool EnsembleClassifier::classify(Frame* frame, ScoredBox* scoreBox) {
 }
 
 void EnsembleClassifier::update(TrainingSet<ScoredBox> ts) {
-    //TODO NotImplemented
+    Frame* frame = ts.frame;
+    for (int bcId = 0; bcId < nrOfBaseClassifiers; bcId++) {
+        BaseClassifier* bc = baseClassifiers[bcId];
+        vector<ScoredBox*> positiveSamples = ts.positiveSamples;
+        for (int i = 0; i < ts.nrOfPositiveSamples; i++) {
+            ScoredBox* scoredBox = positiveSamples[i];
+            bc->update(frame, scoredBox, true);
+        }
+
+        vector<ScoredBox*> negativeSamples = ts.negativeSamples;
+        for (int i = 0; i < ts.nrOfNegativeSamples; i++) {
+            ScoredBox* scoredBox = positiveSamples[i];
+            bc->update(frame, scoredBox, true);
+        }
+    }
 }

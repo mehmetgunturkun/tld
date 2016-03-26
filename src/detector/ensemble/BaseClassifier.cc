@@ -40,5 +40,16 @@ void BaseClassifier::init(Frame* frame, Box* box, bool label) {
 }
 
 void BaseClassifier::update(Frame* frame, ScoredBox* box, bool label) {
-    //TODO NotImplemented
+    EnsembleClassificationDetails* detail = (EnsembleClassificationDetails*) box->getDetail("ensemble");
+    int binaryCode = detail->getBinaryCode(this->id);
+    double score = getProbability(binaryCode);
+    if (label == true && score < 0.8) {
+        Leaf* leaf = decisionTree[binaryCode];
+        leaf->incrementPositive();
+    }
+
+    if (label == false && score > 0.5) {
+        Leaf* leaf = decisionTree[binaryCode];
+        leaf->incrementNegative();
+    }
 }
