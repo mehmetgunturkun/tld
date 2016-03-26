@@ -1,6 +1,10 @@
 #ifndef CLUSTER_H
 #define CLUSTER_H
 
+#include <vector>
+#include <deque>
+#include <unordered_map>
+
 using namespace std;
 
 class Distance {
@@ -23,11 +27,10 @@ public:
     int size;
     vector<int> pointList;
 
-    Cluster(int groupId);
+    Cluster(int gId);
 
     void add(int point);
     Cluster* merge(Cluster* other);
-
 
     static int getId() {
         gId += 1;
@@ -59,9 +62,10 @@ public:
 
                 if (c0->groupId != c1->groupId) {
                     Cluster* c3 = c0->merge(c1);
-                    clusterIndex[c3->groupId] = c3;
+
                     clusterIndex.erase(c0->groupId);
                     clusterIndex.erase(c1->groupId);
+                    clusterIndex[c3->groupId] = c3;
 
                     for (int i = 0; i < c3->size; i++) {
                         int pid = c3->pointList[i];

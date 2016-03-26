@@ -27,6 +27,7 @@ lib2_sources := \
 	src/util/Dataset.cc \
 	src/util/Log.cc \
 	src/util/Random.cc \
+	src/util/Cluster.cc \
 	src/tracker/Flow.cc \
 	src/tracker/FBFlow.cc \
 	src/tracker/Tracker.cc \
