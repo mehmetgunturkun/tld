@@ -8,7 +8,6 @@
 #include "common/BoundedPriorityQueue.hpp"
 #include "util/Util.h"
 
-
 int main(int argc, char** argv) {
     // std::priority_queue<int> queue;
     // queue.comp(3,4);
