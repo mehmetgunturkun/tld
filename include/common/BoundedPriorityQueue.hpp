@@ -11,8 +11,8 @@
 template <class T, class V>
 class BoundedPriorityQueue: public std::priority_queue<T*, vector<T*>, V> {
     int limit;
-    int size;
 public:
+    int size;
     BoundedPriorityQueue(int l) {
         limit = l;
         size = 0;

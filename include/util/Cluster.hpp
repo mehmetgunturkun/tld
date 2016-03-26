@@ -37,13 +37,11 @@ public:
         return gId;
     }
 
-    static vector<Cluster*> build(deque<Distance*> distances, double maximumDistance) {
+    static vector<Cluster*> build(vector<Distance*> distances, int nrOfDistances, double maximumDistance) {
         unordered_map<int, Cluster*> index;
         unordered_map<int, Cluster*> clusterIndex;
-
-        while (distances.size() > 0) {
-            Distance* distance = distances.front();
-            distances.pop_front();
+        for (int i = 0; i < nrOfDistances; i++) {
+            Distance* distance = distances[i];
 
             if (distance->value > maximumDistance) {
                 break;
