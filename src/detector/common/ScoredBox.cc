@@ -6,3 +6,7 @@ ScoredBox::ScoredBox(Box* _box) {
 }
 
 void ScoredBox::withScore(string scorerKey, ClassificationDetails* detail) {}
+
+void merge(ScoredBox* other) {
+
+}
