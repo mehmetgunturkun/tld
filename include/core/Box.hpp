@@ -77,6 +77,16 @@ public:
     static double computeOverlap(Box* b1, Box* b2) {
         return 0.0;
     }
+
+    static Box* merge(Box* b0, Box* b1) {
+        double x1 = (b0->x1 + b1->x1) / 2;
+        double y1 = (b0->y1 + b1->y1) / 2;
+        double x2 = (b0->x2 + b1->x2) / 2;
+        double y2 = (b0->y2 + b1->y2) / 2;
+
+        Box* meanBox = new Box(0, x1, y1, x2, y2);
+        return meanBox;
+    }
 };
 
 struct OverlapOrdered {

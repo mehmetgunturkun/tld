@@ -4,5 +4,6 @@
 class ClassificationDetails {
 public:
     double score;
+    ClassificationDetails* merge(ClassificationDetails* other);
 };
 #endif
