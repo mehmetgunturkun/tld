@@ -5,6 +5,8 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/video/tracking.hpp"
 
+#include "util/Random.hpp"
+#include "util/Util.h"
 using namespace std;
 using namespace cv;
 
@@ -24,7 +26,7 @@ public:
 
     static void imshow(string title, Mat* image, int delay = 0) {
         cv::imshow(title, *image);
-        cv::waitKey(0);
+        cv::waitKey(delay);
     }
 
     static Mat* rgb2gray(Mat* image) {
@@ -59,6 +61,38 @@ public:
             withDerivatives
         );
         return pyramid;
+    }
+
+    static Mat* warp(
+        Mat* img,
+        double shiftX,
+        double shiftY,
+        double angle,
+        double scale) {
+            int width = img->cols;
+            int height = img->rows;
+            Mat* dest = new Mat(img->clone());
+            Point center = Point(width / 2, height / 2);
+
+            double s = 1 - scale * (Random::randomFloat() - 0.5);
+
+            double tx = shiftX * width * (Random::randomFloat() - 0.5);
+            double ty = shiftY * height * (Random::randomFloat() - 0.5);
+
+            double a = (double) angle * ( Random::randomFloat() - 0.5);
+            Mat rotMat = getRotationMatrix2D(center, a, 1.0);
+            Mat H = Mat::zeros(2, 3, CV_64F);
+
+            H.at<double>(0, 0) = s * rotMat.at<double>(0, 0);
+            H.at<double>(0, 1) = rotMat.at<double>(0, 1);
+            H.at<double>(0, 2) = tx + rotMat.at<double>(0, 2);
+
+            H.at<double>(1, 0) = rotMat.at<double>(1, 0);
+            H.at<double>(1, 1) = s * rotMat.at<double>(1, 1);
+            H.at<double>(1, 2) = ty + rotMat.at<double>(1, 2);
+
+            cv::warpAffine(*img, *dest, H, dest->size());
+            return dest;
     }
 };
 #endif

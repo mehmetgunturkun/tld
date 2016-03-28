@@ -7,52 +7,63 @@
 \usepackage{fixltx2e}
 \usepackage{hyperref}
 
+\newcommand{\Tracker}{Tracker}
+\newcommand{\Detector}{Detector}
+\newcommand{\Integrator}{Integrator}
+\newcommand{\initialbox}{$ box_{initial} $}
+
+
 \begin{document}
     % \chapter{Introduction}
+    % TODO
     % \label{chap:Introduction}
     %
     % \chapter{Related Work}
+    % TODO
     % \label{chap:Related Work}
 
-    \chapter{TLD Approach}
+    \chapter{Tracking Learning Detection Approach}
     \paragraph{}
-        TLD implementation is based on three main modules such as: Tracker, Detector and Learner (Integrator).
-        As an input, user gives a sequence of images and an initial box that contains an object of interest.
-        Tracker tracks the initial box from frame to frame and Detector finds the candidate boxes containing the object. They both
-        run independently and halt with possible individual errors. However, Integrator
-        evaluate two separate results from Tracker and Detector, validates tracked box, combines with detected boxes
-        and generates a reasonable result.
-        Besides, it sends feedback to Detector in order to rule out false positives
-        and false negatives if necessary to make model more robust.
-        With this approach, it eliminates tracker's shift error by validation from Detector and uses Tracker
-        to make Detector learn new instances of object and avoid misclassification in further frames and .
-        This is why as long as the TLD tracks the object, learns more and more about it.
+        TLD is based on three main modules: \Tracker, \Detector and \Integrator.
+        As an input, takes a sequence $ frame_{i} = \{ frame_{0}, frame_{1}, ..., frame_{n} \}$ of images
+        and an initial box, \initialbox, that contains an object of interest.
+        \Tracker tracks the initial box from frame to frame and \Detector finds the candidate boxes containing the object.
+        They both run independently and halt with possible individual errors. However, Integrator
+        evaluate two separate results from \Tracker and \Detector, validates the tracked box, combines with detected boxes
+        and generates more accurate box.
+        Additionally, it sends feedback to the \Detector in order to rule out false positives and false negatives
+        if necessary to make model more robust.
+        With this approach, it eliminates \Tracker's drift error by validation from \Detector and uses \Tracker
+        to make \Detector learn new instances of object. Therefore, it avoids misclassification in further frames.
+        This is why as long as TLD tracks the object, learns more and more about it.
     \section{Tracker}
         \paragraph{}
-            Tracker, takes two consequtive frames (frame\textsubscript{0}, frame\textsubscript{1})
+            \Tracker takes two consequtive frames (frame\textsubscript{0}, frame\textsubscript{1})
             and a bounding box (box\textsubscript{0}), containing the target object within frame\textsubscript{0}.
-            Tracker's main task is to estimate the location of the bounding box in the second frame (box\textsubscript{0})
-            or to decide whether the target object is still visible. Basically, tracker generates points in the given
-            bounding box, tracks each point from first frame to second frame, filter the reliable ones and estimates
+            \Tracker's main task is to estimate the location of the bounding box in the second frame (box\textsubscript{1})
+            or to decide whether the target object is still visible. Basically, \Tracker generates points in the given
+            bounding box, tracks each point from first frame to second frame, filters the reliable ones and estimates
             the displacement of the box with these points.
         \paragraph{Point Generation}
             In order to generate points in the given box, we divide the box into equal
-            parts in both directions: x and y. Every corner that horizontal and vertical stripes meet, we generate
-            new point. For example if we divide the box into m parts horizontally and n parts vertically, as a result,
-            we have \textit{mxn} points
+            parts in both directions: x and y. At every corner that horizontal and vertical stripes meet, we generate
+            new point. For example if we divide the box into $m$ parts horizontally and $n$ parts vertically, as a result,
+            we have $m \times n$ points
         \paragraph{Point Tracking}
-            TLD uses Pyramidal Lucas-Kanade tracker, which is already implemented in OpenCV, to track points from frame
+            TLD uses Pyramidal Lucas-Kanade Tracker, which is already implemented in OpenCV, to track points from frame
             to frame. However, Lucas-Kanade Tracker, tracks the points only in one direction. To be more robust,
-            we track backward either and calculate the forward-backward error.
+            we also track backward and calculate the forward-backward error.
             \begin{gather}
-                track(frame_{0}, frame_{1}, point_{0}) = point_{1} \\
-                track(frame_{1}, frame_{0}, point_{1}) = point_{0}' \\
-                fb_{error} = euclidianDistance(point_{0}, point_{0}')
+                track(f_{0}, f_{1}, p_{0}) = p_{1} \\
+                track(f_{1}, f_{0}, p_{1}) = p_{0}' \\
+                E_{fb} = EuclidianDistance(p_{0}, p_{0}')
+                % f_{i} is the frame with index i
+                % p_{i} is the point on the frame with index i
             \end{gather}
         \paragraph{Filtering Reliable Points}
             At this stage of tracking, we have tracked points with forward-backward error
             for each \textit{point to point correspondences}. Besides, forward-backward error, we compute
-            Nearest Normalized Correlation(NCC) for each correspondences as an additional metric for filtering.
+            Normalized Cross Correlation(NCC) for each correspondences as an additional metric for filtering.
 
             With these metrics, we compute median value for forward-backward errors and NCC values, and filter out
             the correspondences that has larger fb\textsubscript{error} value than median\textsubscript{fbError} and
@@ -69,18 +80,18 @@
             \end{gather}
     \section{Detector}
         \paragraph{}
-            Detector's main job is to identify candidate boxes that possibly contain the object. In order to find
-            object instance(s) in the given frame, initially, detector generates boxes by sliding window in different sizes,
+            \Detector's main job is to identify candidate boxes that possibly contain the object. In order to find
+            object instance(s) in the given frame, initially, \Detector generates boxes by sliding windows in different sizes,
             along the image. After that, for each box, it is need to be decided whether there is an instance of the object or not.
-            This part of the process is basically a classification problem. Detector solves this problem in those stages:
+            This part of the process is basically a classification problem. \Detector solves this problem in these stages:
             \textbf{Variance Classifier}, \textbf{Ensemble Classifier} and \textbf{Nearest Neighbour Classifier}.
 
         \paragraph{Variance Classifier}
             is, computationally and logically, the simplest stage along the process.
-            For given box, it computes the variance of the pixel's intensity values which are inside of the box and
-            compares the variance value to the initial box. If the variance\textsubscript{box} is less than half of the
-            variance\textsubscript{initial box} then it is eliminated. This process eliminates the boxes from background, so that
-            computationally more complex proceses are not going to applied these patches.
+            For given box, $box_{i}$, it computes the variance of the pixel's intensity values which are inside of the box and
+            compares the variance value to var(\initialbox). If the var($box_{i}$) is less than half of the
+            var(\initialbox) then it is eliminated. This process eliminates the boxes from background, so that
+            computationally more complex proceses are not going to be applied to these patches.
 
         \paragraph{Ensemble Classifier} is the second classifier in the detection process. It has
             \emph{n} base classifiers which store \emph{m} horizontal and vertical pixel comparisons.
@@ -106,30 +117,33 @@
             classified as positive, otherwise it is eliminated.
     \section{Integrator (Learner)}
         \paragraph{}
-            Simply, Integrator takes the output of both component Tracker and Detector, as input, validates, combines
+            During the first part of the process, \Tracker generates a tracked box, $ box_{track} $, and Detector generates list of
+            boxes as candidates, $ box_{candidates} $. Integrator, simply, takes the output of
+            both component \Tracker and \Detector, as input, validates, combines
             and generates refined result. These discrete modules already have its own failure reasons
-            and peculiar errors such as Tracker can shift away from the object, Detector also can misclassify some other objects. This is
-            where Integrator steps in. It verifies tracker's result by detector. If the box, tracker produced, is correlated with the object model
-            then it filters and refines the boxes, detector generated, according to the tracker's result.
+            and peculiar errors such as \Tracker can drift away from the object, \Detector also can misclassify some other objects.
+            This is where Integrator steps in. It verifies \Tracker's result by \Detector.
+            If the box, \Tracker produced, is correlated with the object model then it filters and refines the boxes,
+            \Detector generated, according to the \Tracker's result.
 
             In the light of this brief introduction for integrator module, there are four possible situations it should cover:
             \begin{enumerate}
-                \item Tracker cannot track the box or it is not validated and, also, Detector failed to detect.
+                \item \Tracker cannot track the box or it is not validated and, also, \Detector failed to detect.
                     In this case there is nothing much to proceed, so Integrator simply returns no box as a result.
-                \item Tracker cannot track the box or it is not validated; however, Detector marked some boxes as candidates.
+                \item \Tracker cannot track the box or it is not validated; however, \Detector marked some boxes as candidates.
                     We have some boxes that we might move on processing sequence, so TLD checks the boxes and if there is only one
-                    box as detected then re-initializes the tracker and move to next frame. The reason for one box rule, actually,
+                    box as detected then re-initializes the \Tracker and move to next frame. The reason for one box rule, actually,
                     we do not have additional information to select one of the boxes.
-                \item Tracker tracked the box or it is validated; however, Detector cannot find any instance in image.
-                    This case indicates that detector has not learnt this part of the object yet, or there might be some
+                \item \Tracker tracked the box or it is validated; however, \Detector cannot find any instance in image.
+                    This case indicates that \Detector has not learnt this part of the object yet, or there might be some
                     partial occlusion, brightness changes, etc so we update the object model with the tracked box.
-                \item Tracker tracked the box or it is valid and Detector finds some boxes as instance of the object.
+                \item \Tracker tracked the box or it is valid and \Detector finds some boxes as instance of the object.
                     In final case, both modules generated some result and we need to refined them. Initially, we check that there is one
-                    and only one box that has higher NCC score than the tracker's result. If there is a box that meets these conditions
-                    then we re-initialize the tracker with that box and move to next frame.
+                    and only one box that has higher NCC score than the \Tracker's result. If there is a box that meets these conditions
+                    then we re-initialize the \Tracker with that box and move to next frame.
 
                     However, if there are boxes which are further away from the tracked box and has lower \textbf{similarity score},
-                    then this means that detector misclassified some boxes. To avoid these misclassifications in future frames and
+                    then this means that \Detector misclassified some boxes. To avoid these misclassifications in future frames and
                     make the object model more stable, we set labels of these misclassified boxes to negative,
                     tracked box as positive and update the object model with this training set.
             \end{enumerate}
