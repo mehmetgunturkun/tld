@@ -24,7 +24,7 @@
 
     \chapter{Tracking Learning Detection Approach}
     \paragraph{}
-        TLD is based on three main modules: \Tracker, \Detector and \Integrator.
+        TLD is based on three main modules: \Tracker, \Detector\ and \Integrator.
         As an input, takes a sequence $ frame_{i} = \{ frame_{0}, frame_{1}, ..., frame_{n} \}$ of images
         and an initial box, \initialbox, that contains an object of interest.
         \Tracker tracks the initial box from frame to frame and \Detector finds the candidate boxes containing the object.
@@ -66,8 +66,8 @@
             Normalized Cross Correlation(NCC) for each correspondences as an additional metric for filtering.
 
             With these metrics, we compute median value for forward-backward errors and NCC values, and filter out
-            the correspondences that has larger fb\textsubscript{error} value than median\textsubscript{fbError} and
-            lower NCC value than median\textsubscript{NCC}.
+            the correspondences that has larger $E_{fb}$ value than median($E_{fb}$) and
+            lower $ncc$ value than median($ncc$).
 
         \paragraph{Relocation of Box}
             At the end of the tracking process, we have points and relatively robust displacements for each of them.
@@ -93,28 +93,76 @@
             var(\initialbox) then it is eliminated. This process eliminates the boxes from background, so that
             computationally more complex proceses are not going to be applied to these patches.
 
-        \paragraph{Ensemble Classifier} is the second classifier in the detection process. It has
-            \emph{n} base classifiers which store \emph{m} horizontal and vertical pixel comparisons.
-            Every base classifier make these comparisons and for each comparison it outputs a bit: 1 or 0
-            whether first pixel has higher value than the second.
-            \textbf{As a result of all comparisons, on one box, we have an array of bits which has \emph{m} elements.}
+        \paragraph{Ensemble Classifier}
+            is the second phase of the detection. It contains $m$ \textit{base classifiers} which computes a probability for given
+            box whether it contains the object or not. Ensemble Classifier takes the average of these probabilities and
+            makes a decision:
+
+            \[
+                contains\ object =
+                \begin{cases}
+                    yes, & \text{if } \frac {\sum\limits_{i=1}^m {p_{i}}} {m} \geq threshold \\
+                    no , & \text{otherwise}
+                \end{cases}
+            \]
+
         \paragraph{}
-            Every base classifier stores a table to keep the number of positive and negative boxes
-            for each binary code has been generated so far. When a new sample arrive to be classified,
-            every base classifier, calculates a probability for the sample box by
+            Every \textit{base classifier} follows these steps to produce the probability: generate a binary code, retrieve statistics
+            and compute the probability. In order to generate binary code, it compares $n$ pixel's intensity value, and the result of the
+            each comparison sets an element in the binary code as follows:
+
+            \[
+                code[i] =
+                \begin{cases}
+                    1, & \text{if } p^{from}_{i} \geq p^{to}_{i} \\
+                    0 , & \text{otherwise}
+                \end{cases}
+            \]
+
+        \paragraph{}
+            After code generation, it retrieves statistics about binary code: how many boxes which have generated
+            same binary code are labelled as positive [\# positive] and negative (\# negative).
+            \begin{center}
+                \begin{tabular}{ | c | c | c | }
+
+                      \hline
+                      \multicolumn{3}{|c|}{ Binary Code Table} \\
+                      \hline
+                      Binary Code & \# positive & \# negative \\
+                      \hline
+                      .. & .. & .. \\
+                      .. & .. & .. \\
+                      01000100 & 7 & 3 \\
+                      01000101 & 9 & 1 \\
+                      01000110 & 2 & 9 \\
+                      .. & .. & .. \\
+                      .. & .. & .. \\
+                      \hline
+                \end{tabular}
+            \end{center}
+
+
+        \paragraph{}
+            After code generation, it retrieves statistics about binary code: how many boxes which have generated
+            same binary code are labelled as positive [\# positive] and negative (\# negative).
+
             \begin{gather}
-                \#positive / (\#positive + \#negative)
+                probability = \frac {\# positive} {\# positive + \# negative}
+                % f_{i} is the frame with index i
+                % p_{i} is the point on the frame with index i
             \end{gather}
-        \paragraph{}
-            Ensemble Classifier, accumulates every probability from each base classifier and takes the average. This result
-            will be the score of the box. If this score is higher than the positive box threshold than it is classified otherwise
-            it is eliminated.
+
+
         \paragraph{Nearest Neighbor Classifier} is the last and, computationally, most intensive stage in the process.
-            An object model, which is simply two lists of bounding boxes that are labelled as positive and negative respectively,
-            is stored within this classifier. During the classification, it compares the sample with all
-            boxes in positive and negative list and takes the highest normalized cross correlation value from both lists.
-            Computes a relative similarity score and if the score is higher than the threshold then sample is
-            classified as positive, otherwise it is eliminated.
+            It stores an object model, which is simply two lists of bounding boxes that are labelled
+            as positive and negative respectively. During the classification,
+            it computes Normalized Cross Correlation (NCC) between given box ($box_{i}$) and every box in positive and
+            negative boxes in object model. It gets two metrics from these comparisons: $max(ncc_{positive})$ and $max(ncc_{negative})$ and
+            with these metrics, computes relative similarity score. If it is higher than the threshold then it is labelled as positive.
+
+            \begin{gather}
+                score_{relative} = \frac {max(ncc_{positive})} {max(ncc_{positive}) + max(ncc_{negative})}
+            \end{gather}
     \section{Integrator (Learner)}
         \paragraph{}
             During the first part of the process, \Tracker generates a tracked box, $ box_{track} $, and Detector generates list of
