@@ -14,6 +14,8 @@ using namespace cv;
 
 class Image {
 public:
+    Mat* underlying;
+    Image(Mat* m);
     static Mat* imread(string fileName, int imageType = CV_LOAD_IMAGE_ANYCOLOR) {
         Mat tmpImage = cv::imread(fileName, imageType);
         Mat* image = new Mat(tmpImage);

@@ -13,7 +13,7 @@ OPENCV_LIBS := `pkg-config opencv --libs` -L/usr/local/cuda/lib64
 CPPFLAGS += -Iinclude $(OPENCV_CFLAGS)
 CCFLAGS = -g -Wall --std=c99
 # CXXFLAGS = -g -Wall --std=c++11
-CXXFLAGS = -g -O2 -Wall --std=c++11
+CXXFLAGS = -g -O3 -Wall --std=c++11
 LDFLAGS  += $(OPENCV_LIBS)
 ARFLAGS = ruv
 
@@ -24,6 +24,7 @@ lib2_sources := \
 	src/core/Point.cc \
 	src/core/Displacement.cc \
 	src/core/IntegralImage.cc \
+	src/core/FrameView.cc \
 	src/util/Dataset.cc \
 	src/util/Log.cc \
 	src/util/Random.cc \
@@ -33,7 +34,7 @@ lib2_sources := \
 	src/tracker/Tracker.cc \
 	src/detector/common/ScoredBox.cc \
 	src/detector/DetectResult.cc \
-	src/detector/BoxIterator.cc \
+	src/detector/common/BoxIterator.cc \
 	src/detector/variance/VarianceClassifier.cc \
 	src/detector/ensemble/PixelComparison.cc \
 	src/detector/ensemble/BaseClassifier.cc \

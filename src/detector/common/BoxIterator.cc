@@ -1,4 +1,4 @@
-#include "detector/BoxIterator.hpp"
+#include "detector/common/BoxIterator.hpp"
 
 BoxIterator::BoxIterator(Frame* f, Box* b, int maximumScale, int minimumWindowSize) {
     frame = f;
@@ -24,7 +24,7 @@ void BoxIterator::init() {
 
     boxCount = 0;
     levelBasedCount = 0;
-    
+
     resetLimitsAndSteps();
 }
 

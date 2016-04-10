@@ -5,7 +5,7 @@
 #include "core/Box.hpp"
 #include "detector/DetectResult.hpp"
 #include "detector/training/TrainingSet.hpp"
-#include "detector/BoxIterator.hpp"
+#include "detector/common/BoxIterator.hpp"
 #include "common/BoundedPriorityQueue.hpp"
 
 #include "detector/ensemble/EnsembleClassifier.hpp"

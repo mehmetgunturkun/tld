@@ -25,7 +25,12 @@ public:
     string toString() {
         stringstream ss;
         ss  << "Frame("
-            << name << ")";
+            << name
+            << ", "
+            << width
+            << ", "
+            << height
+            << ")";
         return ss.str();
     }
 };

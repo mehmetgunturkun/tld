@@ -2,7 +2,10 @@
 
 Frame::Frame(string fileName) {
     name = fileName;
+
     colored = Image::imread(fileName, CV_LOAD_IMAGE_ANYCOLOR);
+    width = colored->cols;
+    height = colored->rows;
     int nrOfChannels = colored->channels();
     if (nrOfChannels == 1) {
         grayscale = Image::imread(fileName, CV_LOAD_IMAGE_GRAYSCALE);
