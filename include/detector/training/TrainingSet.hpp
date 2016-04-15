@@ -17,7 +17,8 @@ public:
 
     int nrOfNegativeSamples;
     vector<Type*> negativeSamples;
-    TrainingSet(Frame* frame, vector<Type*> p, vector<Type*> n) {
+    TrainingSet(Frame* f, vector<Type*> p, vector<Type*> n) {
+        frame = f;
         positiveSamples = p;
         nrOfPositiveSamples = (int) p.size();
 

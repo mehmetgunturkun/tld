@@ -35,7 +35,9 @@ lib2_sources := \
 	src/detector/common/ScoredBox.cc \
 	src/detector/DetectResult.cc \
 	src/detector/common/BoxIterator.cc \
+	src/detector/common/ClassificationDetals.cc \
 	src/detector/variance/VarianceClassifier.cc \
+	src/detector/ensemble/Leaf.cc \
 	src/detector/ensemble/PixelComparison.cc \
 	src/detector/ensemble/BaseClassifier.cc \
 	src/detector/ensemble/EnsembleClassifier.cc \

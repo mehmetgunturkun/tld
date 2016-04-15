@@ -4,37 +4,62 @@
 #include "core/Box.hpp"
 #include "detector/common/ScoredBox.hpp"
 #include "detector/training/TrainingSet.hpp"
-
-#include "common/BoundedPriorityQueue.hpp"
+#include "detector/ensemble/EnsembleClassifier.hpp"
+#include "detector/nn/NearestNeighborClassifier.hpp"
+#include "detector/CascadedSingleDetector.hpp"
+#include "util/Dataset.hpp"
 #include "util/Util.h"
+#include "core/FrameView.hpp"
+#include "util/Random.hpp"
+
+class MockedEnsembleClassifier: public EnsembleClassifier {
+    void init(TrainingSet<Box> ts) {
+        vector<Box*> positiveSamples = ts.positiveSamples;
+        for (int i = 0; i < ts.nrOfPositiveSamples; i++) {
+            FrameView* fv = new FrameView(ts.frame);
+            fv->addBox(positiveSamples[i], FrameView::RED);
+            Image::imshow("pos", fv->underlying, 100);
+        }
+
+        vector<Box*> negativeSamples = ts.negativeSamples;
+        for (int i = 0; i < ts.nrOfNegativeSamples; i++) {
+            FrameView* fv = new FrameView(ts.frame);
+            fv->addBox(negativeSamples[i], FrameView::RED);
+            Image::imshow("neg", fv->underlying, 100);
+        }
+    }
+};
+
+class MockedNearestNeighborClassifier: public NearestNeighborClassifier {
+    void init(TrainingSet<Box> ts) {
+        vector<Box*> positiveSamples = ts.positiveSamples;
+        for (int i = 0; i < ts.nrOfPositiveSamples; i++) {
+            FrameView* fv = new FrameView(ts.frame);
+            fv->addBox(positiveSamples[i], FrameView::RED);
+            Image::imshow("pos", fv->underlying, 0);
+        }
+
+        vector<Box*> negativeSamples = ts.negativeSamples;
+        for (int i = 0; i < ts.nrOfNegativeSamples; i++) {
+            FrameView* fv = new FrameView(ts.frame);
+            fv->addBox(negativeSamples[i], FrameView::RED);
+            Image::imshow("neg", fv->underlying, 100);
+        }
+    }
+};
 
 int main(int argc, char** argv) {
-    // std::priority_queue<int> queue;
-    // queue.comp(3,4);
+    Random::init_genrand(100);
+    Dataset* car = new Dataset("car");
 
-    println("Hello World!");
+    Frame* firstFrame = car->next();
+    Box* firstBox = car->initBox;
 
-    BoundedPriorityQueue<Box, OverlapOrdered> queue = BoundedPriorityQueue<Box, OverlapOrdered>(3);
-    Box* b1 = new Box();
-    b1->overlap = 0.9;
+    EnsembleClassifier* mockedEnsembleClassifier = (EnsembleClassifier*) new MockedEnsembleClassifier();
+    NearestNeighborClassifier* mockedNearestNeighborClassifier = (NearestNeighborClassifier*) new MockedNearestNeighborClassifier();
 
-    Box* b2 = new Box();
-    b2->overlap = 0.1;
-
-    queue += b1;
-    queue += b2;
-
-    Frame* frame = new Frame("resources/test.jpg");
-
-    vector<Box*> initialPositiveSamples;
-    vector<Box*> initalNegativeSamples;
-    TrainingSet<Box>* initialTs= new TrainingSet<Box>(frame, initialPositiveSamples, initalNegativeSamples);
-    printf("There are %d positive, %d negative samples in TrainingSet\n", initialTs->nrOfPositiveSamples, initialTs->nrOfNegativeSamples);
-
-    vector<ScoredBox*> positiveSamples;
-    vector<ScoredBox*> negativeSamples;
-    TrainingSet<ScoredBox>* ts = new TrainingSet<ScoredBox>(frame, positiveSamples, negativeSamples);
-    printf("There are %d positive, %d negative samples in TrainingSet\n", ts->nrOfPositiveSamples, ts->nrOfNegativeSamples);
+    CascadedSingleDetector* stubbedDetector = new CascadedSingleDetector(mockedEnsembleClassifier, mockedNearestNeighborClassifier);
+    stubbedDetector->init(firstFrame, firstBox);
 
     return EXIT_SUCCESS;
 }

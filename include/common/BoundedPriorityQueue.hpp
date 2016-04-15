@@ -7,20 +7,23 @@
 #include <cstdio>
 #include <vector>
 #include <queue>
+#include "util/Util.h"
 
 template <class T, class V>
 class BoundedPriorityQueue: public std::priority_queue<T*, vector<T*>, V> {
     int limit;
 public:
-    int size;
+    int count;
+
     BoundedPriorityQueue(int l) {
         limit = l;
-        size = 0;
+        count = 0;
     }
 
     void operator += (T* item) {
-        if (size < limit) {
+        if (count < limit) {
             this->push(item);
+            count += 1;
         } else {
             T* head = this->top();
             if (this->comp(item, head)) {

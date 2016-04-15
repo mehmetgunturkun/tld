@@ -16,17 +16,24 @@ private:
     Frame* firstFrame;
     Box* firstBox;
 
-    double positiveBoxOverlapThreshold;
-    double negativeBoxOverlapThreshold;
-    double varianceThreshold;
+    EnsembleClassifier* eClassifier;
+    NearestNeighborClassifier* nnClassifier;
 
     bool isPositive(Box* box);
     bool isNegative(Box* box);
 
-    EnsembleClassifier* eClassifier;
-    NearestNeighborClassifier* nnClassifier;
+    double positiveBoxOverlapThreshold;
+    double negativeBoxOverlapThreshold;
+    double varianceThreshold;
+
+    int nrOfNegativeBoxes4EnsembleAtInitialization;
+    int nrOfPositiveBoxes4EnsembleAtInitialization;
+
+    int nrOfNegativeBoxes4NNAtInitialization;
+    int nrOfPositiveBoxes4NNAtInitialization;
 public:
     CascadedSingleDetector();
+    CascadedSingleDetector(EnsembleClassifier* ec, NearestNeighborClassifier* nnc);
     void init(Frame* frame, Box* box);
     DetectResult* detect(Frame* frame);
     ClassificationDetails* score(Frame* frame, Box* box);

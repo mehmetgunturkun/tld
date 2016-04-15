@@ -3,6 +3,29 @@
 CascadedSingleDetector::CascadedSingleDetector() {
     eClassifier = new EnsembleClassifier();
     nnClassifier = new NearestNeighborClassifier();
+
+    positiveBoxOverlapThreshold = 0.6;
+    negativeBoxOverlapThreshold = 0.2;
+
+    nrOfNegativeBoxes4EnsembleAtInitialization = 100;
+    nrOfPositiveBoxes4EnsembleAtInitialization = 10;
+
+    nrOfNegativeBoxes4NNAtInitialization = 10;
+    nrOfPositiveBoxes4NNAtInitialization = 1;
+}
+
+CascadedSingleDetector::CascadedSingleDetector(EnsembleClassifier* ec, NearestNeighborClassifier* nnc) {
+    eClassifier = ec;
+    nnClassifier = nnc;
+
+    positiveBoxOverlapThreshold = 0.6;
+    negativeBoxOverlapThreshold = 0.2;
+
+    nrOfNegativeBoxes4EnsembleAtInitialization = 100;
+    nrOfPositiveBoxes4EnsembleAtInitialization = 10;
+
+    nrOfNegativeBoxes4NNAtInitialization = 10;
+    nrOfPositiveBoxes4NNAtInitialization = 1;
 }
 
 bool CascadedSingleDetector::isPositive(Box* box) {
@@ -17,9 +40,6 @@ void CascadedSingleDetector::init(Frame* frame, Box* box) {
     firstFrame = frame;
     firstBox = box;
 
-    positiveBoxOverlapThreshold = 0.6;
-    negativeBoxOverlapThreshold = 0.2;
-
     MeanVariance* initialMeanVariance = firstFrame->integral->computeMeanVariance(
         (int) firstBox->x1,
         (int) firstBox->y1,
@@ -28,9 +48,10 @@ void CascadedSingleDetector::init(Frame* frame, Box* box) {
     );
     varianceThreshold = initialMeanVariance->variance * 0.5;
 
-
-    BoundedPriorityQueue<Box, OverlapOrdered> positiveQueue = BoundedPriorityQueue<Box, OverlapOrdered>(10);
-    BoundedPriorityQueue<Box, OverlapOrdered> negativeQueue = BoundedPriorityQueue<Box, OverlapOrdered>(INT_MAX);
+    BoundedPriorityQueue<Box, OverlapOrdered> positiveQueue =
+        BoundedPriorityQueue<Box, OverlapOrdered>(nrOfPositiveBoxes4EnsembleAtInitialization);
+    BoundedPriorityQueue<Box, OverlapOrdered> negativeQueue =
+        BoundedPriorityQueue<Box, OverlapOrdered>(nrOfNegativeBoxes4EnsembleAtInitialization);
 
     BoxIterator* boxIterator = new BoxIterator(firstFrame, firstBox, 10, 24);
     while (boxIterator->hasNext()) {
@@ -74,9 +95,8 @@ void CascadedSingleDetector::init(Frame* frame, Box* box) {
     );
     eClassifier->init(trainingSet4Ensemble);
 
-
     vector<Box*> positiveBoxList4NN = { positiveQueue.head() };
-    vector<Box*> negativeBoxList4NN = Random::randomSample(negativeBoxList4Ensemble, 10);
+    vector<Box*> negativeBoxList4NN = Random::randomSample(negativeBoxList4Ensemble, nrOfNegativeBoxes4NNAtInitialization);
     TrainingSet<Box> trainingSet4NN = TrainingSet<Box>(
         frame,
         positiveBoxList4NN,

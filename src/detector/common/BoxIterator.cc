@@ -2,7 +2,7 @@
 
 BoxIterator::BoxIterator(Frame* f, Box* b, int maximumScale, int minimumWindowSize) {
     frame = f;
-    boxPointer = b;
+    boxPointer = b->clone();
     maxScale = maximumScale;
     minWindowSize = minimumWindowSize;
     init();

@@ -38,9 +38,9 @@
         This is why as long as TLD tracks the object, learns more and more about it.
     \section{Tracker}
         \paragraph{}
-            \Tracker takes two consequtive frames (frame\textsubscript{0}, frame\textsubscript{1})
-            and a bounding box (box\textsubscript{0}), containing the target object within frame\textsubscript{0}.
-            \Tracker's main task is to estimate the location of the bounding box in the second frame (box\textsubscript{1})
+            \Tracker takes two consequtive frames ($frame_{i-1}$, $frame_{i}$)
+            and a bounding box ($box_{i-1}$), containing the target object within $frame_{i-1}$.
+            \Tracker's main task is to estimate the location of the bounding box in the second frame ($box_{i}$)
             or to decide whether the target object is still visible. Basically, \Tracker generates points in the given
             bounding box, tracks each point from first frame to second frame, filters the reliable ones and estimates
             the displacement of the box with these points.
@@ -50,7 +50,7 @@
             new point. For example if we divide the box into $m$ parts horizontally and $n$ parts vertically, as a result,
             we have $m \times n$ points
         \paragraph{Point Tracking}
-            TLD uses Pyramidal Lucas-Kanade Tracker, which is already implemented in OpenCV, to track points from frame
+            TLD uses Pyramidal Lucas-Kanade Tracker to track points from frame
             to frame. However, Lucas-Kanade Tracker, tracks the points only in one direction. To be more robust,
             we also track backward and calculate the forward-backward error.
             \begin{gather}
@@ -81,7 +81,7 @@
     \section{Detector}
         \paragraph{}
             \Detector's main job is to identify candidate boxes that possibly contain the object. In order to find
-            object instance(s) in the given frame, initially, \Detector generates boxes by sliding windows in different sizes,
+            object instance(s) in the given frame ($frame_{i}$), initially, \Detector generates boxes by sliding windows in different sizes,
             along the image. After that, for each box, it is need to be decided whether there is an instance of the object or not.
             This part of the process is basically a classification problem. \Detector solves this problem in these stages:
             \textbf{Variance Classifier}, \textbf{Ensemble Classifier} and \textbf{Nearest Neighbour Classifier}.
@@ -90,7 +90,7 @@
             is, computationally and logically, the simplest stage along the process.
             For given box, $box_{i}$, it computes the variance of the pixel's intensity values which are inside of the box and
             compares the variance value to var(\initialbox). If the var($box_{i}$) is less than half of the
-            var(\initialbox) then it is eliminated. This process eliminates the boxes from background, so that
+            var(\initialbox) then it is eliminated. This process aims to eliminate the boxes from background, so that
             computationally more complex proceses are not going to be applied to these patches.
 
         \paragraph{Ensemble Classifier}
@@ -140,12 +140,7 @@
                       \hline
                 \end{tabular}
             \end{center}
-
-
-        \paragraph{}
-            After code generation, it retrieves statistics about binary code: how many boxes which have generated
-            same binary code are labelled as positive [\# positive] and negative (\# negative).
-
+            
             \begin{gather}
                 probability = \frac {\# positive} {\# positive + \# negative}
                 % f_{i} is the frame with index i

@@ -27,7 +27,7 @@ private:
     vector<BaseClassifier*> shuffleComparisons(vector<PixelComparison*> allComparisons);
 public:
     EnsembleClassifier();
-    void init(TrainingSet<Box> ts);
+    virtual void init(TrainingSet<Box> ts);
     bool classify(Frame* frame, ScoredBox* box);
     EnsembleClassificationDetails* score(Frame* frame, Box* box);
     void update(TrainingSet<ScoredBox> ts);

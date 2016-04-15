@@ -15,7 +15,7 @@ private:
     double minimumPositiveThreshold;
 public:
     NearestNeighborClassifier();
-    void init(TrainingSet<Box> ts);
+    virtual void init(TrainingSet<Box> ts);
     bool classify(Frame* frame, ScoredBox* box);
     double score(Frame* frame, Box* box);
     void update(TrainingSet<ScoredBox> ts);
