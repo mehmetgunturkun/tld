@@ -8,6 +8,7 @@
 #include "detector/common/BoxIterator.hpp"
 #include "common/BoundedPriorityQueue.hpp"
 
+#include "detector/variance/VarianceClassifier.hpp"
 #include "detector/ensemble/EnsembleClassifier.hpp"
 #include "detector/nn/NearestNeighborClassifier.hpp"
 
@@ -16,6 +17,7 @@ private:
     Frame* firstFrame;
     Box* firstBox;
 
+    VarianceClassifier* vClassifier;
     EnsembleClassifier* eClassifier;
     NearestNeighborClassifier* nnClassifier;
 
@@ -33,6 +35,7 @@ private:
     int nrOfPositiveBoxes4NNAtInitialization;
 public:
     CascadedSingleDetector();
+    CascadedSingleDetector(Frame* frame, Box* box);
     CascadedSingleDetector(EnsembleClassifier* ec, NearestNeighborClassifier* nnc);
     void init(Frame* frame, Box* box);
     DetectResult* detect(Frame* frame);

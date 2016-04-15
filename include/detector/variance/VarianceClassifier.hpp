@@ -8,6 +8,7 @@ class VarianceClassifier {
 private:
     double minimumVariance;
 public:
+    VarianceClassifier(Frame* f, Box* b);
     VarianceClassifier(double minVariance);
     bool classify(Frame* frame, Box* box);
 };

@@ -1,5 +1,15 @@
 #include "detector/variance/VarianceClassifier.hpp"
 
+VarianceClassifier::VarianceClassifier(Frame* f, Box* b) {
+    MeanVariance* initialMeanVariance = f->integral->computeMeanVariance(
+        (int) b->x1,
+        (int) b->y1,
+        (int) b->width,
+        (int) b->height
+    );
+    minimumVariance = initialMeanVariance->variance * 0.5;
+}
+
 VarianceClassifier::VarianceClassifier(double minVariance) {
     minimumVariance = minVariance;
 }

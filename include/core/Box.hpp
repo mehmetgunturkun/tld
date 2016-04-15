@@ -6,11 +6,14 @@
 #include <math.h>
 #include <string>
 
+#include "opencv2/imgproc/imgproc.hpp"
+
 #include "common/Option.hpp"
 #include "util/Util.h"
 #include "util/StringStream.hpp"
 
 using namespace std;
+using namespace cv;
 
 class Box {
 
@@ -32,6 +35,7 @@ public:
     Box(int id, double x1, double y1, double x2, double y2);
 
     Box* move(float dx, float dy);
+    Rect* toRect();
     Box* clone();
     string toString() {
         stringstream ss;

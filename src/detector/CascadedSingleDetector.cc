@@ -14,6 +14,23 @@ CascadedSingleDetector::CascadedSingleDetector() {
     nrOfPositiveBoxes4NNAtInitialization = 1;
 }
 
+CascadedSingleDetector::CascadedSingleDetector(Frame* frame, Box* box) {
+    firstFrame = frame;
+    firstBox = box;
+
+    MeanVariance* initialMeanVariance = firstFrame->integral->computeMeanVariance(
+        (int) firstBox->x1,
+        (int) firstBox->y1,
+        (int) firstBox->width,
+        (int) firstBox->height
+    );
+    varianceThreshold = initialMeanVariance->variance * 0.5;
+
+    vClassifier = new VarianceClassifier(varianceThreshold);
+    eClassifier = new EnsembleClassifier();
+    nnClassifier = new NearestNeighborClassifier();
+}
+
 CascadedSingleDetector::CascadedSingleDetector(EnsembleClassifier* ec, NearestNeighborClassifier* nnc) {
     eClassifier = ec;
     nnClassifier = nnc;
@@ -37,17 +54,6 @@ bool CascadedSingleDetector::isNegative(Box* box) {
 }
 
 void CascadedSingleDetector::init(Frame* frame, Box* box) {
-    firstFrame = frame;
-    firstBox = box;
-
-    MeanVariance* initialMeanVariance = firstFrame->integral->computeMeanVariance(
-        (int) firstBox->x1,
-        (int) firstBox->y1,
-        (int) firstBox->width,
-        (int) firstBox->height
-    );
-    varianceThreshold = initialMeanVariance->variance * 0.5;
-
     BoundedPriorityQueue<Box, OverlapOrdered> positiveQueue =
         BoundedPriorityQueue<Box, OverlapOrdered>(nrOfPositiveBoxes4EnsembleAtInitialization);
     BoundedPriorityQueue<Box, OverlapOrdered> negativeQueue =
