@@ -7,7 +7,7 @@
         "ensemble": {
             "classifierName": "ensemble",
             "nrOfBaseClassifiers": 10,
-            "nrOfPixelComparisons": 16,
+            "nrOfPixelComparisons": 13,
             "positiveThreshold": 0.5
         },
         "nn": {

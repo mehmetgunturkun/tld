@@ -5,7 +5,9 @@ ScoredBox::ScoredBox(Box* _box) {
     isDetected = false;
 }
 
-void ScoredBox::withScore(string scorerKey, ClassificationDetails* detail) {}
+void ScoredBox::withScore(string scorerKey, ClassificationDetails* detail) {
+    detailMap[scorerKey] = detail;
+}
 
 void ScoredBox::merge(ScoredBox* other) {
     this->box = Box::merge(this->box, other->box);

@@ -22,7 +22,7 @@ public:
     void init(Frame* frame, Box* box, bool label);
     double score(Frame* frame, Box* box);
     void update(Frame* frame, ScoredBox* box, bool label);
-
+    void dumpDecisionTree();
     int generateBinaryCode(Frame* frame, Box* box);
     double getProbability(int binaryCode);
 

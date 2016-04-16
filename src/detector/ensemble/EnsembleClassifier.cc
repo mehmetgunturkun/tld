@@ -5,9 +5,7 @@ EnsembleClassifier::EnsembleClassifier() {
         classifierName = Conf::getString("detector.ensemble.classifierName",  "ensemble");
         nrOfBaseClassifiers = Conf::getInt("detector.ensemble.nrOfBaseClassifiers",  10);
         nrOfPixelComparisons = Conf::getInt("detector.ensemble.nrOfPixelComparisons",  13);
-        println("mc1000");
         baseClassifiers = generateBaseClassifier();
-        println("mc2000");
 
         minimumPositiveThreshold = Conf::getDouble("detector.ensemble.positiveThreshold", 0.5);
 }
@@ -128,7 +126,6 @@ vector<PixelComparison*> EnsembleClassifier::produceAllComparisons() {
         PixelComparison* comparison = new PixelComparison(fromPoint, toPoint);
         allComparisons[i] = comparison;
     }
-    println("%d comparisons generated", allComparisons.size());
     return allComparisons;
 }
 
@@ -140,7 +137,6 @@ vector<BaseClassifier*> EnsembleClassifier::shuffleComparisons(vector<PixelCompa
     for (int i = 0; i < nrOfBaseClassifiers; i++) {
         vector<PixelComparison*> comparisons;
         for (int j = 0; j < nrOfPixelComparisons; j++) {
-            println("%d comparisons are selected", i*nrOfPixelComparisons + j);
             PixelComparison* pc = allComparisons[i*nrOfPixelComparisons+j];
             comparisons.push_back(pc);
         }
@@ -153,14 +149,20 @@ vector<BaseClassifier*> EnsembleClassifier::shuffleComparisons(vector<PixelCompa
 void EnsembleClassifier::init(TrainingSet<Box> ts) {
     Frame* frame = ts.frame;
     vector<Labelled<Box>> samples = ts.getLabelledSamples();
-    for (int i = 0; i < nrOfBaseClassifiers; i++) {
-        BaseClassifier* bc = baseClassifiers[i];
-        for (int i = 0; i < ts.nrOfSamples; i++) {
-            Labelled<Box> sample = samples[i];
-            Box* box = sample.item;
-            if (sample.label == 1) {
+
+    for (int i = 0; i < ts.nrOfSamples; i++) {
+        Labelled<Box> sample = samples[i];
+        Box* box = sample.item;
+
+        EnsembleClassificationDetails* details = score(frame, box);
+        if (sample.label == 1 && details->score < 0.6) {
+            for (int j = 0; j < nrOfBaseClassifiers; j++) {
+                BaseClassifier* bc = baseClassifiers[j];
                 bc->init(frame, box, true);
-            } else {
+            }
+        } else if (sample.label == 0 && details->score > 0.5) {
+            for (int j = 0; j < nrOfBaseClassifiers; j++) {
+                BaseClassifier* bc = baseClassifiers[j];
                 bc->init(frame, box, false);
             }
         }
@@ -168,7 +170,7 @@ void EnsembleClassifier::init(TrainingSet<Box> ts) {
 }
 
 EnsembleClassificationDetails* EnsembleClassifier::score(Frame* frame, Box* box) {
-    EnsembleClassificationDetails* detail = new EnsembleClassificationDetails();
+    EnsembleClassificationDetails* detail = new EnsembleClassificationDetails(nrOfBaseClassifiers);
     for (int i = 0; i < nrOfBaseClassifiers; i++) {
         BaseClassifier* bc = baseClassifiers[i];
         int binaryCode = bc->generateBinaryCode(frame, box);
@@ -199,5 +201,12 @@ void EnsembleClassifier::update(TrainingSet<ScoredBox> ts) {
                 bc->update(frame, scoredBox, false);
             }
         }
+    }
+}
+
+void EnsembleClassifier::dumpBaseClassifiers() {
+    for (int i = 0; i < nrOfBaseClassifiers; i++) {
+        BaseClassifier* bc = baseClassifiers[i];
+        bc->dumpDecisionTree();
     }
 }

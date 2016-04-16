@@ -4,6 +4,10 @@ BaseClassifier::BaseClassifier(int id, vector<PixelComparison*> comparisons) {
     this->id = id;
     pixelComparisons = comparisons;
     nrOfComparisons = (int) comparisons.size();
+    decisionTree.resize(pow(2, nrOfComparisons));
+    for (int i = 0; i < pow(2, nrOfComparisons); i++) {
+        decisionTree[i] = new Leaf();
+    }
 }
 
 double BaseClassifier::score(Frame* frame, Box* box) {
@@ -52,5 +56,14 @@ void BaseClassifier::update(Frame* frame, ScoredBox* box, bool label) {
     if (label == false && score > 0.5) {
         Leaf* leaf = decisionTree[binaryCode];
         leaf->incrementNegative();
+    }
+}
+
+void  BaseClassifier::dumpDecisionTree() {
+    for (int i = 0; i < 8192; i++) {
+        Leaf* leaf = decisionTree[i];
+        if (leaf->nrOfPositives != 0 || leaf->nrOfNegatives != 0) {
+            println("%s", leaf->toString().c_str());
+        }
     }
 }

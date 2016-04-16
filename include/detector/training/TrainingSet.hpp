@@ -13,7 +13,8 @@ public:
     Type* item;
     int label;
     Labelled(Type* item, int l) {
-
+        this->item = item;
+        this->label = l;
     }
 };
 

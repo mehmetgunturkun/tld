@@ -8,6 +8,10 @@ class EnsembleClassificationDetails: public ClassificationDetails {
 public:
     vector<int> binaryCodes;
 
+    EnsembleClassificationDetails(int classifierSize) {
+        binaryCodes.resize(classifierSize);
+    }
+
     void add(int id, int binaryCode, double bcScore) {
         binaryCodes[id] = binaryCode;
         this->score += bcScore;

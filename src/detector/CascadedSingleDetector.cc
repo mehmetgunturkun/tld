@@ -54,6 +54,9 @@ bool CascadedSingleDetector::isNegative(Box* box) {
 }
 
 void CascadedSingleDetector::init(Frame* frame, Box* box) {
+    firstFrame = frame;
+    firstBox = box;
+
     BoundedPriorityQueue<Box, OverlapOrdered> positiveQueue =
         BoundedPriorityQueue<Box, OverlapOrdered>(nrOfPositiveBoxes4EnsembleAtInitialization);
     BoundedPriorityQueue<Box, OverlapOrdered> negativeQueue =
@@ -99,6 +102,7 @@ void CascadedSingleDetector::init(Frame* frame, Box* box) {
         positiveBoxList4Ensemble,
         negativeBoxList4Ensemble
     );
+    
     eClassifier->init(trainingSet4Ensemble);
 
     vector<Box*> positiveBoxList4NN = { positiveQueue.head() };

@@ -31,6 +31,7 @@ public:
     virtual void init(TrainingSet<Box> ts);
     bool classify(Frame* frame, ScoredBox* box);
     EnsembleClassificationDetails* score(Frame* frame, Box* box);
+    void dumpBaseClassifiers();
     void update(TrainingSet<ScoredBox> ts);
     string toString() {
         stringstream ss;
