@@ -1,6 +1,7 @@
 #include "detector/ensemble/BaseClassifier.hpp"
 
-BaseClassifier::BaseClassifier(vector<PixelComparison*> comparisons) {
+BaseClassifier::BaseClassifier(int id, vector<PixelComparison*> comparisons) {
+    this->id = id;
     pixelComparisons = comparisons;
     nrOfComparisons = (int) comparisons.size();
 }

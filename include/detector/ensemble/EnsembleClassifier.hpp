@@ -31,6 +31,15 @@ public:
     bool classify(Frame* frame, ScoredBox* box);
     EnsembleClassificationDetails* score(Frame* frame, Box* box);
     void update(TrainingSet<ScoredBox> ts);
+    string toString() {
+        stringstream ss;
+        for (int i = 0; i < nrOfBaseClassifiers; i++) {
+            BaseClassifier* bc = baseClassifiers[i];
+            ss << bc->toString()
+               << "\n";
+        }
+        return ss.str();
+    }
 };
 
 #endif

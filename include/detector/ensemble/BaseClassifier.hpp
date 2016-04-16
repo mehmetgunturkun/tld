@@ -18,13 +18,25 @@ private:
     vector<Leaf*> decisionTree;
 public:
     int id;
-    BaseClassifier(vector<PixelComparison*> comparisons);
+    BaseClassifier(int i, vector<PixelComparison*> comparisons);
     void init(Frame* frame, Box* box, bool label);
     double score(Frame* frame, Box* box);
     void update(Frame* frame, ScoredBox* box, bool label);
 
     int generateBinaryCode(Frame* frame, Box* box);
     double getProbability(int binaryCode);
+
+    string toString() {
+        stringstream ss;
+        ss << "BC(id = " << id << ")\n";
+        for (int i = 0; i < nrOfComparisons; i++) {
+            PixelComparison* pc = pixelComparisons[i];
+            ss << "\t"
+               << pc->toString()
+               << "\n";
+        }
+        return ss.str();
+    }
 };
 
 #endif

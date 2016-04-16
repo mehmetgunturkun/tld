@@ -124,7 +124,7 @@ vector<PixelComparison*> EnsembleClassifier::produceAllComparisons() {
         if (toPoint->y > 1) toPoint->y = 1;
 
         PixelComparison* comparison = new PixelComparison(fromPoint, toPoint);
-        allComparisons.push_back(comparison);
+        allComparisons[i] = comparison;
     }
 
     return allComparisons;
@@ -132,15 +132,16 @@ vector<PixelComparison*> EnsembleClassifier::produceAllComparisons() {
 
 vector<BaseClassifier*> EnsembleClassifier::shuffleComparisons(vector<PixelComparison*> allComparisons) {
     int nrOfComparisons = (int) allComparisons.size();
-    vector<int> indexes = Random::randPerm(nrOfComparisons);
+    allComparisons = Random::randomSample(allComparisons, nrOfComparisons);
 
     vector<BaseClassifier*> classifiers;
     for (int i = 0; i < nrOfBaseClassifiers; i++) {
         vector<PixelComparison*> comparisons;
         for (int j = 0; j < nrOfPixelComparisons; j++) {
-            comparisons.push_back(allComparisons[i*13+j]);
+            PixelComparison* pc = allComparisons[i*13+j];
+            comparisons.push_back(pc);
         }
-        BaseClassifier* classifier = new BaseClassifier(comparisons);
+        BaseClassifier* classifier = new BaseClassifier(i, comparisons);
         classifiers.push_back(classifier);
     }
     return classifiers;
