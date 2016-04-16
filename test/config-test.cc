@@ -14,18 +14,18 @@ int main(int argc, char** argv) {
     string stringVal = config->getString("testString");
     printf("STR: %s\n", stringVal.c_str());
 
-    int intVal = config->getInt("testInteger");
+    int intVal = config->getInt("testInteger", -1);
     printf("INT: %d\n", intVal);
 
     stringVal = config->getString("testObject.testInnerString");
     printf("STR: %s\n", stringVal.c_str());
 
-    intVal = config->getInt("testObject.testInnerInteger");
+    intVal = config->getInt("testObject.testInnerInteger", -1);
     printf("INT: %d\n", intVal);
 
     Config* objectConf = config->getConfig("testObject");
 
-    intVal = objectConf->getInt("testInnerInteger");
+    intVal = objectConf->getInt("testInnerInteger", -1);
     printf("INT: %d\n", intVal);
 
     return 0;

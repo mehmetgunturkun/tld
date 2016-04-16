@@ -2,12 +2,14 @@
 
 EnsembleClassifier::EnsembleClassifier() {
         Random::seed();
-        nrOfBaseClassifiers = 10;
-        nrOfPixelComparisons = 13;
+        classifierName = Conf::getString("detector.ensemble.classifierName",  "ensemble");
+        nrOfBaseClassifiers = Conf::getInt("detector.ensemble.nrOfBaseClassifiers",  10);
+        nrOfPixelComparisons = Conf::getInt("detector.ensemble.nrOfPixelComparisons",  13);
+        println("mc1000");
         baseClassifiers = generateBaseClassifier();
+        println("mc2000");
 
-        minimumPositiveThreshold = 0.0;
-        classifierName = "ensemble";
+        minimumPositiveThreshold = Conf::getDouble("detector.ensemble.positiveThreshold", 0.5);
 }
 
 vector<BaseClassifier*> EnsembleClassifier::generateBaseClassifier() {
@@ -126,7 +128,7 @@ vector<PixelComparison*> EnsembleClassifier::produceAllComparisons() {
         PixelComparison* comparison = new PixelComparison(fromPoint, toPoint);
         allComparisons[i] = comparison;
     }
-
+    println("%d comparisons generated", allComparisons.size());
     return allComparisons;
 }
 
@@ -138,7 +140,8 @@ vector<BaseClassifier*> EnsembleClassifier::shuffleComparisons(vector<PixelCompa
     for (int i = 0; i < nrOfBaseClassifiers; i++) {
         vector<PixelComparison*> comparisons;
         for (int j = 0; j < nrOfPixelComparisons; j++) {
-            PixelComparison* pc = allComparisons[i*13+j];
+            println("%d comparisons are selected", i*nrOfPixelComparisons + j);
+            PixelComparison* pc = allComparisons[i*nrOfPixelComparisons+j];
             comparisons.push_back(pc);
         }
         BaseClassifier* classifier = new BaseClassifier(i, comparisons);
@@ -149,22 +152,20 @@ vector<BaseClassifier*> EnsembleClassifier::shuffleComparisons(vector<PixelCompa
 
 void EnsembleClassifier::init(TrainingSet<Box> ts) {
     Frame* frame = ts.frame;
-    for (int bcId = 0; bcId < nrOfBaseClassifiers; bcId++) {
-        BaseClassifier* bc = baseClassifiers[bcId];
-        vector<Box*> positiveSamples = ts.positiveSamples;
-        for (int i = 0; i < ts.nrOfPositiveSamples; i++) {
-            Box* box = positiveSamples[i];
-            bc->init(frame, box, true);
-        }
-
-        vector<Box*> negativeSamples = ts.negativeSamples;
-        for (int i = 0; i < ts.nrOfNegativeSamples; i++) {
-            Box* box = positiveSamples[i];
-            bc->init(frame, box, false);
+    vector<Labelled<Box>> samples = ts.getLabelledSamples();
+    for (int i = 0; i < nrOfBaseClassifiers; i++) {
+        BaseClassifier* bc = baseClassifiers[i];
+        for (int i = 0; i < ts.nrOfSamples; i++) {
+            Labelled<Box> sample = samples[i];
+            Box* box = sample.item;
+            if (sample.label == 1) {
+                bc->init(frame, box, true);
+            } else {
+                bc->init(frame, box, false);
+            }
         }
     }
 }
-
 
 EnsembleClassificationDetails* EnsembleClassifier::score(Frame* frame, Box* box) {
     EnsembleClassificationDetails* detail = new EnsembleClassificationDetails();
@@ -180,24 +181,23 @@ EnsembleClassificationDetails* EnsembleClassifier::score(Frame* frame, Box* box)
 bool EnsembleClassifier::classify(Frame* frame, ScoredBox* scoreBox) {
     Box* box = scoreBox->box;
     EnsembleClassificationDetails* detail = this->score(frame, box);
-    scoreBox->withScore("UNDEFINED", detail);
+    scoreBox->withScore(classifierName, detail);
     return detail->score > minimumPositiveThreshold;
 }
 
 void EnsembleClassifier::update(TrainingSet<ScoredBox> ts) {
     Frame* frame = ts.frame;
-    for (int bcId = 0; bcId < nrOfBaseClassifiers; bcId++) {
-        BaseClassifier* bc = baseClassifiers[bcId];
-        vector<ScoredBox*> positiveSamples = ts.positiveSamples;
-        for (int i = 0; i < ts.nrOfPositiveSamples; i++) {
-            ScoredBox* scoredBox = positiveSamples[i];
-            bc->update(frame, scoredBox, true);
-        }
-
-        vector<ScoredBox*> negativeSamples = ts.negativeSamples;
-        for (int i = 0; i < ts.nrOfNegativeSamples; i++) {
-            ScoredBox* scoredBox = positiveSamples[i];
-            bc->update(frame, scoredBox, true);
+    vector<Labelled<ScoredBox>> samples = ts.getLabelledSamples();
+    for (int i = 0; i < nrOfBaseClassifiers; i++) {
+        BaseClassifier* bc = baseClassifiers[i];
+        for (int i = 0; i < ts.nrOfSamples; i++) {
+            Labelled<ScoredBox> sample = samples[i];
+            ScoredBox* scoredBox = sample.item;
+            if (sample.label == 1) {
+                bc->update(frame, scoredBox, true);
+            } else {
+                bc->update(frame, scoredBox, false);
+            }
         }
     }
 }

@@ -30,6 +30,7 @@ public:
         stringstream ss;
         ss << "BC(id = " << id << ")\n";
         for (int i = 0; i < nrOfComparisons; i++) {
+            println("PC(%d)", i);
             PixelComparison* pc = pixelComparisons[i];
             ss << "\t"
                << pc->toString()

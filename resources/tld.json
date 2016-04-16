@@ -1,8 +1,18 @@
 {
-    "testString": "stringValue",
-    "testInteger": 123,
-    "testObject" : {
-        "testInnerString": "innerStringValue",
-        "testInnerInteger": 456
-    }
+    "tracker": {},
+    "detector": {
+        "variance": {
+
+        },
+        "ensemble": {
+            "classifierName": "ensemble",
+            "nrOfBaseClassifiers": 10,
+            "nrOfPixelComparisons": 16,
+            "positiveThreshold": 0.5
+        },
+        "nn": {
+
+        }
+    },
+    "integrator": {}
 }

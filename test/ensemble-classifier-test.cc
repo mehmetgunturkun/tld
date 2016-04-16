@@ -10,6 +10,7 @@
 #include "util/Dataset.hpp"
 
 int main(int argc, char** argv) {
+    Conf::load("resources/tld.json");
     Dataset* dataset = new Dataset("car");
     Frame* f = dataset->next();
     Box* b = dataset->initBox;

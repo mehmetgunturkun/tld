@@ -2,6 +2,7 @@
 #define ENSEMBLE_CLASSIFIER_H
 
 #include "util/Random.hpp"
+#include "common/Config.hpp"
 #include "core/Frame.hpp"
 #include "core/Box.hpp"
 #include "detector/common/ScoredBox.hpp"
