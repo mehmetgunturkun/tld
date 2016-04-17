@@ -29,9 +29,11 @@ Frame::Frame(string fileName) {
         flowPyramid = Image::pyramid(grayscale, Size(4, 4), 2, true);
     }
 }
-
-Frame::Frame(Mat* img) {
-    gaussian = img;
+Frame::Frame(Mat* grayscale, Mat* gaussian) {
+    this->width = grayscale->cols;
+    this->height = grayscale->rows;
+    this->grayscale = grayscale;
+    this->gaussian = gaussian;
 }
 
 int Frame::get(Point2f* point, int imageType) {

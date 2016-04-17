@@ -1,24 +1,24 @@
 #include "detector/nn/NearestNeighborClassifier.hpp"
 
 NearestNeighborClassifier::NearestNeighborClassifier() {
+    classifierName = Conf::getString("detector.nn.classifierName",  "nn");
+    minimumPositiveThreshold = Conf::getDouble("detector.nn.positiveThreshold",  0.6);
+
     model = new ObjectModel();
-    minimumPositiveThreshold = 0.6;
 }
 
 void NearestNeighborClassifier::init(TrainingSet<Box> ts) {
-    Frame* frame = ts.frame;
-    vector<Box*> positiveSamples = ts.positiveSamples;
-    for (int i = 0; i < ts.nrOfPositiveSamples; i++) {
-        Box* box = positiveSamples[i];
+    vector<Labelled<Box>> samples = ts.getLabelledSamples();
+    for (int i = 0; i < ts.nrOfSamples; i++) {
+        println("mc1000");
+        Labelled<Box> sample = samples[i];
+        Frame* frame = sample.frame;
+        Box* box = sample.item;
+        int label = sample.label;
+        println("mc2000 - %d", box->id);
         Patch* patch = new Patch(frame, box);
-        model->add(patch, true);
-    }
-
-    vector<Box*> negativeSamples = ts.negativeSamples;
-    for (int i = 0; i < ts.nrOfNegativeSamples; i++) {
-        Box* box = negativeSamples[i];
-        Patch* patch = new Patch(frame, box);
-        model->add(patch, false);
+        println("mc3000");
+        model->add(patch, label == 1);
     }
 }
 
@@ -27,7 +27,7 @@ bool NearestNeighborClassifier::classify(Frame* frame, ScoredBox* scoredBox) {
     Patch* sample = new Patch(frame, box);
     double score = model->computeRelativeScore(sample);
     NNClassificationDetails* detail = new NNClassificationDetails(sample, score);
-    scoredBox->withScore("UNDEFINED", detail);
+    scoredBox->withScore(classifierName, detail);
     return score > minimumPositiveThreshold;
 }
 
@@ -59,4 +59,11 @@ double NearestNeighborClassifier::score(Frame* frame, Box* box) {
     Patch* sample = new Patch(frame, box);
     double score = model->computeConservativeScore(sample);
     return score;
+}
+
+void NearestNeighborClassifier::dumpObjectModel() {
+    println("There are %d positive and %d negative patches in object model!",
+        model->nrOfPositivePatches,
+        model->nrOfNegativePatches
+    );
 }

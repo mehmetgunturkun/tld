@@ -29,10 +29,27 @@ int main(int argc, char** argv) {
     CascadedSingleDetector* stubbedDetector = new CascadedSingleDetector(eClassifier, mockedNearestNeighborClassifier);
     stubbedDetector->init(firstFrame, firstBox);
 
-    ScoredBox* scoredBox = new ScoredBox(firstBox);
-    eClassifier->classify(firstFrame, scoredBox);
-    println("------------------");
-    double score = scoredBox->getScore("ensemble");
-    println("Score: %g", score);
+    VarianceClassifier* vClassifier = new VarianceClassifier(firstFrame, firstBox);
+
+    while (car->hasNext()) {
+        Frame* nextFrame = car->next();
+        BoxIterator* iterator = new BoxIterator(nextFrame, firstBox, 10, 24);
+
+        while (iterator->hasNext()) {
+            Box* nextBox = iterator->next();
+            if (!vClassifier->classify(nextFrame, nextBox)) {
+                continue;
+            }
+
+            ScoredBox* scoredBox = new ScoredBox(nextBox);
+            if (eClassifier->classify(nextFrame, scoredBox)) {
+                println("Score: %g", scoredBox->getScore("ensemble"));
+                FrameView* view = new FrameView(nextFrame);
+                Box* nextBox = iterator->next();
+                view->addBox(nextBox, FrameView::RED);
+                Image::imshow("ensemble", view->underlying, 5);
+            }
+        }
+    }
     return EXIT_SUCCESS;
 }

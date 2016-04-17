@@ -7,7 +7,7 @@ EnsembleClassifier::EnsembleClassifier() {
         nrOfPixelComparisons = Conf::getInt("detector.ensemble.nrOfPixelComparisons",  13);
         baseClassifiers = generateBaseClassifier();
 
-        minimumPositiveThreshold = Conf::getDouble("detector.ensemble.positiveThreshold", 0.5);
+        minimumPositiveThreshold = Conf::getDouble("detector.ensemble.positiveThreshold", 5);
 }
 
 vector<BaseClassifier*> EnsembleClassifier::generateBaseClassifier() {
@@ -156,8 +156,6 @@ void EnsembleClassifier::init(TrainingSet<Box> ts) {
         int label = sample.label;
 
         EnsembleClassificationDetails* details = score(frame, box);
-
-        println("Label:%d, Score: %g", label, details->score);
 
         if (label == 1 && details->score < 5) {
             for (int j = 0; j < nrOfBaseClassifiers; j++) {

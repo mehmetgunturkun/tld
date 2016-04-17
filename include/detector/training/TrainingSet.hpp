@@ -64,7 +64,7 @@ public:
             }
 
             img = Image::warp(gaussian);
-            f = new Frame(img);
+            f = new Frame(img, f->grayscale);
             warpNo += 1;
         } while (warpNo < 20);
         std::random_shuffle(labelledSamples.begin(), labelledSamples.end());

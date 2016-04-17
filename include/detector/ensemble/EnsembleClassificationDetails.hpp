@@ -10,6 +10,7 @@ public:
 
     EnsembleClassificationDetails(int classifierSize) {
         binaryCodes.resize(classifierSize);
+        this->score = 0.0;
     }
 
     void add(int id, int binaryCode, double bcScore) {

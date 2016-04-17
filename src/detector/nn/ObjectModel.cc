@@ -5,7 +5,6 @@ ObjectModel::ObjectModel() {
     nrOfNegativePatches = 0;
 }
 
-
 double ObjectModel::computeRelativeScore(Patch* sample) {
     double positiveNNSimilarity = computePositiveSimilarity(sample);
     double negativeNNSimilarity = computeNegativeSimilarity(sample);
@@ -30,7 +29,7 @@ double ObjectModel::computeConservativeScore(Patch* sample) {
 }
 
 double ObjectModel::computeInitialPositiveSimilarity(Patch* sample) {
-    return computeNearestSimilarity(positivePatchList, nrOfPositivePatches / 2, sample);
+    return computeNearestSimilarity(positivePatchList, ceil(nrOfPositivePatches / 2), sample);
 }
 
 double ObjectModel::computePositiveSimilarity(Patch* sample) {
@@ -57,14 +56,14 @@ double ObjectModel::computeSimilarity(Patch* templatePatch, Patch* samplePatch) 
     Mat* templateImg = templatePatch->data;
     Mat* sampleImg = samplePatch->data;
 
-    float corr = 0.0;
-    float normTemplate = 0.0;
-    float normSample = 0.0;
+    double corr = 0.0;
+    double normTemplate = 0.0;
+    double normSample = 0.0;
 
     for (int i = 0; i < Patch::HEIGHT; i++) {
         for (int j = 0; j < Patch::WIDTH; j++) {
-            float templateVariance = templateImg->at<float>(i,j);
-            float sampleVariance = sampleImg->at<float>(i,j);
+            double templateVariance = templateImg->at<double>(i,j);
+            double sampleVariance = sampleImg->at<double>(i,j);
 
             corr += templateVariance*sampleVariance;
             normTemplate += templateVariance*templateVariance;
@@ -72,10 +71,10 @@ double ObjectModel::computeSimilarity(Patch* templatePatch, Patch* samplePatch) 
         }
     }
 
-    float upper = corr;
-    float lower = sqrt(normTemplate * normSample);
-    float ncc = (upper / lower);
-    return 0.5 * (ncc + 1);
+    double upper = corr;
+    double lower = sqrt(normTemplate * normSample);
+    double ncc = (upper / lower);
+    return 0.5 * (ncc + 1.0);
 }
 
 void ObjectModel::add(Patch* patch, bool label) {

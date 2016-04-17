@@ -8,30 +8,30 @@ Patch::Patch(Mat* d) {
 }
 
 Rect* toRect(Frame* frame, Box* box) {
-    float left = 0.0;
-    if (box->x1 < 0) {
+    double left = 0.0;
+    if (box->x1 <= 0) {
         left = 0.0;
     } else {
         left = box->x1 - 1;
     }
 
-    float right = 0.0;
+    double right = 0.0;
     if (box->x2 > frame->width) {
-        right = (float) frame->width;
+        right = frame->width;
     } else {
         right = box->x2;
     }
 
-    float top = 0.0;
-    if (box->y1 < 0) {
+    double top = 0.0;
+    if (box->y1 <= 0) {
         top = 0.0;
     } else {
         top = box->y1 - 1;
     }
 
-    float bottom = 0.0;
+    double bottom = 0.0;
     if (box->y2 > frame->height) {
-        bottom = (float) frame->height;
+        bottom = frame->height;
     } else {
         bottom = box->y2;
     }
@@ -42,8 +42,12 @@ Rect* toRect(Frame* frame, Box* box) {
 
 Patch::Patch(Frame* frame, Box* box) {
     //TODO Review if we can do with memcpy?
+    Image::imshow("gray", frame->grayscale, 0);
+    println("mc11000");
     Rect* rect = toRect(frame, box);
+    println("mc12000");
     Mat* patch = new Mat(*(frame->grayscale), *rect);
+    println("mc13000");
     Mat* normalizedTmpPatch = new Mat(Patch::HEIGHT, Patch::WIDTH, CV_8U, 0.0);
     Mat* normalizedPatch = new Mat(Patch::HEIGHT, Patch::WIDTH, CV_64F, 0.0);
     cv::resize(*patch, *normalizedTmpPatch, normalizedPatch->size(), INTER_LINEAR);
