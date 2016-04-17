@@ -10,9 +10,11 @@ using namespace std;
 template <typename Type>
 class Labelled {
 public:
+    Frame* frame;
     Type* item;
     int label;
-    Labelled(Type* item, int l) {
+    Labelled(Frame* frame, Type* item, int l) {
+        this->frame = frame;
         this->item = item;
         this->label = l;
     }
@@ -42,17 +44,30 @@ public:
 
     vector<Labelled<Type>> getLabelledSamples() {
         vector<Labelled<Type>> labelledSamples;
-        for (int i = 0; i < nrOfPositiveSamples; i++) {
-            Type* sample = positiveSamples[i];
-            Labelled<Type> positiveSample = Labelled<Type>(sample, 1);
-            labelledSamples.push_back(positiveSample);
-        }
+        Mat* gaussian = frame->gaussian;
+
+        Mat* img = gaussian;
+        Frame* f = frame;
 
         for (int i = 0; i < nrOfNegativeSamples; i++) {
             Type* sample = negativeSamples[i];
-            Labelled<Type> negativeSample = Labelled<Type>(sample, 0);
+            Labelled<Type> negativeSample = Labelled<Type>(f, sample, 0);
             labelledSamples.push_back(negativeSample);
         }
+
+        int warpNo = 0;
+        do {
+            for (int i = 0; i < nrOfPositiveSamples; i++) {
+                Type* sample = positiveSamples[i];
+                Labelled<Type> positiveSample = Labelled<Type>(f, sample, 1);
+                labelledSamples.push_back(positiveSample);
+            }
+
+            img = Image::warp(gaussian);
+            f = new Frame(img);
+            warpNo += 1;
+        } while (warpNo < 20);
+        std::random_shuffle(labelledSamples.begin(), labelledSamples.end());
         return labelledSamples;
     }
 };

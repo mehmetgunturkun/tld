@@ -30,6 +30,10 @@ Frame::Frame(string fileName) {
     }
 }
 
+Frame::Frame(Mat* img) {
+    gaussian = img;
+}
+
 int Frame::get(Point2f* point, int imageType) {
     int pixel = (int) gaussian->at<uchar>((int) point->y, (int) point->x);
     return pixel;

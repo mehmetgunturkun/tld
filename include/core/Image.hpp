@@ -71,8 +71,8 @@ public:
         double shiftY,
         double angle,
         double scale) {
-            int width = img->cols;
-            int height = img->rows;
+            int width = 24;
+            int height = 24;
             Mat* dest = new Mat(img->clone());
             Point center = Point(width / 2, height / 2);
 
@@ -95,6 +95,10 @@ public:
 
             cv::warpAffine(*img, *dest, H, dest->size());
             return dest;
+    }
+
+    static Mat* warp(Mat* img) {
+        return Image::warp(img, 0.1, 0.1, 10.0, 0);
     }
 };
 #endif

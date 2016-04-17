@@ -62,7 +62,7 @@ void BaseClassifier::update(Frame* frame, ScoredBox* box, bool label) {
 void  BaseClassifier::dumpDecisionTree() {
     for (int i = 0; i < 8192; i++) {
         Leaf* leaf = decisionTree[i];
-        if (leaf->nrOfPositives != 0 || leaf->nrOfNegatives != 0) {
+        if (leaf->nrOfPositives > 0 || leaf->nrOfNegatives > 0) {
             println("%s", leaf->toString().c_str());
         }
     }

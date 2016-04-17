@@ -147,20 +147,24 @@ vector<BaseClassifier*> EnsembleClassifier::shuffleComparisons(vector<PixelCompa
 }
 
 void EnsembleClassifier::init(TrainingSet<Box> ts) {
-    Frame* frame = ts.frame;
     vector<Labelled<Box>> samples = ts.getLabelledSamples();
-
     for (int i = 0; i < ts.nrOfSamples; i++) {
         Labelled<Box> sample = samples[i];
+
+        Frame* frame = sample.frame;
         Box* box = sample.item;
+        int label = sample.label;
 
         EnsembleClassificationDetails* details = score(frame, box);
-        if (sample.label == 1 && details->score < 0.6) {
+
+        println("Label:%d, Score: %g", label, details->score);
+
+        if (label == 1 && details->score < 5) {
             for (int j = 0; j < nrOfBaseClassifiers; j++) {
                 BaseClassifier* bc = baseClassifiers[j];
                 bc->init(frame, box, true);
             }
-        } else if (sample.label == 0 && details->score > 0.5) {
+        } else if (label == 0 && details->score > 5) {
             for (int j = 0; j < nrOfBaseClassifiers; j++) {
                 BaseClassifier* bc = baseClassifiers[j];
                 bc->init(frame, box, false);

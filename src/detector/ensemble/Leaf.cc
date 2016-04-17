@@ -8,10 +8,10 @@ Leaf::Leaf() {
 
 void Leaf::incrementPositive() {
     nrOfPositives += 1;
-    probability = nrOfPositives / (nrOfPositives + nrOfNegatives);
+    probability = (double) nrOfPositives / (nrOfPositives + nrOfNegatives);
 }
 
 void Leaf::incrementNegative() {
     nrOfNegatives += 1;
-    probability = nrOfPositives / (nrOfPositives + nrOfNegatives);
+    probability = (double) nrOfPositives / (nrOfPositives + nrOfNegatives);
 }
