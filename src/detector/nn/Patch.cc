@@ -42,12 +42,8 @@ Rect* toRect(Frame* frame, Box* box) {
 
 Patch::Patch(Frame* frame, Box* box) {
     //TODO Review if we can do with memcpy?
-    Image::imshow("gray", frame->grayscale, 0);
-    println("mc11000");
     Rect* rect = toRect(frame, box);
-    println("mc12000");
     Mat* patch = new Mat(*(frame->grayscale), *rect);
-    println("mc13000");
     Mat* normalizedTmpPatch = new Mat(Patch::HEIGHT, Patch::WIDTH, CV_8U, 0.0);
     Mat* normalizedPatch = new Mat(Patch::HEIGHT, Patch::WIDTH, CV_64F, 0.0);
     cv::resize(*patch, *normalizedTmpPatch, normalizedPatch->size(), INTER_LINEAR);

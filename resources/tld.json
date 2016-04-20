@@ -11,7 +11,8 @@
             "positiveThreshold": 5
         },
         "nn": {
-
+            "classifierName": "nn",
+            "positiveThreshold": 0.6
         }
     },
     "integrator": {}

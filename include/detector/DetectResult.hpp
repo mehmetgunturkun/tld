@@ -18,6 +18,7 @@ public:
     int detectedSize;
     vector<ScoredBox*> detected;
 
-    DetectResult();
+    DetectResult();    
+    DetectResult(vector<ScoredBox*> a, vector<ScoredBox*> d);
 };
 #endif

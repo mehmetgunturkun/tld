@@ -3,21 +3,17 @@
 NearestNeighborClassifier::NearestNeighborClassifier() {
     classifierName = Conf::getString("detector.nn.classifierName",  "nn");
     minimumPositiveThreshold = Conf::getDouble("detector.nn.positiveThreshold",  0.6);
-
     model = new ObjectModel();
 }
 
 void NearestNeighborClassifier::init(TrainingSet<Box> ts) {
     vector<Labelled<Box>> samples = ts.getLabelledSamples();
     for (int i = 0; i < ts.nrOfSamples; i++) {
-        println("mc1000");
         Labelled<Box> sample = samples[i];
         Frame* frame = sample.frame;
         Box* box = sample.item;
         int label = sample.label;
-        println("mc2000 - %d", box->id);
         Patch* patch = new Patch(frame, box);
-        println("mc3000");
         model->add(patch, label == 1);
     }
 }

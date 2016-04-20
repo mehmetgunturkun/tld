@@ -102,7 +102,7 @@ void CascadedSingleDetector::init(Frame* frame, Box* box) {
         positiveBoxList4Ensemble,
         negativeBoxList4Ensemble
     );
-    
+
     eClassifier->init(trainingSet4Ensemble);
 
     vector<Box*> positiveBoxList4NN = { positiveQueue.head() };
@@ -117,12 +117,33 @@ void CascadedSingleDetector::init(Frame* frame, Box* box) {
 }
 
 DetectResult* CascadedSingleDetector::detect(Frame* frame) {
-    DetectResult* detectResult = new DetectResult();
+    vector<ScoredBox*> allBoxList;
+    vector<ScoredBox*> detectedBoxList;
+    BoxIterator* iterator = new BoxIterator(frame, firstBox, 10, 24);
+    while (iterator->hasNext()) {
+        Box* nextBox = iterator->next();
+        if (!vClassifier->classify(frame, nextBox)) {
+            continue;
+        }
+
+        ScoredBox* scoredBox = new ScoredBox(nextBox);
+        allBoxList.push_back(scoredBox);
+        if (!eClassifier->classify(frame, scoredBox)) {
+            continue;
+        }
+
+        if (!nnClassifier->classify(frame, scoredBox)) {
+            continue;
+        }
+        detectedBoxList.push_back(scoredBox);
+    }
+    DetectResult* detectResult = new DetectResult(allBoxList, detectedBoxList);
     return detectResult;
 }
 
 ClassificationDetails* CascadedSingleDetector::score(Frame* frame, Box* box) {
     ClassificationDetails* detail = new ClassificationDetails();
+    detail->score = nnClassifier->score(frame, box);
     return detail;
 }
 
