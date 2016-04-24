@@ -46,7 +46,8 @@ lib2_sources := \
 	src/detector/nn/NearestNeighborClassifier.cc \
 	src/detector/CascadedSingleDetector.cc \
 	src/tld/TrackResult.cc \
-	src/tld/TLD.cc
+	src/tld/TLD.cc \
+	src/tld/TLDRunner.cc
 
 lib2_objects := $(patsubst %.cc,%.o,$(lib2_sources))
 lib2_target  := libceng515++.a
