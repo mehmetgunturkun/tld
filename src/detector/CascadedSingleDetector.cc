@@ -3,15 +3,21 @@
 CascadedSingleDetector::CascadedSingleDetector() {
     eClassifier = new EnsembleClassifier();
     nnClassifier = new NearestNeighborClassifier();
+    loadConfigurations();
+}
 
-    positiveBoxOverlapThreshold = 0.6;
-    negativeBoxOverlapThreshold = 0.2;
+void CascadedSingleDetector::loadConfigurations() {
+    positiveBoxOverlapThreshold = Conf::getDouble("detector.training.positiveBoxOverlap", 0.6);
+    negativeBoxOverlapThreshold = Conf::getDouble("detector.training.negativeBoxOverlap", 0.2);
 
-    nrOfNegativeBoxes4EnsembleAtInitialization = 100;
-    nrOfPositiveBoxes4EnsembleAtInitialization = 10;
+    nrOfPositiveBoxes4EnsembleAtInitialization = Conf::getInt("detector.ensemble.samples.init.nrOfPositive", 10);
+    nrOfNegativeBoxes4EnsembleAtInitialization = Conf::getInt("detector.ensemble.samples.init.nrOfNegative", 100);
 
-    nrOfNegativeBoxes4NNAtInitialization = 10;
-    nrOfPositiveBoxes4NNAtInitialization = 1;
+    nrOfPositiveBoxes4NNAtInitialization = Conf::getInt("detector.nn.samples.init.nrOfPositive", 1);
+    nrOfNegativeBoxes4NNAtInitialization = Conf::getInt("detector.nn.samples.init.nrOfNegative", 10);
+
+    maxScaleLimit = Conf::getInt("detector.iterator.maxScaleLevel", 10);
+    minimumPatchSize = Conf::getInt("detector.iterator.minimumPatchSize", 24);
 }
 
 CascadedSingleDetector::CascadedSingleDetector(Frame* frame, Box* box) {
@@ -29,20 +35,15 @@ CascadedSingleDetector::CascadedSingleDetector(Frame* frame, Box* box) {
     vClassifier = new VarianceClassifier(varianceThreshold);
     eClassifier = new EnsembleClassifier();
     nnClassifier = new NearestNeighborClassifier();
+
+    loadConfigurations();
 }
 
 CascadedSingleDetector::CascadedSingleDetector(EnsembleClassifier* ec, NearestNeighborClassifier* nnc) {
     eClassifier = ec;
     nnClassifier = nnc;
 
-    positiveBoxOverlapThreshold = 0.6;
-    negativeBoxOverlapThreshold = 0.2;
-
-    nrOfNegativeBoxes4EnsembleAtInitialization = 100;
-    nrOfPositiveBoxes4EnsembleAtInitialization = 10;
-
-    nrOfNegativeBoxes4NNAtInitialization = 10;
-    nrOfPositiveBoxes4NNAtInitialization = 1;
+    loadConfigurations();
 }
 
 bool CascadedSingleDetector::isPositive(Box* box) {
@@ -62,7 +63,7 @@ void CascadedSingleDetector::init(Frame* frame, Box* box) {
     BoundedPriorityQueue<Box, OverlapOrdered> negativeQueue =
         BoundedPriorityQueue<Box, OverlapOrdered>(nrOfNegativeBoxes4EnsembleAtInitialization);
 
-    BoxIterator* boxIterator = new BoxIterator(firstFrame, firstBox, 10, 24);
+    BoxIterator* boxIterator = new BoxIterator(firstFrame, firstBox, maxScaleLimit, minimumPatchSize);
     while (boxIterator->hasNext()) {
         Box* sampleBox = boxIterator->next();
 
@@ -119,7 +120,7 @@ void CascadedSingleDetector::init(Frame* frame, Box* box) {
 DetectResult* CascadedSingleDetector::detect(Frame* frame) {
     vector<ScoredBox*> allBoxList;
     vector<ScoredBox*> detectedBoxList;
-    BoxIterator* iterator = new BoxIterator(frame, firstBox, 10, 24);
+    BoxIterator* iterator = new BoxIterator(frame, firstBox, maxScaleLimit, minimumPatchSize);
     while (iterator->hasNext()) {
         Box* nextBox = iterator->next();
         if (!vClassifier->classify(frame, nextBox)) {
@@ -188,7 +189,6 @@ void CascadedSingleDetector::learn(Frame* frame, Box* box, DetectResult* detectR
         positiveBoxList4Ensemble,
         negativeBoxList4Ensemble
     );
-
     eClassifier->update(trainingSet4Ensemble);
 
     vector<ScoredBox*> positiveBoxList4NN = { positiveQueue.head() };

@@ -28,26 +28,22 @@ bool NearestNeighborClassifier::classify(Frame* frame, ScoredBox* scoredBox) {
 }
 
 void NearestNeighborClassifier::update(TrainingSet<ScoredBox> ts) {
-    vector<ScoredBox*> positiveSamples = ts.positiveSamples;
-    for (int i = 0; i < ts.nrOfPositiveSamples; i++) {
-        ScoredBox* scoredBox = positiveSamples[i];
-        NNClassificationDetails* details = (NNClassificationDetails*) scoredBox->getDetail("nn");
-        Patch* patch = details->patch;
-        double score = model->computeRelativeScore(patch);
-        if (score < 0.65) {
-            model->add(patch, true);
-        }
-    }
+    println("mc17000");
+    vector<Labelled<ScoredBox>> samples = ts.getLabelledSamples();
+    println("mc18000");
+    for (int i = 0; i < ts.nrOfSamples; i++) {
+        println("mc19000");
+        Labelled<ScoredBox> sample = samples[i];
+        ScoredBox* box = sample.item;
 
-    vector<ScoredBox*> negativeSamples = ts.negativeSamples;
-    for (int i = 0; i < ts.nrOfNegativeSamples; i++) {
-        ScoredBox* scoredBox = negativeSamples[i];
-        NNClassificationDetails* details = (NNClassificationDetails*) scoredBox->getDetail("nn");
+        int label = sample.label;
+
+        NNClassificationDetails* details = (NNClassificationDetails*) box->getDetail(classifierName);
+        println("mc20000");
         Patch* patch = details->patch;
-        double score = model->computeRelativeScore(patch);
-        if (score > 0.5) {
-            model->add(patch, false);
-        }
+        println("mc21000");
+        model->add(patch, label == 1);
+        println("mc22000");
     }
 }
 

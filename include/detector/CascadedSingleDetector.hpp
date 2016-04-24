@@ -1,12 +1,14 @@
 #ifndef DETECTOR_HPP
 #define DETECTOR_HPP
 
+
 #include "core/Frame.hpp"
 #include "core/Box.hpp"
 #include "detector/DetectResult.hpp"
 #include "detector/training/TrainingSet.hpp"
 #include "detector/common/BoxIterator.hpp"
 #include "common/BoundedPriorityQueue.hpp"
+#include "common/Config.hpp"
 
 #include "detector/variance/VarianceClassifier.hpp"
 #include "detector/ensemble/EnsembleClassifier.hpp"
@@ -33,6 +35,10 @@ private:
 
     int nrOfNegativeBoxes4NNAtInitialization;
     int nrOfPositiveBoxes4NNAtInitialization;
+
+    int maxScaleLimit;
+    int minimumPatchSize;
+    void loadConfigurations();
 public:
     CascadedSingleDetector();
     CascadedSingleDetector(Frame* frame, Box* box);

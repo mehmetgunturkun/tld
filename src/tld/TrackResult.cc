@@ -7,7 +7,7 @@ TrackResult::TrackResult() {
 }
 
 TrackResult::TrackResult(ScoredBox* b) {
-    isFailed = true;
+    isFailed = false;
     box = b;
 }
 

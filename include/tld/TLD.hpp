@@ -17,25 +17,23 @@ using namespace std;
 
 class TLD {
 private:
+    double minOverlap;
+    double minValidationScore;
+
+    TrackResult* validate(Frame* current, Option<Box>* trackResult);
     Option<Box>* integrate(Frame* current, TrackResult* trackResult, DetectResult* detectResult);
     Box* combineClosestBoxes(TrackResult* trackResult, DetectResult* detectResult);
     bool isThereMoreConfidentOneBox(TrackResult* trackResult, DetectResult* detectResult);
-    TrackResult* validate(Frame* current, Option<Box>* trackResult);
-
-    double MIN_OVERLAP;
-    double MIN_VALIDATION_SCORE;
-
 public:
     Tracker* tracker;
     CascadedSingleDetector* detector;
 
     TLD(Tracker* t, CascadedSingleDetector* d);
-
+    TLD(Frame* f, Box* b);
     void init(Frame* firstFrame, Box* firstBox);
     TrackResult* track(Frame* prev, Frame* current, Option<Box>* maybePrevBox);
     void learn(Frame* current, Box* trackedBox, DetectResult* detectResult);
     DetectResult* detect(Frame* current);
     Option<Box>* process(Frame* prev, Frame* current, Option<Box>* maybePrevBox);
-
 };
 #endif

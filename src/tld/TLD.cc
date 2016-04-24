@@ -5,6 +5,16 @@ TLD::TLD(Tracker* t, CascadedSingleDetector* d) {
     detector = d;
 }
 
+TLD::TLD(Frame* f, Box* b) {
+    minOverlap = Conf::getDouble("tld.minOverlap", 0.8);
+    minValidationScore = Conf::getDouble("tld.minValidationScore", 0.8);
+
+    tracker = new Tracker();
+    detector = new CascadedSingleDetector(f, b);
+
+    init(f, b);
+}
+
 void TLD::init(Frame* firstFrame, Box* firstBox) {
     detector->init(firstFrame, firstBox);
 }
@@ -33,10 +43,10 @@ TrackResult* TLD::validate(Frame* current, Option<Box>* maybeBox) {
     } else {
         Box* box = maybeBox->get();
         ClassificationDetails* detail = detector->score(current, box);
-        if (detail->score > MIN_VALIDATION_SCORE) {
+        if (detail->score > minValidationScore) {
             //TODO Define appropriate key instead of UNDEFINED
             ScoredBox* scoredBox = new ScoredBox(box);
-            scoredBox->withScore("UNDEFINED", detail);
+            scoredBox->withScore("ensemble", detail);
             TrackResult* trackResult = new TrackResult(scoredBox);
             return trackResult;
         } else {
@@ -112,17 +122,21 @@ Option<Box>* TLD::integrate(Frame* current, TrackResult* trackResult, DetectResu
 
 bool TLD::isThereMoreConfidentOneBox(TrackResult* trackResult, DetectResult* detectResult) {
     int detectedSize = detectResult->detectedSize;
-
     if (detectedSize == 1) {
-        vector<ScoredBox*> detectedBoxes = detectResult->detected;
-        ScoredBox* trackScoredBox = trackResult->getBox();
-        Box* trackBox = trackScoredBox->box;
         bool moreConfident = false;
+
+        ScoredBox* trackScoredBox = trackResult->getBox();
+        double trackScore = trackScoredBox->getScore("nn");
+        Box* trackBox = trackScoredBox->box;
+
+        vector<ScoredBox*> detectedBoxes = detectResult->detected;
         for (int i = 0; i < detectedSize; i++) {
             ScoredBox* scoredBox = detectedBoxes[i];
+            double detectScore = scoredBox->getScore("nn");
             float overlap = Box::computeOverlap(trackBox, scoredBox->box);
-            if (overlap < MIN_OVERLAP) {
+            if (overlap < minOverlap && detectScore > trackScore) {
                 moreConfident = true;
+                break;
             }
         }
         return moreConfident;
@@ -168,5 +182,6 @@ Box* TLD::combineClosestBoxes(TrackResult* trackResult, DetectResult* detectResu
 }
 
 void TLD::learn(Frame* current, Box* trackedBox, DetectResult* detectResult) {
-    detector->learn(current, trackedBox, detectResult);
+    // TODO Out of order for now!
+    // detector->learn(current, trackedBox, detectResult);
 }

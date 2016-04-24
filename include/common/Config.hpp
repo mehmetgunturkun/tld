@@ -9,6 +9,7 @@
 #include <json/value.h>
 
 #include "common/StringUtils.hpp"
+#include "util/Util.h"
 
 using namespace std;
 
@@ -33,7 +34,7 @@ public:
     static void load(string fileName) {
         root = new Config(fileName);
     }
-    
+
     static string getString(string key,  string defaultVal = "__NAN__") {
         return root->getString(key, defaultVal);
     }
@@ -43,8 +44,7 @@ public:
     }
 
     static double getDouble(string key, double defaultVal) {
-        return root->getDouble(key, defaultVal);
+        return root->getDouble(key, defaultVal);;
     }
-
 };
 #endif

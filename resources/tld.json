@@ -1,6 +1,16 @@
 {
-    "tracker": {},
+    "tracker": {
+
+    },
     "detector": {
+        "cascaded": {
+            "maxScaleLevel": 10,
+            "minimumPatchSize": 24
+        },
+        "training": {
+            "positiveBoxOverlap": 0.6,
+            "negativeBoxOverlap": 0.2
+        },
         "variance": {
 
         },
@@ -8,12 +18,35 @@
             "classifierName": "ensemble",
             "nrOfBaseClassifiers": 10,
             "nrOfPixelComparisons": 13,
+            "samples": {
+                "init": {
+                    "nrOfPositive": 10,
+                    "nrOfNegative": 100
+                },
+                "update": {
+                    "nrOfPositive": 1,
+                    "nrOfNegative": 10
+                }
+            },
             "positiveThreshold": 5
         },
         "nn": {
             "classifierName": "nn",
-            "positiveThreshold": 0.6
+            "positiveThreshold": 0.6,
+            "samples": {
+                "init": {
+                    "nrOfPositive": 1,
+                    "nrOfNegative": 10
+                },
+                "update": {
+                    "nrOfPositive": 10,
+                    "nrOfNegative": 10
+                }
+            }
         }
     },
-    "integrator": {}
+    "tld": {
+        "minOverlap": 0.5,
+        "minValidationScore": 0.7
+    }
 }
