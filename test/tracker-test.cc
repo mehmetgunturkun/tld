@@ -1,3 +1,4 @@
+#include "core/FrameView.hpp"
 #include "util/Dataset.hpp"
 #include "tracker/Tracker.hpp"
 
@@ -10,10 +11,14 @@ int main(int argc, char** argv) {
     Tracker* tracker = new Tracker();
 
     while(dataset->hasNext()) {
-        printf("BOX >> %s\n", firstBox->toString().c_str());
+        FrameView* view = new FrameView(firstFrame);
+        view->addBox(firstBox, FrameView::BLUE);
+        Image::imshow("tracker", view->underlying, 1);
+
         Frame* secondFrame = dataset->next();
         Option<Box>* trackResult = tracker->track(firstFrame, secondFrame, firstBox);
         if (trackResult->isEmpty()) {
+            println("Failed!");
             return EXIT_FAILURE;
         } else {
             firstBox = trackResult->get();

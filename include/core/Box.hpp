@@ -11,6 +11,7 @@
 #include "common/Option.hpp"
 #include "util/Util.h"
 #include "util/StringStream.hpp"
+#include "core/Frame.hpp"
 
 using namespace std;
 using namespace cv;

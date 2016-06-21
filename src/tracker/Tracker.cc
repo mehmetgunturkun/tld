@@ -4,6 +4,7 @@
 Tracker::Tracker() {
     termCriteria = new TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, 20, 0.03);
     winSize = new Size(4, 4);
+    margin = 5;
 }
 
 Option<Box>* Tracker::track(Frame* prev, Frame* current, Box* box) {
@@ -22,8 +23,12 @@ Option<Box>* Tracker::track(Frame* prev, Frame* current, Box* box) {
     }
 }
 
-float computeStep(float start, float end, int pointCount) {
-    return ((end - MARGIN -1) - (start + MARGIN)) / (pointCount - 1);
+bool isInside(Box* b, Frame* f) {
+    return b->x1 < f->width && b->y1 < f->height && b->x2 > 0.0 && b->y2 > 0.0;
+}
+
+bool Tracker::isValid(Box* box, Frame* frame) {
+    return isInside(box, frame);
 }
 
 vector<tld::Point*> Tracker::generatePoints(Box* box) {
@@ -31,8 +36,8 @@ vector<tld::Point*> Tracker::generatePoints(Box* box) {
     int id = 0;
     float horizontalStep = computeStep(box->x1, box->x2, 10);
     float verticalStep = computeStep(box->y1, box->y2, 10);
-    for (float j = MARGIN; j <= box->height - MARGIN; j = j + verticalStep) {
-        for (float i = MARGIN; i <= box->width - MARGIN; i = i + horizontalStep) {
+    for (float j = margin; j <= box->height - margin; j = j + verticalStep) {
+        for (float i = margin; i <= box->width - margin; i = i + horizontalStep) {
             Point2f point2f = Point2f(box->x1 + i, box->y1 +j);
             tld::Point* point = new tld::Point(id, point2f);
 
@@ -41,6 +46,10 @@ vector<tld::Point*> Tracker::generatePoints(Box* box) {
         }
     }
     return points;
+}
+
+float Tracker::computeStep(float start, float end, int pointCount) {
+    return ((end - margin - 1) - (start + margin)) / (pointCount - 1);
 }
 
 Flow* Tracker::computeFlow(Frame* src, Frame* target, vector<tld::Point*> srcPoints) {
@@ -72,6 +81,7 @@ Flow* Tracker::computeFlow(Frame* src, Frame* target, vector<tld::Point*> srcPoi
     vector<tld::Point*> targetPoints;
     for (int i = 0; i < pointCount; i++) {
         tld::Point* srcPoint = srcPoints[i];
+
         Point2f toPoint = toPoints[i];
         tld::Point* targetPoint = new tld::Point(srcPoint->id, toPoint);
         targetPoints.push_back(targetPoint);
@@ -79,8 +89,4 @@ Flow* Tracker::computeFlow(Frame* src, Frame* target, vector<tld::Point*> srcPoi
 
     Flow* flow = new Flow(src, target, srcPoints, targetPoints, status, errors);
     return flow;
-}
-
-bool Tracker::isValid(Box* box, Frame* frame) {
-    return true;
 }

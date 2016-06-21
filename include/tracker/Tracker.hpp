@@ -17,9 +17,11 @@ class Tracker {
 private:
     TermCriteria* termCriteria;
     Size* winSize;
+    int margin;
 public:
     vector<tld::Point*> generatePoints(Box* box);
     Flow* computeFlow(Frame* src, Frame* target, vector<tld::Point*> points);
+    float computeStep(float start, float end, int pointCount);
     bool isValid(Box* box, Frame* frame);
     Option<Box>* track(Frame* prev, Frame* current, Box* box);
     Tracker();

@@ -22,6 +22,6 @@ void TLDRunner::run() {
     }
 }
 
-void TLD::persistOutput(Option<Box>* maybeBox) {
-    
+void TLDRunner::persistOutput(Option<Box>* maybeBox) {
+
 }

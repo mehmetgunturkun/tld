@@ -44,9 +44,8 @@ TrackResult* TLD::validate(Frame* current, Option<Box>* maybeBox) {
         Box* box = maybeBox->get();
         ClassificationDetails* detail = detector->score(current, box);
         if (detail->score > minValidationScore) {
-            //TODO Define appropriate key instead of UNDEFINED
             ScoredBox* scoredBox = new ScoredBox(box);
-            scoredBox->withScore("ensemble", detail);
+            scoredBox->withScore("nn", detail);
             TrackResult* trackResult = new TrackResult(scoredBox);
             return trackResult;
         } else {

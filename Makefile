@@ -8,7 +8,7 @@ AR := ar
 
 OPENCV_CFLAGS := `pkg-config opencv --cflags`
 OPENCV_LIBS := `pkg-config opencv --libs` -L/usr/local/cuda/lib64
-# LAPACK_LIBS := ./lapack_LINUX.a ./blas_LINUX.a ./libf2c.a
+#LAPACK_LIBS := ./lapack_LINUX.a ./blas_LINUX.a ./libf2c.a
 
 CPPFLAGS += -Iinclude $(OPENCV_CFLAGS)
 CCFLAGS = -g -Wall --std=c99

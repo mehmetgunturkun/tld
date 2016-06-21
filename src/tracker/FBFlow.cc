@@ -10,6 +10,7 @@ float computeFBError(tld::Point* src, tld::Point* target, tld::Point* fb) {
 }
 
 float computeNCC(Frame* srcFrame, tld::Point* srcPoint, Frame* targetFrame, tld::Point* targetPoint) {
+    //TODO Might need to write own ncc computation
     Size windowSize(4, 4);
     Mat rec0 = Mat::zeros(windowSize, CV_8U);
     Mat rec1 = Mat::zeros(windowSize, CV_8U);
@@ -37,11 +38,10 @@ FBFlow::FBFlow(Flow* forward, Flow* backward) {
     vector<float> nccErrors;
 
     vector<FBDisplacement*> initialDisplacements;
+    Frame* srcFrame = forward->source;
+    Frame* targetFrame = forward->target;
 
     for (int i = 0; i < displacementCount; i++) {
-        Frame* srcFrame = forward->source;
-        Frame* targetFrame = forward->target;
-
         Displacement* fwdDisplacement = forwardDisplacements[i];
         Displacement* bwdDisplacement = backwardDisplacements[i];
 
@@ -61,13 +61,12 @@ FBFlow::FBFlow(Flow* forward, Flow* backward) {
         }
     }
 
-
     float medFBE = median(fbErrors);
     float medNCC = median(nccErrors);
     if (medFBE > FB_ERROR_LIMIT) {
+        println("Invalid Box -- high fb error - %f", medFBE);
         isValid = false;
     } else {
-
         displacementCount = (int) initialDisplacements.size();
         for (int i = 0; i < displacementCount; i++) {
             FBDisplacement* fbDisp = initialDisplacements[i];
