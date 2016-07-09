@@ -9,13 +9,15 @@ int main(int argc, char** argv) {
     Box* firstBox = dataset->initBox;
 
     Tracker* tracker = new Tracker();
-
+    int frameNo = 1;
     while(dataset->hasNext()) {
+
         FrameView* view = new FrameView(firstFrame);
         view->addBox(firstBox, FrameView::BLUE);
         Image::imshow("tracker", view->underlying, 1);
 
         Frame* secondFrame = dataset->next();
+        printf("---  #%3d. %s. Frame ---\n", frameNo, secondFrame->name.c_str());
         Option<Box>* trackResult = tracker->track(firstFrame, secondFrame, firstBox);
         if (trackResult->isEmpty()) {
             println("Failed!");
@@ -24,6 +26,8 @@ int main(int argc, char** argv) {
             firstBox = trackResult->get();
             firstFrame = secondFrame;
         }
+        frameNo += 1;
+        printf("-------------------\n");
     }
     return EXIT_SUCCESS;
 }

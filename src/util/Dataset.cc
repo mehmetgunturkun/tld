@@ -4,7 +4,7 @@ vector<string> Dataset::extensions = {".jpg", ".png"};
 
 bool endsWith (std::string const &fullString, std::string const &ending) {
     if (fullString.length() >= ending.length()) {
-        return (0 == fullString.compare (fullString.length() - ending.length(), ending.length(), ending));
+        return (fullString.compare (fullString.length() - ending.length(), ending.length(), ending) == 0);
     } else {
         return false;
     }
@@ -75,4 +75,10 @@ Frame* Dataset::next() {
 
 void Dataset::reset() {
 
+}
+
+Frame* Dataset::get(int frameNo) {
+    string imageFile = files[frameNo];
+    Frame* frame = new Frame(imageFile);
+    return frame;
 }

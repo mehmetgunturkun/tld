@@ -13,6 +13,7 @@ namespace tld {
         cv::Point2f underlying;
 
         Point(int id, Point2f underlying);
+        Point(int id, float x, float y);
 
         string toString() {
             stringstream ss;

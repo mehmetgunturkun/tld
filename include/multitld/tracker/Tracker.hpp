@@ -5,7 +5,7 @@
 
 #include "common/Option.hpp"
 
-#include "core/Point.hpp"
+#include "multitld/core/Point.hpp"
 
 #include "multitld/core/Frame.hpp"
 #include "multitld/core/Box.hpp"
@@ -20,7 +20,8 @@ private:
 public:
     float computeStep(float start, float end, int pointCount);
     vector<tld::Point*> generatePoints(vector<Box*> boxList, int nrOfBoxes);
-    vector<FBPoint*> lkTrack(vector<tld::Point*> points);
+    vector<FBPoint*> fbTrack(Frame* prev, Frame* curr, vector<tld::Point*> points);
+    vector<tld::Point*> lkTrack(Frame* prev, Frame* curr, vector<tld::Point*> points);
     vector<Box*> estimate(Frame* prev, Frame* curr, vector<Box*> boxList, vector<FBPoint*> trackedPoints);
     std::vector<Box*> track(Frame* prev, Frame* curr, std::vector<Box*> boxList);
 };

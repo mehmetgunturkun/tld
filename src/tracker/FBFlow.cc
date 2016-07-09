@@ -41,6 +41,8 @@ FBFlow::FBFlow(Flow* forward, Flow* backward) {
     Frame* srcFrame = forward->source;
     Frame* targetFrame = forward->target;
 
+
+    printf("Stable Points %d - begin\n", displacementCount);
     for (int i = 0; i < displacementCount; i++) {
         Displacement* fwdDisplacement = forwardDisplacements[i];
         Displacement* bwdDisplacement = backwardDisplacements[i];
@@ -49,6 +51,12 @@ FBFlow::FBFlow(Flow* forward, Flow* backward) {
             tld::Point* srcPoint = fwdDisplacement->source;
             tld::Point* targetPoint = fwdDisplacement->target;
             tld::Point* fbPoint = bwdDisplacement->target;
+
+            printf("--------------\n");
+            cout << srcPoint->toString() << "\n";
+            cout << targetPoint->toString() << "\n";
+            cout << fbPoint->toString() << "\n";
+            printf("--------------\n");
 
             float fbError = computeFBError(srcPoint, targetPoint, fbPoint);
             float ncc = computeNCC(srcFrame, srcPoint, targetFrame, targetPoint);
@@ -60,8 +68,12 @@ FBFlow::FBFlow(Flow* forward, Flow* backward) {
             initialDisplacements.push_back(fbDisp);
         }
     }
+    printf("Stable Points %d - end\n", displacementCount);
 
     float medFBE = median(fbErrors);
+
+    printf("FbError = %f, #points = %d\n", medFBE, fbErrors.size());
+
     float medNCC = median(nccErrors);
     if (medFBE > FB_ERROR_LIMIT) {
         println("Invalid Box -- high fb error - %f", medFBE);
@@ -76,7 +88,7 @@ FBFlow::FBFlow(Flow* forward, Flow* backward) {
         }
 
         displacementSize = (int) displacementList.size();
-
+        printf("Total reliable displacements: %d\n", displacementSize);
         if (displacementList.size() > 0) {
             isValid = true;
         } else {
@@ -101,6 +113,9 @@ Option<Box>* FBFlow::estimate(Box* box) {
 
         float medX = median(dxList);
         float medY = median(dyList);
+
+        printf("Dx = %f, Dy = %f\n", medX, medY);
+
         Box* movedBox = box->move(medX, medY);
         Option<Box>* maybeMovedBox = new Option<Box>(movedBox);
         return maybeMovedBox;

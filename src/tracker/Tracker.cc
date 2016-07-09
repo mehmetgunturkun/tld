@@ -11,7 +11,25 @@ Option<Box>* Tracker::track(Frame* prev, Frame* current, Box* box) {
     if (isValid(box, prev)) {
         vector<tld::Point*> points = generatePoints(box);
 
+        printf("Number of points to track - %d - begin\n", points.size());
+        for (int i = 0; i < points.size(); i++) {
+            printf("%3d. %s\n", i, points[i]->toString().c_str());
+        }
+        printf("Number of points to track - %d - end\n", points.size());
+
         Flow* forward = computeFlow(prev, current, points);
+
+        vector<Displacement*> displacementList = forward->displacementList;
+        cout << "-------- FFF ----------\n";
+        for (int i = 0; i < displacementList.size(); i++) {
+            Displacement* d = displacementList[i];
+            tld::Point* p1 = d->source;
+            tld::Point* p2 = d->target;
+            cout << p1->toString() << "\n";
+            cout << p2->toString() << "\n";
+            cout << "------------------\n";
+        }
+
         Flow* backward = computeFlow(current, prev, forward->newPoints);
 
         FBFlow* fbFlow = new FBFlow(forward, backward);

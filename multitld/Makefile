@@ -18,36 +18,13 @@ LDFLAGS  += $(OPENCV_LIBS)
 ARFLAGS = ruv
 
 lib2_sources := \
-	src/common/Config.cc \
 	src/core/Frame.cc \
 	src/core/Box.cc \
 	src/core/Point.cc \
-	src/core/Displacement.cc \
-	src/core/IntegralImage.cc \
-	src/core/FrameView.cc \
-	src/util/Dataset.cc \
-	src/util/Log.cc \
-	src/util/Random.cc \
-	src/util/Cluster.cc \
-	src/tracker/Flow.cc \
-	src/tracker/FBFlow.cc \
+	src/tracker/FBPoint.cc \
 	src/tracker/Tracker.cc \
-	src/detector/common/ScoredBox.cc \
-	src/detector/DetectResult.cc \
-	src/detector/common/BoxIterator.cc \
-	src/detector/common/ClassificationDetals.cc \
-	src/detector/variance/VarianceClassifier.cc \
-	src/detector/ensemble/Leaf.cc \
-	src/detector/ensemble/PixelComparison.cc \
-	src/detector/ensemble/BaseClassifier.cc \
-	src/detector/ensemble/EnsembleClassifier.cc \
-	src/detector/nn/Patch.cc \
-	src/detector/nn/ObjectModel.cc \
-	src/detector/nn/NearestNeighborClassifier.cc \
-	src/detector/CascadedSingleDetector.cc \
-	src/tld/TrackResult.cc \
-	src/tld/TLD.cc \
-	src/tld/TLDRunner.cc
+	src/testbase/Sequence.cc
+
 lib2_objects := $(patsubst %.cc,%.o,$(lib2_sources))
 lib2_target  := libceng515++.a
 
@@ -63,12 +40,6 @@ dependencies = $(patsubst %.o,%.d,$(all_objects))
 
 .PHONY: all
 all : $(all_targets)
-#
-# .PHONY: lapack_deps
-# lapack_deps:
-# 	make -C ext/CLAPACK-3.2.1/F2CLIBS/libf2c/
-# 	make -C ext/CLAPACK-3.2.1/BLAS/SRC/
-# 	make -C ext/CLAPACK-3.2.1/SRC/
 
 $(lib_target) : $(lib_objects) Makefile
 	$(AR) $(ARFLAGS) $@ $(lib_objects)
