@@ -23,7 +23,9 @@ lib2_sources := \
 	src/core/Point.cc \
 	src/tracker/FBPoint.cc \
 	src/tracker/Tracker.cc \
-	src/testbase/Sequence.cc
+	src/testbase/Sequence.cc \
+	src/core/Score.cc \
+	src/core/ScoredBox.cc
 
 lib2_objects := $(patsubst %.cc,%.o,$(lib2_sources))
 lib2_target  := libceng515++.a
