@@ -6,6 +6,10 @@
 class Frame {
 public:
     string name;
+
+    int width;
+    int height;
+
     Mat* displayImg;
     Mat* grayscale;
     vector<Mat> flowPyramid;

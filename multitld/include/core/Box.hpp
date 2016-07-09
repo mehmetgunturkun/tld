@@ -29,6 +29,7 @@ public:
 
     Box(int id, float x1, float y1, float x2, float y2);
     Box* move(float dx, float dy);
+    Box* clone();
 
     static Option<Box>* parseFromLine(string line) {
         StringStream* stream = new StringStream(line, ',');
@@ -57,6 +58,18 @@ public:
             << x2 << ", "
             << y2 << ")";
         return ss.str();
+    }
+
+    static Box* rounded(Box* box) {
+        Box* newBox = new Box(
+            box->id,
+            round(box->x1),
+            round(box->y1),
+            round(box->x1) +
+            round(box->width) - 1.0,
+            round(box->y1) + round(box->height) - 1.0
+        );
+        return newBox;
     }
 };
 

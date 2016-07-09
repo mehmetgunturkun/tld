@@ -25,7 +25,8 @@ lib2_sources := \
 	src/tracker/Tracker.cc \
 	src/testbase/Sequence.cc \
 	src/core/Score.cc \
-	src/core/ScoredBox.cc
+	src/core/ScoredBox.cc \
+	src/core/BoxIterator.cc
 
 lib2_objects := $(patsubst %.cc,%.o,$(lib2_sources))
 lib2_target  := libceng515++.a

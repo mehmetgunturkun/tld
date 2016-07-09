@@ -16,3 +16,8 @@ Box* Box::move(float dx, float dy) {
     Box* box = new Box(id, x1 + dx, y1 + dy, x2 + dx, y2 + dy);
     return box;
 }
+
+Box* Box::clone() {
+    Box* clone = new Box(id, x1, y1, x2, y2);
+    return clone;
+}

@@ -4,8 +4,8 @@ Frame::Frame(string fileName) {
     name = fileName;
     Mat* colored = Image::imread(fileName, CV_LOAD_IMAGE_ANYCOLOR);
     this->displayImg = colored;
-    // int width = colored->cols;
-    // int height = colored->rows;
+    width = colored->cols;
+    height = colored->rows;
     int nrOfChannels = colored->channels();
     if (nrOfChannels == 1) {
         grayscale = Image::imread(fileName, CV_LOAD_IMAGE_GRAYSCALE);

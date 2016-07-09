@@ -9,20 +9,7 @@ Tracker::Tracker() {
 vector<Box*> Tracker::track(Frame* prev, Frame* curr, vector<Box*> boxList) {
     int nrOfBoxes = boxList.size();
     vector<tld::Point*> points = decomposePoints(boxList, nrOfBoxes);
-    printf("Number of points to track - %d - begin\n", points.size());
-    for (int i = 0; i < points.size(); i++) {
-        printf("%3d. %s\n", i, points[i]->toString().c_str());
-    }
-    printf("Number of points to track - %d - end\n", points.size());
     vector<FBPoint*> trackedPoints = track(prev, curr, points);
-
-    printf("Stable Points %d - begin\n", trackedPoints.size());
-    for (int i = 0; i < trackedPoints.size(); i++) {
-        printf("%3d. %s\n", i, trackedPoints[i]->toString().c_str());
-    }
-    printf("Stable Points %d - end\n", trackedPoints.size());
-
-
     vector<Box*> estimatedBoxList = fragmentAndEstimateBoxList(prev, curr, boxList, trackedPoints);
     return estimatedBoxList;
 }
@@ -179,7 +166,6 @@ Option<Box>* estimate(Frame* prev, Frame* curr, Box* box, vector<FBPoint*> track
     }
 
     float medFBE = median(fbErrors);
-    printf("FbError = %f, #points = %d\n", medFBE, fbErrors.size());
 
     float medNCC = median(nccErrors);
     if (medFBE > 0.5) {
@@ -203,18 +189,10 @@ Option<Box>* estimate(Frame* prev, Frame* curr, Box* box, vector<FBPoint*> track
         return failedBox;
     }
 
-    printf("Number of reliable displacements: %d\n", nrOfReliablePoints);
-
     vector<float> dxList(nrOfReliablePoints);
     vector<float> dyList(nrOfReliablePoints);
     for (int i = 0; i < nrOfReliablePoints; i++) {
         FBPoint* fbPoint = reliablePoints[i];
-        printf("%3d. %s -> %s -> %s\n",
-            i,
-            fbPoint->src->toString().c_str(),
-            fbPoint->to->toString().c_str(),
-            fbPoint->backwardPoint->toString().c_str()
-        );
         dxList[i] = fbPoint->dx;
         dyList[i] = fbPoint->dy;
     }
