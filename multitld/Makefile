@@ -26,7 +26,10 @@ lib2_sources := \
 	src/testbase/Sequence.cc \
 	src/core/Score.cc \
 	src/core/ScoredBox.cc \
-	src/core/BoxIterator.cc
+	src/core/BoxIterator.cc \
+	src/core/IntegralImage.cc \
+	src/detector/variance/VarianceClassifier.cc \
+	src/detector/Detector.cc
 
 lib2_objects := $(patsubst %.cc,%.o,$(lib2_sources))
 lib2_target  := libceng515++.a

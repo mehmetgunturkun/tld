@@ -25,6 +25,10 @@ public:
     float width;
     float height;
 
+    float mean;
+    float variance;
+    float overlap;
+
     int nrOfPoints;
 
     Box(int id, float x1, float y1, float x2, float y2);
