@@ -1,6 +1,8 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
+#define CV_LOAD_IMAGE_GAUSSIAN -1
+
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/video/tracking.hpp"
@@ -48,6 +50,17 @@ public:
             withDerivatives
         );
         return pyramid;
+    }
+
+    static Mat* gaussian(Mat* image, double sigma) {
+        Mat kernel = cv::getGaussianKernel(12, sigma);
+        Mat kernelTranspose = Mat(kernel.cols, kernel.rows, kernel.type());
+        cv::transpose(kernel, kernelTranspose);
+        Mat kernel2d = kernel * kernelTranspose;
+
+        Mat* dest = new Mat(*image);
+        cv::filter2D(*image, *dest, -1, kernel2d, Point(-1, -1), 0, BORDER_CONSTANT);
+        return dest;
     }
 };
 #endif
