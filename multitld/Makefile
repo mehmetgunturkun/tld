@@ -35,6 +35,7 @@ lib2_sources := \
 	src/detector/ensemble/Branch.cc \
 	src/detector/ensemble/Leaf.cc \
 	src/detector/ensemble/BaseClassifier.cc \
+	src/detector/ensemble/EnsembleClassifier.cc \
 	src/detector/Detector.cc
 
 lib2_objects := $(patsubst %.cc,%.o,$(lib2_sources))

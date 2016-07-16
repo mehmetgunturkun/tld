@@ -1,12 +1,15 @@
 #include "detector/ensemble/BaseClassifier.hpp"
 
-BaseClassifier::BaseClassifier(int i, vector<PixelComparison*> comparisons) {
+BaseClassifier::BaseClassifier(int id, vector<PixelComparison*> comparisons) {
+    this->id = id;
     this->codeGen = new CodeGenerator(comparisons);
     this->decTree = new DecisionTree();
 }
 
-vector<float> BaseClassifier::score(Frame* frame, ScoredBox* box) {
-    int binaryCode = codeGen->generateBinaryCode(frame, box->box);
+vector<float> BaseClassifier::score(Frame* frame, Box* box, EnsembleScore* score) {
+    int binaryCode = codeGen->generateBinaryCode(frame, box);
+    score->binaryCodes[id] = binaryCode;
+
     vector<float> probabilities = decTree->getProbabilities(binaryCode);
     return probabilities;
 }
