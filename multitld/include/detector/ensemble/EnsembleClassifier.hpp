@@ -6,6 +6,7 @@
 #include "core/ScoredBox.hpp"
 
 #include "detector/ensemble/BaseClassifier.hpp"
+#include "detector/training/TrainingSet.hpp"
 
 class EnsembleClassifier {
 private:
@@ -23,5 +24,7 @@ private:
 public:
     EnsembleClassifier();
     bool classify(Frame* frame, ScoredBox* scoredBox);
+    void train(TrainingSet<Box> ts, int modelId);
+    void train(TrainingSet<ScoredBox> ts, int modelId);
 };
 #endif

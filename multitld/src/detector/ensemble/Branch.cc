@@ -8,3 +8,12 @@ vector<float> Branch::getProbabilities() {
     }
     return probabilities;
 }
+
+void Branch::update(int modelId, bool label) {
+    Leaf* leaf = branch[modelId];
+    if (label) {
+        leaf->incrementPositive();
+    } else {
+        leaf->incrementNegative();
+    }
+}

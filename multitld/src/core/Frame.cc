@@ -30,6 +30,13 @@ Frame::Frame(string fileName) {
     }
 }
 
+Frame::Frame(Mat* grayscale, Mat* gaussian) {
+    this->width = grayscale->cols;
+    this->height = grayscale->rows;
+    this->grayscale = grayscale;
+    this->gaussian = gaussian;
+}
+
 void Frame::show() {
     Image::imshow("Frame", this->displayImg, 1000);
 }

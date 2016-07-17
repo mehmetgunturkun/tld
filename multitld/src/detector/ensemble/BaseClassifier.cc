@@ -13,3 +13,14 @@ vector<float> BaseClassifier::score(Frame* frame, Box* box, EnsembleScore* score
     vector<float> probabilities = decTree->getProbabilities(binaryCode);
     return probabilities;
 }
+
+void BaseClassifier::train(Frame* frame, Box* box, int modelId, bool label) {
+    int binaryCode = codeGen->generateBinaryCode(frame, box);
+    decTree->update(binaryCode, modelId, label);
+}
+
+void BaseClassifier::train(Frame* frame, ScoredBox* scoredBox, int modelId, bool label) {
+    EnsembleScore* ensembleScore = (EnsembleScore*) scoredBox->getScore("ensemble");
+    int binaryCode = ensembleScore->binaryCodes[id];
+    decTree->update(binaryCode, modelId, label);
+}

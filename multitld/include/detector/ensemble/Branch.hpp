@@ -9,6 +9,7 @@ private:
     int nrOfLeaves;
 public:
     vector<float> getProbabilities();
+    void update(int modelId, bool label);
 };
 
 #endif

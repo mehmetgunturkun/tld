@@ -8,6 +8,7 @@ private:
     vector<Branch*> tree;
 public:
     vector<float> getProbabilities(int binaryCode);
+    void update(int binaryCode, int modelId, bool label);
 };
 
 #endif

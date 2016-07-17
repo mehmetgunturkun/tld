@@ -172,6 +172,37 @@ bool EnsembleClassifier::classify(Frame* frame, ScoredBox* scoredBox) {
     }
 
     score->scores = scores;
-
     return anyModelClassified;
+}
+
+void EnsembleClassifier::train(TrainingSet<Box> ts, int modelId) {
+    vector<Labelled<Box>> samples = ts.getLabelledSamples();
+    for (int i = 0; i < ts.nrOfSamples; i++) {
+        Labelled<Box> sample = samples[i];
+
+        Frame* frame = sample.frame;
+        Box* box = sample.item;
+        int label = sample.label;
+
+        for (int j = 0; j < nrOfBaseClassifiers; j++) {
+            BaseClassifier* bc = baseClassifiers[j];
+            bc->train(frame, box, modelId, label);
+        }
+    }
+}
+
+void EnsembleClassifier::train(TrainingSet<ScoredBox> ts, int modelId) {
+    vector<Labelled<ScoredBox>> samples = ts.getLabelledSamples();
+    for (int i = 0; i < ts.nrOfSamples; i++) {
+        Labelled<ScoredBox> sample = samples[i];
+
+        Frame* frame = sample.frame;
+        ScoredBox* scoredBox = sample.item;
+        int label = sample.label;
+
+        for (int j = 0; j < nrOfBaseClassifiers; j++) {
+            BaseClassifier* bc = baseClassifiers[j];
+            bc->train(frame, scoredBox, modelId, label);
+        }
+    }
 }

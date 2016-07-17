@@ -1,5 +1,5 @@
-#ifndef SCORED_BOX_HPP
-#define SCORED_BOX_HPP
+#ifndef SCORED_BOX_H
+#define SCORED_BOX_H
 
 #include <string>
 #include <unordered_map>
