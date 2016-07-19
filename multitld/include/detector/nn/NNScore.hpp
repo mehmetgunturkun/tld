@@ -1,0 +1,20 @@
+#ifndef NN_SCORE_H
+#define NN_SCORE_H
+
+#include <vector>
+#include "detector/nn/Patch.hpp"
+
+using namespace std;
+
+class NNScore {
+public:
+    Patch* patch;
+    vector<float> relativeScores;
+    vector<float> conservativeScores;
+
+    bool isAnyModelClassified;
+
+    NNScore(Patch* patch, vector<float> relativeScores, vector<float> conservativeScores);
+
+};
+#endif
