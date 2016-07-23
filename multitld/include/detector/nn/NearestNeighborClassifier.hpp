@@ -6,7 +6,10 @@
 #include "core/Frame.hpp"
 #include "core/ScoredBox.hpp"
 
+#include "detector/training/TrainingSet.hpp"
+
 #include "detector/nn/Patch.hpp"
+#include "detector/nn/NNScore.hpp"
 #include "detector/nn/ObjectModel.hpp"
 
 
@@ -14,7 +17,8 @@ using namespace std;
 
 class NearestNeighborClassifier {
 private:
-    vector<ObjectModel> models;
+    int nrOfModels;
+    vector<ObjectModel*> models;
 public:
     NearestNeighborClassifier();
     bool classify(Frame* frame, ScoredBox* scoredBox);

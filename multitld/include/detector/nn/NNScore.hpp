@@ -6,7 +6,7 @@
 
 using namespace std;
 
-class NNScore {
+class NNScore: public Score {
 public:
     Patch* patch;
     vector<float> relativeScores;

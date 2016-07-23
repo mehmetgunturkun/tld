@@ -25,5 +25,6 @@ public:
 
     double computeRelativeScore(Patch* sample);
     double computeConservativeScore(Patch* sample);
+    void add(Patch* patch, bool label);
 };
 #endif

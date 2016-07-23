@@ -76,3 +76,13 @@ double ObjectModel::computeSimilarity(Patch* templatePatch, Patch* samplePatch) 
     double ncc = (upper / lower);
     return 0.5 * (ncc + 1.0);
 }
+
+void ObjectModel::add(Patch* patch, bool label) {
+    if (label) {
+        positivePatchList.push_back(patch);
+        nrOfPositivePatches += 1;
+    } else {
+        negativePatchList.push_back(patch);
+        nrOfNegativePatches += 1;
+    }
+}
