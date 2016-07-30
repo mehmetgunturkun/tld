@@ -75,6 +75,40 @@ public:
         );
         return newBox;
     }
+
+    static double computeOverlap(Box* b1, Box* b2) {
+        double x11 = b1->x1;
+        double x12 = b1->x2;
+        double y11 = b1->y1;
+        double y12 = b1->y2;
+
+        double x21 = b2->x1;
+        double x22 = b2->x2;
+        double y21 = b2->y1;
+        double y22 = b2->y2;
+
+        if (x11 > x22 ||
+            y11 > y22 ||
+            x12 < x21 ||
+            y12 < y21) {
+                return 0;
+        }
+
+        double intersectionX = min(x12, x22) - max(x11, x21) + 1;
+        double intersectionY = min(y12, y22) - max(y11, y21) + 1;
+        double intersection = intersectionX * intersectionY;
+
+        double area1 = (x12 - x11 + 1) * (y12 - y11 + 1);
+        double area2 = (x22 - x21 + 1) * (y22 - y21 + 1);
+        double overlap = intersection / (area1 + area2 - intersection);
+        return overlap;
+    }
+};
+
+struct OverlapOrdered {
+  bool operator() (Box* box1, Box* box2) {
+      return box1->overlap >= box2->overlap;
+  }
 };
 
 #endif

@@ -8,7 +8,10 @@ public:
     vector<float> scores;
     vector<int> binaryCodes;
 
-    EnsembleScore() {}
+    EnsembleScore() {
+        scores.resize(13);
+        binaryCodes.resize(13);
+    }
 };
 
 #endif

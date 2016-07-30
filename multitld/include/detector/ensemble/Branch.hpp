@@ -8,6 +8,7 @@ private:
     vector<Leaf*> branch;
     int nrOfLeaves;
 public:
+    Branch();
     vector<float> getProbabilities();
     void update(int modelId, bool label);
 };

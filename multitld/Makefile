@@ -18,6 +18,7 @@ LDFLAGS  += $(OPENCV_LIBS)
 ARFLAGS = ruv
 
 lib2_sources := \
+	src/core/Random.cc \
 	src/core/Frame.cc \
 	src/core/Box.cc \
 	src/core/Point.cc \

@@ -9,7 +9,8 @@ EnsembleClassifier::EnsembleClassifier() {
         nrOfBaseClassifiers = 10;
         nrOfPixelComparisons = 13;
         baseClassifiers = generateBaseClassifier();
-
+        nrOfModels = 1;
+        printf("Ensemble Classifier is created with %lu base classifiers\n", baseClassifiers.size());
         this->POSITIVE_SCORE_THRESHOLD = 5;
 }
 
@@ -156,7 +157,7 @@ bool EnsembleClassifier::classify(Frame* frame, ScoredBox* scoredBox) {
     for (int i = 0; i < nrOfBaseClassifiers; i++) {
         BaseClassifier* bc = baseClassifiers[i];
         vector<float> bcScores = bc->score(frame, scoredBox->box, score);
-
+        
         for (int j = 0; j < nrOfModels; j++) {
             scores[j] += bcScores[j];
         }

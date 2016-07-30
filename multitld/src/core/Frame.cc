@@ -40,3 +40,13 @@ Frame::Frame(Mat* grayscale, Mat* gaussian) {
 void Frame::show() {
     Image::imshow("Frame", this->displayImg, 1000);
 }
+
+int Frame::get(Point2f* point, int imageType) {
+    int pixel = (int) gaussian->at<uchar>((int) point->y, (int) point->x);
+    return pixel;
+}
+
+int Frame::get(int x, int y, int imageType) {
+    int pixel = (int) gaussian->at<uchar>(y, x);
+    return pixel;
+}

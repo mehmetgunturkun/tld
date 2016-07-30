@@ -1,7 +1,7 @@
 #include "core/ScoredBox.hpp"
 
 ScoredBox::ScoredBox(Box* box) {
-
+    this->box = box;
 }
 
 ScoredBox* ScoredBox::clone() {
@@ -10,11 +10,11 @@ ScoredBox* ScoredBox::clone() {
 }
 
 void ScoredBox::merge(ScoredBox* other) {
-
+    //TODO NotImplemented
 }
 
 void ScoredBox::withScore(string classifierKey, Score* score) {
-
+    //TODO NotImplemented
 }
 
 Score* ScoredBox::getScore(string classifierKey) {
