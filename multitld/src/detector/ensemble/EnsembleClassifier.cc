@@ -157,7 +157,7 @@ bool EnsembleClassifier::classify(Frame* frame, ScoredBox* scoredBox) {
     for (int i = 0; i < nrOfBaseClassifiers; i++) {
         BaseClassifier* bc = baseClassifiers[i];
         vector<float> bcScores = bc->score(frame, scoredBox->box, score);
-        
+
         for (int j = 0; j < nrOfModels; j++) {
             scores[j] += bcScores[j];
         }
@@ -173,11 +173,13 @@ bool EnsembleClassifier::classify(Frame* frame, ScoredBox* scoredBox) {
     }
 
     score->scores = scores;
+    scoredBox->withScore("ensemble", score);
     return anyModelClassified;
 }
 
 void EnsembleClassifier::train(TrainingSet<Box> ts, int modelId) {
     vector<Labelled<Box>> samples = ts.getLabelledSamples();
+    printf("EC >> %lu samples are going to be processed for training\n", samples.size());
     for (int i = 0; i < ts.nrOfSamples; i++) {
         Labelled<Box> sample = samples[i];
 
@@ -190,6 +192,7 @@ void EnsembleClassifier::train(TrainingSet<Box> ts, int modelId) {
             bc->train(frame, box, modelId, label);
         }
     }
+    printf("EC >> %lu samples were processed for training\n", samples.size());
 }
 
 void EnsembleClassifier::train(TrainingSet<ScoredBox> ts, int modelId) {

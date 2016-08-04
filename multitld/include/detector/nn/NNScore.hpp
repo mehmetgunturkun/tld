@@ -2,6 +2,8 @@
 #define NN_SCORE_H
 
 #include <vector>
+
+#include "core/Score.hpp"
 #include "detector/nn/Patch.hpp"
 
 using namespace std;

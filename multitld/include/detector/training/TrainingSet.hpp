@@ -42,7 +42,7 @@ public:
         nrOfSamples = nrOfPositiveSamples + nrOfNegativeSamples;
     }
 
-    vector<Labelled<Type>> getLabelledSamples() {
+    vector<Labelled<Type>> getLabelledSamples(bool shouldWarp = false) {
         vector<Labelled<Type>> labelledSamples;
         Mat* gaussian = frame->gaussian;
 
@@ -56,6 +56,11 @@ public:
         }
 
         int warpNo = 0;
+        int warpLimit = 1;
+        if (shouldWarp) {
+            warpLimit = 20;
+        }
+
         do {
             for (int i = 0; i < nrOfPositiveSamples; i++) {
                 Type* sample = positiveSamples[i];
@@ -63,10 +68,10 @@ public:
                 labelledSamples.push_back(positiveSample);
             }
 
-            img = gaussian;
+            img = Image::warp(gaussian);
             f = new Frame(img, f->grayscale);
             warpNo += 1;
-        } while (warpNo < 20);
+        } while (warpNo < warpLimit);
         std::random_shuffle(labelledSamples.begin(), labelledSamples.end());
         return labelledSamples;
     }

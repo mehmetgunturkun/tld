@@ -96,5 +96,9 @@ public:
             cv::warpAffine(*img, *dest, H, dest->size());
             return dest;
     }
+
+    static Mat* warp(Mat* img) {
+        return Image::warp(img, 0.1, 0.1, 10.0, 0);
+    }
 };
 #endif

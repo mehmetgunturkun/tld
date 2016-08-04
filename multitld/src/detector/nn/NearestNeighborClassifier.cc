@@ -1,6 +1,9 @@
 #include "detector/nn/NearestNeighborClassifier.hpp"
 
-NearestNeighborClassifier::NearestNeighborClassifier() {}
+NearestNeighborClassifier::NearestNeighborClassifier() {
+    nrOfModels = 1;
+    models = { new ObjectModel() };
+}
 
 bool NearestNeighborClassifier::classify(Frame* frame, ScoredBox* scoredBox) {
     Box* box = scoredBox->box;
@@ -23,6 +26,7 @@ bool NearestNeighborClassifier::classify(Frame* frame, ScoredBox* scoredBox) {
 
 void NearestNeighborClassifier::train(TrainingSet<Box> ts, int modelId) {
     vector<Labelled<Box>> samples = ts.getLabelledSamples();
+    printf("NN >> %lu samples are going to be processed for training\n", samples.size());
     ObjectModel* model = models[modelId];
     for (int i = 0; i < ts.nrOfSamples; i++) {
         Labelled<Box> sample = samples[i];
@@ -32,6 +36,7 @@ void NearestNeighborClassifier::train(TrainingSet<Box> ts, int modelId) {
         Patch* patch = new Patch(frame, box);
         model->add(patch, label == 1);
     }
+    printf("NN >> %lu samples were processed for training\n", samples.size());
 }
 
 void NearestNeighborClassifier::train(TrainingSet<ScoredBox> ts, int modelId) {

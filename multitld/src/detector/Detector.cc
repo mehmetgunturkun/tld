@@ -6,13 +6,16 @@ Detector::Detector(Frame* frame, vector<Box*> boxList) {
 
     vClassifier = new VarianceClassifier(frame, boxList);
     eClassifier = new EnsembleClassifier();
-    // nnClassifier = new NearestNeighborClassifier();
+    nnClassifier = new NearestNeighborClassifier();
 
     maxScaleLimit = 10;
     minimumPatchSize = 24;
 
     nrOfPositiveBoxes4EnsembleAtInitialization = 10;
     nrOfNegativeBoxes4EnsembleAtInitialization = 100;
+
+    nrOfPositiveBoxes4NNAtInitialization = 1;
+    nrOfNegativeBoxes4NNAtInitialization = 10;
 
     positiveBoxOverlapThreshold = 0.6;
     negativeBoxOverlapThreshold = 0.2;
@@ -34,7 +37,7 @@ void Detector::init(Frame* frame, Box* box) {
     BoundedPriorityQueue<Box, OverlapOrdered> negativeQueue =
         BoundedPriorityQueue<Box, OverlapOrdered>(nrOfNegativeBoxes4EnsembleAtInitialization);
     BoxIterator* boxIterator = new BoxIterator(firstFrame, firstBox, maxScaleLimit, minimumPatchSize);
-    int i = 0;
+
     while (boxIterator->hasNext()) {
         Box* sampleBox = boxIterator->next();
 
@@ -75,29 +78,61 @@ void Detector::init(Frame* frame, Box* box) {
     );
 
     eClassifier->train(trainingSet4Ensemble, 0);
+
+    vector<Box*> positiveBoxList4NN = { positiveQueue.head() };
+    vector<Box*> negativeBoxList4NN = Random::randomSample(
+        negativeBoxList4Ensemble,
+        nrOfNegativeBoxes4NNAtInitialization
+    );
+    TrainingSet<Box> trainingSet4NN = TrainingSet<Box>(
+        frame,
+        positiveBoxList4NN,
+        negativeBoxList4NN
+    );
+
+    nnClassifier->train(trainingSet4NN, 0);
 }
 
 vector<ScoredBox*> Detector::detect(Frame* frame) {
     vector<ScoredBox*> allBoxList;
     BoxIterator* iterator = new BoxIterator(frame, firstBox, maxScaleLimit, minimumPatchSize);
+
+    int allPass = 0;
+    int variancePass = 0;
+    int ensemblePass = 0;
+
+    int nearestNeighborPass = 0;
+
     while (iterator->hasNext()) {
         Box* nextBox = iterator->next();
-
+        allPass += 1;
         if (!vClassifier->classify(frame, nextBox)) {
             continue;
         }
-
+        variancePass += 1;
 
         ScoredBox* scoredBox = new ScoredBox(nextBox);
         allBoxList.push_back(scoredBox);
         if (!eClassifier->classify(frame, scoredBox)) {
             continue;
         }
+        ensemblePass += 1;
 
 
-        // if (!nnClassifier->classify(frame, scoredBox)) {
-        //     continue;
-        // }
+        if (!nnClassifier->classify(frame, scoredBox)) {
+            continue;
+        } else {
+            printf("NEARESTN >>> %6d\n", nearestNeighborPass);
+            nearestNeighborPass += 1;
+        }
     }
+
+
+    printf("VARIANCE >>> %6d\n", variancePass);
+    printf("ENSEMBLE >>> %6d\n", ensemblePass);
+    printf("NEARESTN >>> %6d\n", nearestNeighborPass);
+    printf("---------------------\n");
+    printf("ALLPATCH >>> %6d\n", allPass);
+
     return allBoxList;
 }

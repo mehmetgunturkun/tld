@@ -9,6 +9,7 @@
 #include "common/BoundedPriorityQueue.hpp"
 #include "detector/variance/VarianceClassifier.hpp"
 #include "detector/ensemble/EnsembleClassifier.hpp"
+#include "detector/nn/NearestNeighborClassifier.hpp"
 
 class Detector {
 public:
@@ -17,7 +18,8 @@ public:
 
     VarianceClassifier* vClassifier;
     EnsembleClassifier* eClassifier;
-
+    NearestNeighborClassifier* nnClassifier;
+    
     int maxScaleLimit;
     int minimumPatchSize;
 
@@ -27,6 +29,8 @@ public:
 
     int nrOfPositiveBoxes4EnsembleAtInitialization;
     int nrOfNegativeBoxes4EnsembleAtInitialization;
+    int nrOfPositiveBoxes4NNAtInitialization;
+    int nrOfNegativeBoxes4NNAtInitialization;
 
     Detector(Frame* frame, vector<Box*> boxList);
 
