@@ -12,6 +12,7 @@
 #include "detector/nn/NNScore.hpp"
 #include "detector/nn/ObjectModel.hpp"
 
+#include "util/ImageBuilder.hpp"
 
 using namespace std;
 
@@ -19,6 +20,7 @@ class NearestNeighborClassifier {
 private:
     int nrOfModels;
     vector<ObjectModel*> models;
+    float POSITIVE_SCORE_THRESHOLD;
 public:
     NearestNeighborClassifier();
     bool classify(Frame* frame, ScoredBox* scoredBox);

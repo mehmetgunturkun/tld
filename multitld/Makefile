@@ -18,6 +18,7 @@ LDFLAGS  += $(OPENCV_LIBS)
 ARFLAGS = ruv
 
 lib2_sources := \
+	src/common/Colors.cc \
 	src/core/Random.cc \
 	src/core/Frame.cc \
 	src/core/Box.cc \
@@ -29,6 +30,7 @@ lib2_sources := \
 	src/core/ScoredBox.cc \
 	src/core/BoxIterator.cc \
 	src/core/IntegralImage.cc \
+	src/util/ImageBuilder.cc \
 	src/detector/variance/VarianceClassifier.cc \
 	src/detector/ensemble/PixelComparison.cc \
 	src/detector/ensemble/CodeGenerator.cc \

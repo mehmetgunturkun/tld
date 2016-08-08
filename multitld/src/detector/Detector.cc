@@ -21,7 +21,6 @@ Detector::Detector(Frame* frame, vector<Box*> boxList) {
     negativeBoxOverlapThreshold = 0.2;
 }
 
-
 bool Detector::isPositive(Box* box) {
     return (box->overlap > positiveBoxOverlapThreshold);
 }
@@ -30,19 +29,26 @@ bool Detector::isNegative(Box* box) {
     return (box->overlap < negativeBoxOverlapThreshold) && (box->variance > varianceThreshold);
 }
 
-//TODO It is going to be vector<Box*>
-void Detector::init(Frame* frame, Box* box) {
+void Detector::init(Frame* frame, vector<Box*> boxList) {
+    int nrOfBoxes = (int) boxList.size();
+    for (int i = 0; i < nrOfBoxes; i++) {
+            Box* box = boxList[i];
+            this->init(frame, box, i);
+    }
+}
+
+void Detector::init(Frame* frame, Box* box, int modelId) {
     BoundedPriorityQueue<Box, OverlapOrdered> positiveQueue =
         BoundedPriorityQueue<Box, OverlapOrdered>(nrOfPositiveBoxes4EnsembleAtInitialization);
     BoundedPriorityQueue<Box, OverlapOrdered> negativeQueue =
         BoundedPriorityQueue<Box, OverlapOrdered>(nrOfNegativeBoxes4EnsembleAtInitialization);
-    BoxIterator* boxIterator = new BoxIterator(firstFrame, firstBox, maxScaleLimit, minimumPatchSize);
 
+    BoxIterator* boxIterator = new BoxIterator(firstFrame, firstBox, maxScaleLimit, minimumPatchSize);
     while (boxIterator->hasNext()) {
         Box* sampleBox = boxIterator->next();
 
         //Compute Overlap
-        double overlap = Box::computeOverlap(sampleBox, firstBox);
+        double overlap = Box::computeOverlap(sampleBox, box);
         sampleBox->overlap = overlap;
 
         //Check if positive
@@ -77,7 +83,7 @@ void Detector::init(Frame* frame, Box* box) {
         negativeBoxList4Ensemble
     );
 
-    eClassifier->train(trainingSet4Ensemble, 0);
+    eClassifier->train(trainingSet4Ensemble, modelId);
 
     vector<Box*> positiveBoxList4NN = { positiveQueue.head() };
     vector<Box*> negativeBoxList4NN = Random::randomSample(
@@ -90,7 +96,7 @@ void Detector::init(Frame* frame, Box* box) {
         negativeBoxList4NN
     );
 
-    nnClassifier->train(trainingSet4NN, 0);
+    nnClassifier->train(trainingSet4NN, modelId);
 }
 
 vector<ScoredBox*> Detector::detect(Frame* frame) {
@@ -118,13 +124,18 @@ vector<ScoredBox*> Detector::detect(Frame* frame) {
         }
         ensemblePass += 1;
 
+        ImageBuilder* builder = new ImageBuilder();
+        builder->
+            withFrame(frame)->
+            withBox(nextBox)
+            ->display();
+
 
         if (!nnClassifier->classify(frame, scoredBox)) {
             continue;
-        } else {
-            printf("NEARESTN >>> %6d\n", nearestNeighborPass);
-            nearestNeighborPass += 1;
         }
+        printf("NEARESTN >>> %6d\n", nearestNeighborPass);
+        nearestNeighborPass += 1;
     }
 
 

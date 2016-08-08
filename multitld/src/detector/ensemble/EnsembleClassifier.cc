@@ -1,23 +1,22 @@
 #include "detector/ensemble/EnsembleClassifier.hpp"
-
+#include "util/ImageBuilder.hpp"
 EnsembleClassifier::EnsembleClassifier() {
         Random::seed();
-        // classifierName = Conf::getString("detector.ensemble.classifierName",  "ensemble");
-        // nrOfBaseClassifiers = Conf::getInt("detector.ensemble.nrOfBaseClassifiers",  10);
-        // nrOfPixelComparisons = Conf::getInt("detector.ensemble.nrOfPixelComparisons",  13);
+
         classifierName = "ensemble";
+
         nrOfBaseClassifiers = 10;
         nrOfPixelComparisons = 13;
+        nrOfModels = 2;
+
         baseClassifiers = generateBaseClassifier();
-        nrOfModels = 1;
-        printf("Ensemble Classifier is created with %lu base classifiers\n", baseClassifiers.size());
         this->POSITIVE_SCORE_THRESHOLD = 5;
 }
-
 
 vector<BaseClassifier*> EnsembleClassifier::generateBaseClassifier() {
     vector<PixelComparison*> allComparisons = produceAllComparisons();
     vector<BaseClassifier*> classifiers = shuffleComparisons(allComparisons);
+    printf("Ensemble Classifier is created with %lu base classifiers\n", classifiers.size());
     return classifiers;
 }
 
@@ -173,16 +172,16 @@ bool EnsembleClassifier::classify(Frame* frame, ScoredBox* scoredBox) {
     }
 
     score->scores = scores;
+    score->isAnyClassified = anyModelClassified;
     scoredBox->withScore("ensemble", score);
-    return anyModelClassified;
+    return score->isAnyClassified;
 }
 
 void EnsembleClassifier::train(TrainingSet<Box> ts, int modelId) {
-    vector<Labelled<Box>> samples = ts.getLabelledSamples();
+    vector<Labelled<Box>> samples = ts.getLabelledSamples(true);
     printf("EC >> %lu samples are going to be processed for training\n", samples.size());
-    for (int i = 0; i < ts.nrOfSamples; i++) {
+    for (int i = 0; i < samples.size(); i++) {
         Labelled<Box> sample = samples[i];
-
         Frame* frame = sample.frame;
         Box* box = sample.item;
         int label = sample.label;

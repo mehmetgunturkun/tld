@@ -35,6 +35,7 @@ Frame::Frame(Mat* grayscale, Mat* gaussian) {
     this->height = grayscale->rows;
     this->grayscale = grayscale;
     this->gaussian = gaussian;
+    this->displayImg = grayscale;
 }
 
 void Frame::show() {

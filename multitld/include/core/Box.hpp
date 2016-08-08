@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <math.h>
 #include <string>
+#include <vector>
 
 #include "common/Option.hpp"
 #include "common/StringStream.hpp"
@@ -34,6 +35,7 @@ public:
     Box(int id, float x1, float y1, float x2, float y2);
     Box* move(float dx, float dy);
     Box* clone();
+    vector<Box*> splitTwo();
 
     static Option<Box>* parseFromLine(string line) {
         StringStream* stream = new StringStream(line, ',');
@@ -103,6 +105,16 @@ public:
         double overlap = intersection / (area1 + area2 - intersection);
         return overlap;
     }
+
+    static vector<double> computeOverlap(Box* b1, vector<Box*> boxList, int nrOfBoxes) {
+        vector<double> overlaps(nrOfBoxes);
+        for (int i = 0; i < nrOfBoxes; i++) {
+            Box* b2 = boxList[i];
+            overlaps[i] = Box::computeOverlap(b1, b2);
+        }
+        return overlaps;
+    }
+
 };
 
 struct OverlapOrdered {

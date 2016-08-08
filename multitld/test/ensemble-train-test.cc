@@ -8,18 +8,20 @@ int main(int argc, char** argv) {
     Frame* frame = sequence->next();
 
     Box* initBox = sequence->initBox;
+    vector<Box*> boxList = initBox->splitTwo();
 
-    Box* b0 = initBox->move(0.0f, 0.0f);
-    Box* b1 = initBox->move(50.0f, 50.0f);
-    Box* b2 = initBox->move(-50.0f, 50.0f);
-    Box* b3 = initBox->move(50.0f, -50.0f);
-    Box* b4 = initBox->move(-50.0f, -50.0f);
+    Box* b0 = boxList[0];
+    Box* b1 = boxList[1];
+
+    printf("Box1 >> %s\n", b0->toString().c_str());
+    printf("Box2 >> %s\n", b1->toString().c_str());
+
+    boxList = {b1, b0};
 
 
-    vector<Box*> boxList = { b0, b1, b2, b3, b4 };
     Detector* detector = new Detector(frame, boxList);
-    printf("Init Box: %s\n", initBox->toString().c_str());
-    detector->init(frame, initBox);
+
+    detector->init(frame, boxList);
 
     vector<ScoredBox*> scoredBoxList = detector->detect(frame);
 

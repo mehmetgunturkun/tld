@@ -19,7 +19,7 @@ public:
     VarianceClassifier* vClassifier;
     EnsembleClassifier* eClassifier;
     NearestNeighborClassifier* nnClassifier;
-    
+
     int maxScaleLimit;
     int minimumPatchSize;
 
@@ -36,7 +36,8 @@ public:
 
     bool isPositive(Box* box);
     bool isNegative(Box* box);
-    void init(Frame* frame, Box* box);
+    void init(Frame* frame, vector<Box*> boxList);
+    void init(Frame* frame, Box* box, int modelId);
     vector<ScoredBox*> detect(Frame* frame);
 };
 #endif

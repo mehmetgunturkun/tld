@@ -1,7 +1,7 @@
 #include "detector/ensemble/Branch.hpp"
 
 Branch::Branch() {
-    nrOfLeaves = 1;
+    nrOfLeaves = 2;
     branch.resize(nrOfLeaves);
     for (int i = 0; i < nrOfLeaves; i++) {
         branch[i] = new Leaf();

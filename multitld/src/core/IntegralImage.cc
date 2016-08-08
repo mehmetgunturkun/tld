@@ -56,7 +56,7 @@ MeanVariance* IntegralImage::computeMeanVariance(int x, int y, int w, int h) {
     float variance = (float) squaredMean - (mean*mean);
 
     if (windowSum < 0 || squaredWindowSum < 0) {
-        printf("X: %d, Y: %d, SUM: %d, SQUARED-SUM: %d, AREA: %d, VAR: %f\n",x, y, windowSum, squaredWindowSum, area, variance);
+        printf("X: %d, Y: %d, W: %d, H: %d, SUM: %d, SQUARED-SUM: %d, AREA: %d, VAR: %f\n",x, y, w, h, windowSum, squaredWindowSum, area, variance);
     }
 
     MeanVariance* meanVariance = new MeanVariance(mean, variance);

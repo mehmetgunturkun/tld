@@ -21,3 +21,10 @@ Box* Box::clone() {
     Box* clone = new Box(id, x1, y1, x2, y2);
     return clone;
 }
+
+vector<Box*> Box::splitTwo() {
+    Box* b1 = new Box(id + 1, this->x1, this->y1, (this->x1 + this->x2) / 2, this->y2);
+    Box* b2 = new Box(id + 1, (this->x1 + this->x2) / 2, this->y1, this->x2, this->y2);
+    vector<Box*> boxList = {b1, b2};
+    return boxList;
+}

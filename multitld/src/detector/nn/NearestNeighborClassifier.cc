@@ -1,15 +1,16 @@
 #include "detector/nn/NearestNeighborClassifier.hpp"
 
 NearestNeighborClassifier::NearestNeighborClassifier() {
-    nrOfModels = 1;
-    models = { new ObjectModel() };
+    nrOfModels = 2;
+    models = { new ObjectModel(), new ObjectModel()  };
+    POSITIVE_SCORE_THRESHOLD = 0.6;
 }
 
 bool NearestNeighborClassifier::classify(Frame* frame, ScoredBox* scoredBox) {
     Box* box = scoredBox->box;
     Patch* patch = new Patch(frame, box);
-    vector<float> relativeScores;
-    vector<float> conservativeScores;
+    vector<float> relativeScores(nrOfModels);
+    vector<float> conservativeScores(nrOfModels);
     for (int i = 0;  i < nrOfModels; i++) {
         ObjectModel* objectModel = models[i];
         float relativeScore = objectModel->computeRelativeScore(patch);
@@ -19,8 +20,19 @@ bool NearestNeighborClassifier::classify(Frame* frame, ScoredBox* scoredBox) {
         conservativeScores[i] = conservativeScore;
     }
 
+    bool anyModelClassified = false;
+    for (int j = 0; j < nrOfModels; j++) {
+        float score = relativeScores[j];
+        if (score > POSITIVE_SCORE_THRESHOLD) {
+            anyModelClassified = true;
+            break;
+        }
+    }
+
     NNScore* score = new NNScore(patch, relativeScores, conservativeScores);
+    score->isAnyModelClassified = anyModelClassified;
     scoredBox->withScore("nn", score);
+
     return score->isAnyModelClassified;
 }
 
