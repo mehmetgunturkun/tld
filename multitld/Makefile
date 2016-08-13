@@ -43,7 +43,8 @@ lib2_sources := \
 	src/detector/nn/ObjectModel.cc \
 	src/detector/nn/NNScore.cc \
 	src/detector/nn/NearestNeighborClassifier.cc \
-	src/detector/Detector.cc
+	src/detector/Detector.cc \
+	src/tld/TLD.cc
 
 lib2_objects := $(patsubst %.cc,%.o,$(lib2_sources))
 lib2_target  := libceng515++.a

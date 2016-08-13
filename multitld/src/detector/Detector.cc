@@ -103,47 +103,25 @@ vector<ScoredBox*> Detector::detect(Frame* frame) {
     vector<ScoredBox*> allBoxList;
     BoxIterator* iterator = new BoxIterator(frame, firstBox, maxScaleLimit, minimumPatchSize);
 
-    int allPass = 0;
-    int variancePass = 0;
-    int ensemblePass = 0;
-
-    int nearestNeighborPass = 0;
-
     while (iterator->hasNext()) {
         Box* nextBox = iterator->next();
-        allPass += 1;
+
         if (!vClassifier->classify(frame, nextBox)) {
             continue;
         }
-        variancePass += 1;
 
         ScoredBox* scoredBox = new ScoredBox(nextBox);
         allBoxList.push_back(scoredBox);
         if (!eClassifier->classify(frame, scoredBox)) {
             continue;
         }
-        ensemblePass += 1;
-
-        ImageBuilder* builder = new ImageBuilder();
-        builder->
-            withFrame(frame)->
-            withBox(nextBox)
-            ->display();
-
 
         if (!nnClassifier->classify(frame, scoredBox)) {
             continue;
         }
-        printf("NEARESTN >>> %6d\n", nearestNeighborPass);
-        nearestNeighborPass += 1;
+
+        scoredBox->isDetected = true;
     }
-
-
-    printf("VARIANCE >>> %6d\n", variancePass);
-    printf("ENSEMBLE >>> %6d\n", ensemblePass);
-    printf("NEARESTN >>> %6d\n", nearestNeighborPass);
-    printf("---------------------\n");
-    printf("ALLPATCH >>> %6d\n", allPass);
 
     return allBoxList;
 }

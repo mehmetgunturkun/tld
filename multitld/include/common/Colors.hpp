@@ -14,5 +14,7 @@ public:
     static Scalar ORANGE;
     static Scalar PURPLE;
     static Scalar YELLOW;
+
+    static vector<Scalar> colors;
 };
 #endif

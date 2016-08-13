@@ -12,6 +12,8 @@
 
 #include <unordered_set>
 
+#define NR_OF_MODELS 2
+
 using namespace std;
 
 class Box {

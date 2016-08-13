@@ -32,6 +32,7 @@ public:
     int nrOfPositiveBoxes4NNAtInitialization;
     int nrOfNegativeBoxes4NNAtInitialization;
 
+    Detector();
     Detector(Frame* frame, vector<Box*> boxList);
 
     bool isPositive(Box* box);

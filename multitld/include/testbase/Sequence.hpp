@@ -15,6 +15,7 @@ using namespace std;
 
 class Sequence {
 public:
+    string key;
     vector<string> files;
     Box* initBox;
 

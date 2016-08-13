@@ -1,8 +1,8 @@
 #include "detector/nn/NearestNeighborClassifier.hpp"
 
 NearestNeighborClassifier::NearestNeighborClassifier() {
-    nrOfModels = 2;
-    models = { new ObjectModel(), new ObjectModel()  };
+    nrOfModels = NR_OF_MODELS;
+    models = { new ObjectModel(), new ObjectModel(), new ObjectModel()};
     POSITIVE_SCORE_THRESHOLD = 0.6;
 }
 
@@ -21,19 +21,21 @@ bool NearestNeighborClassifier::classify(Frame* frame, ScoredBox* scoredBox) {
     }
 
     bool anyModelClassified = false;
+    vector<int> classifiedModelIds;
     for (int j = 0; j < nrOfModels; j++) {
         float score = relativeScores[j];
         if (score > POSITIVE_SCORE_THRESHOLD) {
             anyModelClassified = true;
-            break;
+            classifiedModelIds.push_back(j);
         }
     }
 
     NNScore* score = new NNScore(patch, relativeScores, conservativeScores);
-    score->isAnyModelClassified = anyModelClassified;
+    score->isAnyModellClassified = anyModelClassified;
+    score->classifiedModelIds = classifiedModelIds;
     scoredBox->withScore("nn", score);
 
-    return score->isAnyModelClassified;
+    return score->isAnyModellClassified;
 }
 
 void NearestNeighborClassifier::train(TrainingSet<Box> ts, int modelId) {

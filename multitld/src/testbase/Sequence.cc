@@ -40,27 +40,27 @@ vector<string> listImageFiles(string directory) {
 }
 
 Sequence::Sequence(string key, int skip) {
-        string resourceString(RESOURCE_DIR);
-        string sampleDirectory = resourceString + "/" + key;
-        string sequenceDirectory = sampleDirectory + "/sequence";
+    this->key = key;
+    string resourceString(RESOURCE_DIR);
+    string sampleDirectory = resourceString + "/" + key;
+    string sequenceDirectory = sampleDirectory + "/sequence";
 
-        files = listImageFiles(sequenceDirectory);
-        nrOfFrames =  (int) files.size();
-        processedFrames = skip;
+    files = listImageFiles(sequenceDirectory);
+    nrOfFrames =  (int) files.size();
+    processedFrames = skip;
 
-        string initDir = sampleDirectory + "/evaluations/init.txt";
-        ifstream initFile(initDir);
-        if (initFile.is_open()) {
-            string line;
-            getline(initFile, line);
-            Option<Box>* maybeBox = Box::parseFromLine(line);
-            if (maybeBox->isEmpty()) {
-                throw "Failed to parse box from line" + line;
-            } else {
-                initBox = maybeBox->get();
-            }
+    string initDir = sampleDirectory + "/evaluations/init.txt";
+    ifstream initFile(initDir);
+    if (initFile.is_open()) {
+        string line;
+        getline(initFile, line);
+        Option<Box>* maybeBox = Box::parseFromLine(line);
+        if (maybeBox->isEmpty()) {
+            throw "Failed to parse box from line" + line;
+        } else {
+            initBox = maybeBox->get();
         }
-
+    }
 }
 
 bool Sequence::hasNext() {

@@ -4,6 +4,8 @@ Tracker::Tracker() {
     this->MARGIN = 5;
     this->TERM_CRITERIA = new TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, 20, 0.03);
     this->WIN_SIZE = new Size(4, 4);
+
+    printf("Tracker is created\n");
 }
 
 vector<Box*> Tracker::track(Frame* prev, Frame* curr, vector<Box*> boxList) {

@@ -7,7 +7,7 @@ EnsembleClassifier::EnsembleClassifier() {
 
         nrOfBaseClassifiers = 10;
         nrOfPixelComparisons = 13;
-        nrOfModels = 2;
+        nrOfModels = NR_OF_MODELS;
 
         baseClassifiers = generateBaseClassifier();
         this->POSITIVE_SCORE_THRESHOLD = 5;
@@ -163,18 +163,21 @@ bool EnsembleClassifier::classify(Frame* frame, ScoredBox* scoredBox) {
     }
 
     bool anyModelClassified = false;
+    vector<int> classifiedModelIds;
     for (int j = 0; j < nrOfModels; j++) {
         float score = scores[j];
         if (score > POSITIVE_SCORE_THRESHOLD) {
             anyModelClassified = true;
-            break;
+            classifiedModelIds.push_back(j);
         }
     }
 
     score->scores = scores;
-    score->isAnyClassified = anyModelClassified;
+    score->isAnyModellClassified = anyModelClassified;
+    score->classifiedModelIds = classifiedModelIds;
     scoredBox->withScore("ensemble", score);
-    return score->isAnyClassified;
+
+    return score->isAnyModellClassified;
 }
 
 void EnsembleClassifier::train(TrainingSet<Box> ts, int modelId) {

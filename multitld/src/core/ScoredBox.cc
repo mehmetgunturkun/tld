@@ -2,6 +2,7 @@
 
 ScoredBox::ScoredBox(Box* box) {
     this->box = box;
+    this->isDetected = false;
 }
 
 ScoredBox* ScoredBox::clone() {
@@ -14,7 +15,7 @@ void ScoredBox::merge(ScoredBox* other) {
 }
 
 void ScoredBox::withScore(string classifierKey, Score* score) {
-    //TODO NotImplemented
+    detailMap[classifierKey] = score;
 }
 
 Score* ScoredBox::getScore(string classifierKey) {
@@ -25,4 +26,9 @@ Score* ScoredBox::getScore(string classifierKey) {
 double ScoredBox::getScoreValue(string classifierKey) {
     Score* score = getScore(classifierKey);
     return score->value;
+}
+
+vector<int> ScoredBox::getCandidateModels() {
+    Score* score = getScore("nn");
+    return score->classifiedModelIds;
 }

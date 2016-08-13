@@ -14,8 +14,6 @@ public:
     vector<float> relativeScores;
     vector<float> conservativeScores;
 
-    bool isAnyModelClassified;
-
     NNScore(Patch* patch, vector<float> relativeScores, vector<float> conservativeScores);
 
 };

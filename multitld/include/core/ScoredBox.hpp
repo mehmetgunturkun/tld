@@ -22,5 +22,6 @@ public:
     void withScore(string classifierKey, Score* score);
     Score* getScore(string classifierKey);
     double getScoreValue(string classifierKey);
+    vector<int> getCandidateModels();
 };
 #endif

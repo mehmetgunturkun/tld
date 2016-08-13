@@ -5,7 +5,6 @@
 
 class EnsembleScore: public Score {
 public:
-    bool isAnyClassified;
     vector<float> scores;
     vector<int> binaryCodes;
 
