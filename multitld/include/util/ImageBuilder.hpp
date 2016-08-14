@@ -15,6 +15,7 @@ public:
 
     ImageBuilder();
     ImageBuilder(Mat* img);
+    ImageBuilder(Frame* frame);
     ImageBuilder* withFrame(Frame* frame);
     ImageBuilder* withBox(Box* box, Scalar color = Colors::RED);
     ImageBuilder* withTitle(string title);

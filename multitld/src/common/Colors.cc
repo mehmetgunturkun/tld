@@ -10,8 +10,8 @@ Scalar Colors::BLUE = Scalar(255, 0, 0);
 vector<Scalar> Colors::colors = {
     Colors::RED,
     Colors::BLUE,
-    Colors::PURPLE,
-    Colors::YELLOW,
     Colors::ORANGE,
-    Colors::GREEN
+    Colors::GREEN,
+    Colors::PURPLE,
+    Colors::YELLOW
 };

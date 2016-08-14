@@ -9,6 +9,11 @@ ImageBuilder::ImageBuilder(Mat* img) {
     this->img = img;
 }
 
+ImageBuilder::ImageBuilder(Frame* frame) {
+    this->title = "Default";
+    this->img = new Mat(frame->displayImg->clone());
+}
+
 ImageBuilder* ImageBuilder::withFrame(Frame* frame) {
     this->img = new Mat(frame->displayImg->clone());
     return this;

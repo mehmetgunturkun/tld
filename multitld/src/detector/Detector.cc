@@ -105,12 +105,12 @@ vector<ScoredBox*> Detector::detect(Frame* frame) {
 
     while (iterator->hasNext()) {
         Box* nextBox = iterator->next();
+        ScoredBox* scoredBox = new ScoredBox(nextBox);
 
-        if (!vClassifier->classify(frame, nextBox)) {
+        if (!vClassifier->classify(frame, scoredBox)) {
             continue;
         }
 
-        ScoredBox* scoredBox = new ScoredBox(nextBox);
         allBoxList.push_back(scoredBox);
         if (!eClassifier->classify(frame, scoredBox)) {
             continue;
