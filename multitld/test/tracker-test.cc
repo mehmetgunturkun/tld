@@ -3,47 +3,26 @@
 #include "testbase/Sequence.hpp"
 #include "common/Colors.hpp"
 #include "util/ImageBuilder.hpp"
+
 int main(int argc, char** argv) {
-    Box* b1 = new Box(1, 142, 125, 232, 165);
+    Sequence* sequence = new Sequence("car");
+    Frame* firstFrame = sequence->next();
+    Frame* secondFrame = sequence->next();
+
+    Box* initBox = sequence->initBox;
+    vector<Box*> boxList = initBox->splitTwo();
+    boxList = { initBox, nullptr, boxList[0], boxList[1] };
 
     Tracker* tracker = new Tracker();
 
-    Sequence* sequence = new Sequence("car");
-    Frame* firstFrame = sequence->next();
-
-    Box* firstBox = sequence->initBox;
-    vector<Box*> boxList = { firstBox, firstBox, firstBox };
-    int frameNo = 1;
-    Frame* previous = firstFrame;
-    while (sequence->hasNext()) {
-        Frame* current = sequence->next();
-        printf("---  #%3d. %s. Frame ---\n", frameNo, current->name.c_str());
-        boxList = tracker->track(previous, current, boxList);
-        for (int i = 0; i < boxList.size(); i++) {
-            Box* box = boxList[i];
-            ImageBuilder* builder = new ImageBuilder();
-            builder->
-                withFrame(current)->
-                withBox(box, Colors::BLUE)
-                ->display(0);
+    vector<Box*> nextBoxList = tracker->track(firstFrame, secondFrame, boxList);
+    for (int i = 0; i < 4; i++) {
+        Box* box = nextBoxList[i];
+        if (box == nullptr) {
+            printf("BOX >> Failed\n");
+        } else {
+            printf("BOX >> %s\n", box->toString().c_str());
         }
-        if (frameNo == 20) {
-            Image::imshow("Failure", current->displayImg, 0);
-        }
-        if (boxList.size() == 0) {
-            current->show();
-            return EXIT_FAILURE;
-        }
-
-        previous = current;
-        printf("-------------------\n");
-        frameNo += 1;
     }
-
-
-
-
-    // vector<Box*> trackedPoints = tracker->track(firstFrame, secondFrame, boxList);
-
     return EXIT_SUCCESS;
 }

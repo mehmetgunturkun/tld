@@ -23,7 +23,14 @@ public:
     vector<tld::Point*> decomposePoints(vector<Box*> boxList, int nrOfBoxes);
     vector<FBPoint*> track(Frame* prev, Frame* curr, vector<tld::Point*> points);
     vector<tld::Point*> lkTrack(Frame* prev, Frame* curr, vector<tld::Point*> points);
-    vector<Box*> fragmentAndEstimateBoxList(Frame* prev, Frame* curr, vector<Box*> boxList, vector<FBPoint*> trackedPoints);
+    // vector<Box*> fragmentAndEstimateBoxList(Frame* prev, Frame* curr, vector<Box*> boxList, vector<FBPoint*> trackedPoints);
+    vector<Box*> fragmentAndEstimateBoxList(Frame* prev,
+                                            Frame* curr,
+                                            int nrOfStableBoxes,
+                                            vector<Box*> stableBoxList,
+                                            int nrOfBoxes,
+                                            vector<Box*> boxList,
+                                            vector<FBPoint*> trackedPoints);
     vector<Box*> track(Frame* prev, Frame* curr, std::vector<Box*> boxList);
 };
 #endif

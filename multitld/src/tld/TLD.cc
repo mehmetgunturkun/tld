@@ -17,11 +17,13 @@ vector<Box*> TLD::track(Frame* prev, Frame* curr, vector<Box*> boxList) {
 
     for (int i = 0; i < currBoxList.size(); i++) {
         Box* box = currBoxList[i];
-        ImageBuilder* builder = new ImageBuilder();
-        builder->
-            withFrame(curr)->
-            withBox(box, Colors::YELLOW)
-            ->display(50);
+        if (box != nullptr) {
+            ImageBuilder* builder = new ImageBuilder();
+            builder->
+                withFrame(curr)->
+                withBox(box, Colors::YELLOW)
+                ->display(50);
+        }
     }
 
     vector<vector<ScoredBox*>> groupedScoredBoxes;

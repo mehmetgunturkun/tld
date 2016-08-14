@@ -8,11 +8,34 @@ Tracker::Tracker() {
     printf("Tracker is created\n");
 }
 
+vector<Box*> getStableBoxes(int nrOfBoxes, vector<Box*> boxList) {
+    vector<Box*> stableBoxList;
+    for (int i = 0; i < nrOfBoxes; i++) {
+        Box* box = boxList[i];
+        if (box != nullptr) {
+            stableBoxList.push_back(box);
+        }
+    }
+    return stableBoxList;
+}
+
 vector<Box*> Tracker::track(Frame* prev, Frame* curr, vector<Box*> boxList) {
     int nrOfBoxes = boxList.size();
-    vector<tld::Point*> points = decomposePoints(boxList, nrOfBoxes);
+
+    vector<Box*> stableBoxList = getStableBoxes(nrOfBoxes, boxList);
+    int nrOfStableBoxes = (int) stableBoxList.size();
+
+    vector<tld::Point*> points = decomposePoints(stableBoxList, nrOfStableBoxes);
     vector<FBPoint*> trackedPoints = track(prev, curr, points);
-    vector<Box*> estimatedBoxList = fragmentAndEstimateBoxList(prev, curr, boxList, trackedPoints);
+    vector<Box*> estimatedBoxList = fragmentAndEstimateBoxList(
+        prev,
+        curr,
+        nrOfStableBoxes,
+        stableBoxList,
+        nrOfBoxes,
+        boxList,
+        trackedPoints
+    );
     return estimatedBoxList;
 }
 
@@ -207,18 +230,35 @@ Option<Box>* estimate(Frame* prev, Frame* curr, Box* box, vector<FBPoint*> track
     return successBox;
 }
 
-vector<Box*> Tracker::fragmentAndEstimateBoxList(Frame* prev, Frame* curr, vector<Box*> boxList, vector<FBPoint*> trackedPoints) {
+vector<Box*> Tracker::fragmentAndEstimateBoxList(Frame* prev,
+                                                 Frame* curr,
+                                                 int nrOfStableBoxes,
+                                                 vector<Box*> stableBoxList,
+                                                 int nrOfBoxes,
+                                                 vector<Box*> boxList,
+                                                 vector<FBPoint*> trackedPoints) {
     vector<Box*> estimatedBoxList;
-    int nrOfBoxes = boxList.size();
+    int i = 0;
+    int j = 0;
+
     int cursor = 0;
-    for (int i = 0; i < nrOfBoxes; i++) {
+    while (i < nrOfBoxes) {
         Box* box = boxList[i];
-        int nrOfPoints = box->nrOfPoints;
-        Option<Box>* maybeBox = estimate(prev, curr, box, trackedPoints, cursor, cursor + nrOfPoints);
-        if (maybeBox->isDefined()) {
-            estimatedBoxList.push_back(maybeBox->get());
+        if (box == nullptr) {
+            estimatedBoxList.push_back(nullptr);
+        } else {
+            Box* stableBox = stableBoxList[j];
+            int nrOfPoints = stableBox->nrOfPoints;
+            Option<Box>* maybeBox = estimate(prev, curr, stableBox, trackedPoints, cursor, cursor + nrOfPoints);
+            if (maybeBox->isDefined()) {
+                estimatedBoxList.push_back(maybeBox->get());
+            } else {
+                estimatedBoxList.push_back(nullptr);
+            }
+            cursor += nrOfPoints;
+            j += 1;
         }
-        cursor += nrOfPoints;
+        i += 1;
     }
     return estimatedBoxList;
 }
