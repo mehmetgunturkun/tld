@@ -125,3 +125,9 @@ vector<ScoredBox*> Detector::detect(Frame* frame) {
 
     return allBoxList;
 }
+
+ScoredBox* Detector::validate(Frame* frame, Box* box, int modelId) {
+    ScoredBox* scoredBox = new ScoredBox(box);
+    nnClassifier->validate(frame, scoredBox, modelId);
+    return scoredBox;
+}

@@ -24,6 +24,7 @@ private:
 public:
     NearestNeighborClassifier();
     bool classify(Frame* frame, ScoredBox* scoredBox);
+    bool validate(Frame* frame, ScoredBox* scoredBox, int modelId);
     void train(TrainingSet<Box> ts, int modelId);
     void train(TrainingSet<ScoredBox> ts, int modelId);
 };

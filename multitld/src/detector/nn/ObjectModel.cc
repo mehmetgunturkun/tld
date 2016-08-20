@@ -29,7 +29,7 @@ double ObjectModel::computeConservativeScore(Patch* sample) {
 }
 
 double ObjectModel::computeInitialPositiveSimilarity(Patch* sample) {
-    return computeNearestSimilarity(positivePatchList, ceil(nrOfPositivePatches / 2), sample);
+    return computeNearestSimilarity(positivePatchList, ceil( (float) nrOfPositivePatches / 2), sample);
 }
 
 double ObjectModel::computePositiveSimilarity(Patch* sample) {

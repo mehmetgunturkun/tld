@@ -12,6 +12,13 @@ ScoredBox* ScoredBox::clone() {
 
 void ScoredBox::merge(ScoredBox* other) {
     //TODO NotImplemented
+    this->box = Box::merge(this->box, other->box);
+    // for ( auto it = this->detailMap.begin(); it != this->detailMap.end(); ++it ) {
+    //     Score* thisScore = it->second;
+    //     Score* otherScore = other->detailMap[it->first];
+    //     Score* newScore = thisScore->merge(otherScore);
+    //     this->detailMap[it->first] = newScore;
+    // }
 }
 
 void ScoredBox::withScore(string classifierKey, Score* score) {

@@ -14,8 +14,8 @@ void ScoredBox::merge(ScoredBox* other) {
     for ( auto it = this->detailMap.begin(); it != this->detailMap.end(); ++it ) {
         ClassificationDetails* thisDetail = it->second;
         ClassificationDetails* otherDetail = other->detailMap[it->first];
-        ClassificationDetails* newDetail = thisDetail->merge(otherDetail);
-        this->detailMap[it->first] = newDetail;
+        ClassificationDetails* newScore = thisDetail->merge(otherDetail);
+        this->detailMap[it->first] = newScore;
     }
 }
 

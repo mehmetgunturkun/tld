@@ -38,8 +38,40 @@ bool NearestNeighborClassifier::classify(Frame* frame, ScoredBox* scoredBox) {
     return score->isAnyModellClassified;
 }
 
+bool NearestNeighborClassifier::validate(Frame* frame, ScoredBox* scoredBox, int modelId) {
+    Box* box = scoredBox->box;
+    Patch* patch = new Patch(frame, box);
+    vector<float> relativeScores(nrOfModels);
+    vector<float> conservativeScores(nrOfModels);
+
+    ObjectModel* objectModel = models[modelId];
+    float relativeScore = objectModel->computeRelativeScore(patch);
+    float conservativeScore = objectModel->computeConservativeScore(patch);
+
+    relativeScores[modelId] = relativeScore;
+    conservativeScores[modelId] = conservativeScore;
+
+    printf("CS(%d): %f\n", modelId, conservativeScore);
+
+    bool anyModelClassified = false;
+    vector<int> classifiedModelIds;
+    if (conservativeScore > 0.5) {
+        anyModelClassified = true;
+        classifiedModelIds.push_back(modelId);
+    }
+
+    NNScore* score = new NNScore(patch, relativeScores, conservativeScores);
+    score->isAnyModellClassified = anyModelClassified;
+
+    score->classifiedModelIds = classifiedModelIds;
+    scoredBox->withScore("nn", score);
+    scoredBox->isDetected = anyModelClassified;
+
+    return score->isAnyModellClassified;
+}
+
 void NearestNeighborClassifier::train(TrainingSet<Box> ts, int modelId) {
-    vector<Labelled<Box>> samples = ts.getLabelledSamples();
+    vector<Labelled<Box>> samples = ts.getLabelledSamples(false);
     printf("NN >> %lu samples are going to be processed for training\n", samples.size());
     ObjectModel* model = models[modelId];
     for (int i = 0; i < ts.nrOfSamples; i++) {

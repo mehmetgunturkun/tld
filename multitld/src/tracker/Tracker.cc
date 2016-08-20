@@ -25,18 +25,22 @@ vector<Box*> Tracker::track(Frame* prev, Frame* curr, vector<Box*> boxList) {
     vector<Box*> stableBoxList = getStableBoxes(nrOfBoxes, boxList);
     int nrOfStableBoxes = (int) stableBoxList.size();
 
-    vector<tld::Point*> points = decomposePoints(stableBoxList, nrOfStableBoxes);
-    vector<FBPoint*> trackedPoints = track(prev, curr, points);
-    vector<Box*> estimatedBoxList = fragmentAndEstimateBoxList(
-        prev,
-        curr,
-        nrOfStableBoxes,
-        stableBoxList,
-        nrOfBoxes,
-        boxList,
-        trackedPoints
-    );
-    return estimatedBoxList;
+    if (nrOfStableBoxes == 0) {
+        return boxList;
+    } else {
+        vector<tld::Point*> points = decomposePoints(stableBoxList, nrOfStableBoxes);
+        vector<FBPoint*> trackedPoints = track(prev, curr, points);
+        vector<Box*> estimatedBoxList = fragmentAndEstimateBoxList(
+            prev,
+            curr,
+            nrOfStableBoxes,
+            stableBoxList,
+            nrOfBoxes,
+            boxList,
+            trackedPoints
+        );
+        return estimatedBoxList;
+    }
 }
 
 float Tracker::computeStep(float start, float end, int pointCount) {

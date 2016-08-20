@@ -1,5 +1,7 @@
 #include "core/Box.hpp"
 
+Option<Box>* Box::None = new Option<Box>();
+
 Box::Box(int id, float x1, float y1, float x2, float y2) {
     this->id = id;
 
