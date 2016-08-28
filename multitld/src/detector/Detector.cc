@@ -99,6 +99,68 @@ void Detector::init(Frame* frame, Box* box, int modelId) {
     nnClassifier->train(trainingSet4NN, modelId);
 }
 
+void Detector::learn(Frame* current,
+                     Box* box,
+                     vector<ScoredBox*> grids,
+                     int modelId) {
+    int gridSize = (int) grids.size();
+    BoundedPriorityQueue<ScoredBox, ScoredBoxOverlapOrdered> positiveQueue =
+        BoundedPriorityQueue<ScoredBox, ScoredBoxOverlapOrdered>(10);
+
+    BoundedPriorityQueue<ScoredBox, ScoredBoxOverlapOrdered> negativeQueue =
+        BoundedPriorityQueue<ScoredBox, ScoredBoxOverlapOrdered>(INT_MAX);
+
+    BoundedPriorityQueue<ScoredBox, ScoredBoxOverlapOrdered> negativeQueue4NN =
+        BoundedPriorityQueue<ScoredBox, ScoredBoxOverlapOrdered>(INT_MAX);
+
+    for (int i = 0; i < gridSize; i++) {
+        ScoredBox* sample = grids[i];
+
+        //Compute Overlap
+        Box* sampleBox = sample->box;
+        double overlap = Box::computeOverlap(sampleBox, box);
+
+        sampleBox->overlap = overlap;
+
+        if (isPositive(sample->box)) {
+            positiveQueue += sample;
+            continue;
+        }
+
+        if (isNegative(sample->box) && sample->getScoreValue("ensemble") >= 1) {
+            negativeQueue += sample;
+        }
+
+        if (sample->isDetected && sampleBox->overlap < 0.2) {
+            negativeQueue4NN += sample;
+        }
+
+    }
+
+    vector<ScoredBox*> positiveBoxList4Ensemble = positiveQueue.toVector();
+    vector<ScoredBox*> negativeBoxList4Ensemble = negativeQueue.toVector();
+    TrainingSet<ScoredBox> trainingSet4Ensemble = TrainingSet<ScoredBox>(
+        current,
+        positiveBoxList4Ensemble,
+        negativeBoxList4Ensemble
+    );
+
+    // eClassifier->train(trainingSet4Ensemble, modelId);
+
+    vector<ScoredBox*> positiveBoxList4NN;
+    if (positiveQueue.count > 0) {
+        positiveBoxList4NN = { positiveQueue.head() };
+    }
+    vector<ScoredBox*> negativeBoxList4NN = negativeQueue4NN.toVector();
+
+    TrainingSet<ScoredBox> trainingSet4NN = TrainingSet<ScoredBox>(
+        current,
+        positiveBoxList4NN,
+        negativeBoxList4NN
+    );
+    // nnClassifier->train(trainingSet4NN, modelId);
+}
+
 vector<ScoredBox*> Detector::detect(Frame* frame) {
     vector<ScoredBox*> allBoxList;
     BoxIterator* iterator = new BoxIterator(frame, firstBox, maxScaleLimit, minimumPatchSize);

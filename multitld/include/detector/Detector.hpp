@@ -40,6 +40,10 @@ public:
     void init(Frame* frame, vector<Box*> boxList);
     void init(Frame* frame, Box* box, int modelId);
     vector<ScoredBox*> detect(Frame* frame);
+    void learn(Frame* current,
+               Box* box,
+               vector<ScoredBox*> grids,
+               int modelId);
     ScoredBox* validate(Frame* frame, Box* box, int modelId);
 };
 #endif

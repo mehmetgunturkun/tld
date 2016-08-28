@@ -42,24 +42,18 @@ private:
         vector<ScoredBox*> boxList) {
             int nrOfClusters = (int) cluster.size();
             vector<ScoredBox*> clusteredBoxes;
-            printf("#Clusters: %d\n", nrOfClusters);
 
             for (int i = 0; i < nrOfClusters; i++) {
                 Cluster* c = cluster[i];
                 vector<int> idList = c->pointList;
                 ScoredBox* box = boxList[idList[0]]->clone();
                 int nrOfBoxes = c->size;
-                printf("#Boxes: %d\n", nrOfBoxes);
                 for (int j = 1; j < nrOfBoxes; j++) {
-                    printf("%d - begin\n", j);
                     ScoredBox* otherBox = boxList[idList[j]];
                     box->merge(otherBox);
-                    printf("%d - end\n", j);
                 }
-                printf("#Boxes: %d - end\n", nrOfBoxes);
                 clusteredBoxes.push_back(box);
             }
-            printf("#Clusters: %d - end\n", nrOfClusters);
             return clusteredBoxes;
     }
 public:
@@ -77,13 +71,16 @@ public:
     vector<int> getCandidateModels();
 
     static vector<ScoredBox*> cluster(vector<ScoredBox*> boxList, int nrOfBoxes) {
-        printf("Computing distances...\n");
         vector<Distance*> distances = computeDistances(boxList, nrOfBoxes);
-        printf("Building clusters...\n");
         vector<Cluster*> clusters = Cluster::build(distances, distances.size(), 0.5);
-        printf("Combining clusters...\n");
         vector<ScoredBox*> clusteredBoxes = combineClusters(clusters, boxList);
         return clusteredBoxes;
     }
+};
+
+struct ScoredBoxOverlapOrdered {
+  bool operator() (ScoredBox* box1, ScoredBox* box2) {
+      return box1->box->overlap >= box2->box->overlap;
+  }
 };
 #endif

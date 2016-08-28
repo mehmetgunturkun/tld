@@ -50,9 +50,7 @@ bool NearestNeighborClassifier::validate(Frame* frame, ScoredBox* scoredBox, int
 
     relativeScores[modelId] = relativeScore;
     conservativeScores[modelId] = conservativeScore;
-
-    printf("CS(%d): %f\n", modelId, conservativeScore);
-
+    
     bool anyModelClassified = false;
     vector<int> classifiedModelIds;
     if (conservativeScore > 0.5) {

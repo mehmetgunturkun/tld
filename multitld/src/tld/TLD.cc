@@ -44,6 +44,7 @@ vector<Box*> TLD::track(Frame* prev, Frame* curr, vector<Box*> boxList) {
     }
 
     ImageBuilder* builder = new ImageBuilder(curr);
+    vector<Box*> estimatedBoxList;
     for (int i = 0; i < NR_OF_MODELS; i++) {
         Box* trackedBox = currBoxList[i];
         vector<ScoredBox*> allBoxList = groupedAllBoxes[i];
@@ -53,19 +54,19 @@ vector<Box*> TLD::track(Frame* prev, Frame* curr, vector<Box*> boxList) {
         Option<Box>* maybeBox = integrate(curr, trackedBox, allBoxList, detectedBoxList, i);
         if (maybeBox->isDefined()) {
             builder->withBox(maybeBox->get());
+            estimatedBoxList.push_back(maybeBox->get());
         } else {
+            estimatedBoxList.push_back(nullptr);
             printf("No valid result for %d!\n", i);
         }
     }
     builder->display(5);
-    return currBoxList;
+    return estimatedBoxList;
 }
 
 Option<Box>* TLD::integrate(Frame* current, Box* trackedBox, vector<ScoredBox*> allBoxes, vector<ScoredBox*> detectedBoxes, int modelId) {
     ScoredBox* scoredTrackBox = validate(current, trackedBox, modelId);
-    printf("Clustering...\n");
     vector<ScoredBox*> clusteredBoxes = ScoredBox::cluster(detectedBoxes,(int) detectedBoxes.size());
-    printf("Clustered...\n");
     if (scoredTrackBox->isDetected) {
         printf("Tracker Success ");
         // Tracker.Success
@@ -77,7 +78,7 @@ Option<Box>* TLD::integrate(Frame* current, Box* trackedBox, vector<ScoredBox*> 
                 return successBox;
             } else {
                 Box* combinedBox = combineClosestBoxes(scoredTrackBox, clusteredBoxes);
-                // learn(combined, allBoxes);
+                detector->learn(current, combinedBox, allBoxes, modelId);
                 Option<Box>* successBox = new Option<Box>(combinedBox);
                 return successBox;
             }
@@ -85,7 +86,7 @@ Option<Box>* TLD::integrate(Frame* current, Box* trackedBox, vector<ScoredBox*> 
             printf("Detector Failed \n");
             // Detector.Fail
             Option<Box>* successBox = new Option<Box>(trackedBox);
-            // learn(trackedBox, allBoxes);
+            detector->learn(current, trackedBox, allBoxes, modelId);
             return successBox;
         }
     } else {
@@ -118,6 +119,7 @@ ScoredBox* TLD::validate(Frame* current, Box* trackedBox, int modelId) {
         if (scoredBox->isDetected) {
             return scoredBox;
         } else {
+            printf("Tracker Invalid ");
             return new ScoredBox(trackedBox);
         }
     }

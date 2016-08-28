@@ -228,7 +228,7 @@ Option<Box>* estimate(Frame* prev, Frame* curr, Box* box, vector<FBPoint*> track
 
     float medX = median(dxList);
     float medY = median(dyList);
-    printf("Dx = %f, Dy = %f\n", medX, medY);
+
     Box* movedBox = box->move(medX, medY);
     Option<Box>* successBox = new Option<Box>(movedBox);
     return successBox;
