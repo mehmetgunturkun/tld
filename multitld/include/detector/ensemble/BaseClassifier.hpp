@@ -17,7 +17,10 @@ public:
     int id;
     BaseClassifier(int i, vector<PixelComparison*> comparisons);
     vector<float> score(Frame* frame, Box* box, EnsembleScore* score);
+    float score(Frame* frame, Box* box, EnsembleScore* score, int modelId);
+    float getProbability(ScoredBox* box, int modelId);
     void train(Frame* frame, Box* box, int modelId, bool label);
     void train(Frame* frame, ScoredBox* box, int modelId, bool label);
+    void dumpBaseClassifier();
 };
 #endif

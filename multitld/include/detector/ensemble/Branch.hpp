@@ -7,10 +7,14 @@ class Branch {
 private:
     vector<Leaf*> branch;
     int nrOfLeaves;
+
 public:
+    bool dirtyBit;
     Branch();
     vector<float> getProbabilities();
+    float getProbability(int modelId);
     void update(int modelId, bool label);
+    void dumpLeaves();
 };
 
 #endif

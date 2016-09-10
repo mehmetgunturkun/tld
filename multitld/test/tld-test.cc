@@ -6,7 +6,7 @@ int main(int argc, char** argv) {
     Frame* firstFrame = sequence->next();
 
     Box* initBox = sequence->initBox;
-    vector<Box*> boxList = initBox->splitTwo();
+    vector<Box*> boxList = { initBox };
 
     TLD* tld = new TLD(firstFrame, boxList);
 

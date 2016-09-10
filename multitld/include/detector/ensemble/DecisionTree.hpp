@@ -10,7 +10,9 @@ private:
 public:
     DecisionTree();
     vector<float> getProbabilities(int binaryCode);
+    float getProbability(int binaryCode, int modelId);
     void update(int binaryCode, int modelId, bool label);
+    void dumpDecisionTree();
 };
 
 #endif

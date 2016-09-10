@@ -1,4 +1,5 @@
 
+#include "detector/ensemble/EnsembleClassifier.hpp"
 #include "detector/Detector.hpp"
 #include "testbase/Sequence.hpp"
 
@@ -6,25 +7,29 @@ int main(int argc, char** argv) {
     Sequence* sequence = new Sequence("car");
 
     Frame* frame = sequence->next();
+    Frame* testFrame = sequence->next();
 
     Box* initBox = sequence->initBox;
-    vector<Box*> boxList = initBox->splitTwo();
-
-    Box* b0 = boxList[0];
-    Box* b1 = boxList[1];
-
-    printf("Box1 >> %s\n", b0->toString().c_str());
-    printf("Box2 >> %s\n", b1->toString().c_str());
-
-    boxList = {b1, b0};
-
+    vector<Box*> boxList = { initBox };
 
     Detector* detector = new Detector(frame, boxList);
+    EnsembleClassifier* eClassifier = detector->eClassifier;
 
+    // eClassifier->dumpEnsembleClassifier();
     detector->init(frame, boxList);
+    // eClassifier->dumpEnsembleClassifier();
 
-    vector<ScoredBox*> scoredBoxList = detector->detect(frame);
-
-
+    vector<ScoredBox*> scoredBoxList = detector->detect(testFrame);
+    int nrOfBoxes = scoredBoxList.size();
+    for (int i = 0 ; i < nrOfBoxes; i++) {
+        ScoredBox* scoredBox = scoredBoxList[i];
+        if (scoredBox->isDetected) {
+            ImageBuilder* builder = (new ImageBuilder(frame))->withBox(scoredBox->box);
+            EnsembleScore* ensembleScore = (EnsembleScore*) scoredBox->getScore("ensemble");
+            float score = ensembleScore->scores[0];
+            printf("Score >> %3.3f\n", score);
+            builder->display(0);
+        }
+    }
     return EXIT_SUCCESS;
 }

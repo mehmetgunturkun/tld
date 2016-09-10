@@ -13,7 +13,24 @@ vector<float> DecisionTree::getProbabilities(int binaryCode) {
     return probabilities;
 }
 
+float DecisionTree::getProbability(int binaryCode, int modelId) {
+    Branch* branch = tree[binaryCode];
+    float probability = branch->getProbability(modelId);
+    return probability;
+}
+
 void DecisionTree::update(int binaryCode, int modelId, bool label) {
     Branch* branch = tree[binaryCode];
     branch->update(modelId, label);
+}
+
+void DecisionTree::dumpDecisionTree() {
+    int nrOfBranch = pow(2, 13);
+    for (int i = 0; i < nrOfBranch; i++) {
+         Branch* branch = tree[i];
+         if (branch->dirtyBit) {
+             printf("BinaryCode: %d\n", i);
+             branch->dumpLeaves();
+         }
+    }
 }

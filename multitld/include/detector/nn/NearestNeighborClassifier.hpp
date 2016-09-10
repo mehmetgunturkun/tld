@@ -22,7 +22,7 @@ private:
     vector<ObjectModel*> models;
     float POSITIVE_SCORE_THRESHOLD;
 public:
-    NearestNeighborClassifier();
+    NearestNeighborClassifier(Frame* firstFrame, vector<Box*> boxList);
     bool classify(Frame* frame, ScoredBox* scoredBox);
     bool validate(Frame* frame, ScoredBox* scoredBox, int modelId);
     void train(TrainingSet<Box> ts, int modelId);

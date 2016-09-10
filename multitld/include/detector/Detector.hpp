@@ -15,6 +15,7 @@ class Detector {
 public:
     Frame* firstFrame;
     Box* firstBox;
+    int nrOfModels;
 
     VarianceClassifier* vClassifier;
     EnsembleClassifier* eClassifier;

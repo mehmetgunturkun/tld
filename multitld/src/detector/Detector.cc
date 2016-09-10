@@ -5,8 +5,8 @@ Detector::Detector(Frame* frame, vector<Box*> boxList) {
     firstBox = boxList[0];
 
     vClassifier = new VarianceClassifier(frame, boxList);
-    eClassifier = new EnsembleClassifier();
-    nnClassifier = new NearestNeighborClassifier();
+    eClassifier = new EnsembleClassifier(frame, boxList);
+    nnClassifier = new NearestNeighborClassifier(frame, boxList);
 
     maxScaleLimit = 10;
     minimumPatchSize = 24;
@@ -19,6 +19,7 @@ Detector::Detector(Frame* frame, vector<Box*> boxList) {
 
     positiveBoxOverlapThreshold = 0.6;
     negativeBoxOverlapThreshold = 0.2;
+    nrOfModels = (int) boxList.size();
 }
 
 bool Detector::isPositive(Box* box) {
@@ -131,6 +132,7 @@ void Detector::learn(Frame* current,
             negativeQueue += sample;
         }
 
+        //TOCHECK: It might use the boxes classified by EnsembleClassifier.
         if (sample->isDetected && sampleBox->overlap < 0.2) {
             negativeQueue4NN += sample;
         }
@@ -145,7 +147,7 @@ void Detector::learn(Frame* current,
         negativeBoxList4Ensemble
     );
 
-    // eClassifier->train(trainingSet4Ensemble, modelId);
+    eClassifier->train(trainingSet4Ensemble, modelId);
 
     vector<ScoredBox*> positiveBoxList4NN;
     if (positiveQueue.count > 0) {
@@ -158,7 +160,7 @@ void Detector::learn(Frame* current,
         positiveBoxList4NN,
         negativeBoxList4NN
     );
-    // nnClassifier->train(trainingSet4NN, modelId);
+    nnClassifier->train(trainingSet4NN, modelId);
 }
 
 vector<ScoredBox*> Detector::detect(Frame* frame) {
@@ -172,8 +174,8 @@ vector<ScoredBox*> Detector::detect(Frame* frame) {
         if (!vClassifier->classify(frame, scoredBox)) {
             continue;
         }
-
         allBoxList.push_back(scoredBox);
+
         if (!eClassifier->classify(frame, scoredBox)) {
             continue;
         }
@@ -184,7 +186,6 @@ vector<ScoredBox*> Detector::detect(Frame* frame) {
 
         scoredBox->isDetected = true;
     }
-
     return allBoxList;
 }
 

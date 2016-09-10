@@ -4,26 +4,28 @@ TLD::TLD(Frame* frame, vector<Box*> boxList) {
     this->tracker = new Tracker();
     this->detector = new Detector(frame, boxList);
     this->detector->init(frame, boxList);
+    this->nrOfModels = (int) boxList.size();
 }
 
 TLD::TLD(Tracker* tracker, Detector* detector) {
     this->tracker = tracker;
     this->detector = detector;
+    this->nrOfModels = 0;
 }
 
 vector<Box*> TLD::track(Frame* prev, Frame* curr, vector<Box*> boxList) {
     vector<Box*> currBoxList = tracker->track(prev, curr, boxList);
+
     vector<ScoredBox*> currScoredBoxList = detector->detect(curr);
-
-    vector<vector<ScoredBox*>> groupedScoredBoxes;
     vector<vector<ScoredBox*>> groupedAllBoxes;
+    vector<vector<ScoredBox*>> groupedScoredBoxes;
 
-    for (int i = 0; i < NR_OF_MODELS; i++) {
-        vector<ScoredBox*> scoredBoxPerModel;
-        groupedScoredBoxes.push_back(scoredBoxPerModel);
-
+    for (int i = 0; i < nrOfModels; i++) {
         vector<ScoredBox*> allBoxPerModel;
         groupedAllBoxes.push_back(allBoxPerModel);
+
+        vector<ScoredBox*> scoredBoxPerModel;
+        groupedScoredBoxes.push_back(scoredBoxPerModel);
     }
 
     for (int i = 0; i < currScoredBoxList.size(); i++) {
@@ -43,41 +45,42 @@ vector<Box*> TLD::track(Frame* prev, Frame* curr, vector<Box*> boxList) {
         }
     }
 
-    ImageBuilder* builder = new ImageBuilder(curr);
     vector<Box*> estimatedBoxList;
-    for (int i = 0; i < NR_OF_MODELS; i++) {
+    for (int i = 0; i < nrOfModels; i++) {
         Box* trackedBox = currBoxList[i];
         vector<ScoredBox*> allBoxList = groupedAllBoxes[i];
         vector<ScoredBox*> detectedBoxList = groupedScoredBoxes[i];
 
-
         Option<Box>* maybeBox = integrate(curr, trackedBox, allBoxList, detectedBoxList, i);
         if (maybeBox->isDefined()) {
-            builder->withBox(maybeBox->get());
             estimatedBoxList.push_back(maybeBox->get());
         } else {
             estimatedBoxList.push_back(nullptr);
             printf("No valid result for %d!\n", i);
         }
     }
-    builder->display(5);
     return estimatedBoxList;
 }
 
 Option<Box>* TLD::integrate(Frame* current, Box* trackedBox, vector<ScoredBox*> allBoxes, vector<ScoredBox*> detectedBoxes, int modelId) {
     ScoredBox* scoredTrackBox = validate(current, trackedBox, modelId);
+    //TrackerResult* trackerResult = new TrackerResult(current, trackedBox, modelId);
+
     vector<ScoredBox*> clusteredBoxes = ScoredBox::cluster(detectedBoxes,(int) detectedBoxes.size());
+    //DetectorResult* detectorResult = new DetectorResult(allBoxes);
+    //vector<ScoredBox*> clusteredBoxes = detectorResult->clusteredBoxList;
+
     if (scoredTrackBox->isDetected) {
         printf("Tracker Success ");
         // Tracker.Success
-        if (clusteredBoxes.size() > 0) {
+        if (detectedBoxes.size() > 0) {
             printf("Detector Success \n");
             if (isThereMoreConfidentOneBox(scoredTrackBox, clusteredBoxes)) {
                 ScoredBox* detectedBox = clusteredBoxes[0];
                 Option<Box>* successBox = new Option<Box>(detectedBox->box);
                 return successBox;
             } else {
-                Box* combinedBox = combineClosestBoxes(scoredTrackBox, clusteredBoxes);
+                Box* combinedBox = combineClosestBoxes(scoredTrackBox, detectedBoxes);
                 detector->learn(current, combinedBox, allBoxes, modelId);
                 Option<Box>* successBox = new Option<Box>(combinedBox);
                 return successBox;

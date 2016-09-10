@@ -1,8 +1,11 @@
 #include "detector/nn/NearestNeighborClassifier.hpp"
 
-NearestNeighborClassifier::NearestNeighborClassifier() {
-    nrOfModels = NR_OF_MODELS;
-    models = { new ObjectModel(), new ObjectModel(), new ObjectModel()};
+NearestNeighborClassifier::NearestNeighborClassifier(Frame* firstFrame, vector<Box*> boxList) {
+    nrOfModels = (int) boxList.size();
+    for (int i = 0; i < nrOfModels; i++) {
+        models.push_back(new ObjectModel());
+    }
+
     POSITIVE_SCORE_THRESHOLD = 0.6;
 }
 
@@ -50,7 +53,7 @@ bool NearestNeighborClassifier::validate(Frame* frame, ScoredBox* scoredBox, int
 
     relativeScores[modelId] = relativeScore;
     conservativeScores[modelId] = conservativeScore;
-    
+
     bool anyModelClassified = false;
     vector<int> classifiedModelIds;
     if (conservativeScore > 0.5) {
@@ -84,15 +87,22 @@ void NearestNeighborClassifier::train(TrainingSet<Box> ts, int modelId) {
 }
 
 void NearestNeighborClassifier::train(TrainingSet<ScoredBox> ts, int modelId) {
-    vector<Labelled<ScoredBox>> samples = ts.getLabelledSamples();
+    vector<Labelled<ScoredBox>> samples = ts.getLabelledSamples(false);
+    printf("NN >> %lu samples are going to be processed for training\n", samples.size());
     ObjectModel* model = models[modelId];
     for (int i = 0; i < ts.nrOfSamples; i++) {
         Labelled<ScoredBox> sample = samples[i];
+        Frame* frame = sample.frame;
         ScoredBox* scoredBox = sample.item;
         int label = sample.label;
 
         NNScore* nnScore = (NNScore*) scoredBox->getScore("nn");
+        if (nnScore == NULL) {
+            classify(frame, scoredBox);
+            nnScore = (NNScore*) scoredBox->getScore("nn");
+        }
         Patch* patch = nnScore->patch;
         model->add(patch, label == 1);
     }
+    printf("NN >> %lu samples were processed for training\n", samples.size());
 }

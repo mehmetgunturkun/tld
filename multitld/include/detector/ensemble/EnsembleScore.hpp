@@ -12,6 +12,10 @@ public:
         scores.resize(13);
         binaryCodes.resize(13);
     }
+
+    float getProbability(int modelId) {
+        return scores[modelId];
+    }
 };
 
 #endif
