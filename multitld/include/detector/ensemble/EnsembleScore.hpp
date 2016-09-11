@@ -9,15 +9,22 @@ public:
     vector<int> binaryCodes;
 
     EnsembleScore() {
-        scores.resize(13);
+        scores.resize(TLDConfig::nrOfModels);
         binaryCodes.resize(13);
     }
 
-    Score* merge(Score* other) {
-        EnsembleScore* otherEnsembleScore = (EnsembleScore*) other;
-        EnsembleScore* newEnsembleScore = new EnsembleScore();
+    EnsembleScore(vector<float> scores) {
+        this->scores = scores;
+    }
 
-        for (int i = 0; i < TLDConfig::nrOfModels; i++) {
+    Score* merge(Score* other) {
+        int n = (int) scores.size();
+        vector<float> newScores(n);
+
+        EnsembleScore* otherEnsembleScore = (EnsembleScore*) other;
+        EnsembleScore* newEnsembleScore = new EnsembleScore(newScores);
+
+        for (int i = 0; i < n; i++) {
             float thisScore = scores[i];
             float otherScore = otherEnsembleScore->scores[i];
             newEnsembleScore->scores[i] = (thisScore + otherScore) / 2;
