@@ -58,7 +58,7 @@ public:
         int warpNo = 0;
         int warpLimit = 1;
         if (shouldWarp) {
-            warpLimit = 20;
+            warpLimit = 10;
         }
 
         do {

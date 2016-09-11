@@ -3,12 +3,14 @@
 
 #include <vector>
 
+#include "core/TLDConfig.hpp"
+
 using namespace std;
 
 class Score {
 public:
     double value;
-    Score* merge(Score* other);
+    virtual Score* merge(Score* other);
 
     bool isAnyModellClassified;
     vector<int> classifiedModelIds;

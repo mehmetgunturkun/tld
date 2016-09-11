@@ -14,7 +14,9 @@ public:
     vector<float> relativeScores;
     vector<float> conservativeScores;
 
+    NNScore();
     NNScore(Patch* patch, vector<float> relativeScores, vector<float> conservativeScores);
 
+    Score* merge(Score* other);
 };
 #endif
