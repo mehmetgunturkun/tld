@@ -6,6 +6,7 @@
 
 class Frame {
 public:
+    int id;
     string name;
 
     int width;

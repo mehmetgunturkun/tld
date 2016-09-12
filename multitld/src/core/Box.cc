@@ -30,3 +30,21 @@ vector<Box*> Box::splitTwo() {
     vector<Box*> boxList = {b1, b2};
     return boxList;
 }
+
+Box* Box::sum(Box* other) {
+    double x1 = (this->x1 + other->x1);
+    double y1 = (this->y1 + other->y1);
+    double x2 = (this->x2 + other->x2);
+    double y2 = (this->y2 + other->y2);
+
+    Box* sum = new Box(0, x1, y1, x2, y2);
+    return sum;
+}
+
+Box* Box::divide(int n) {
+    this->x1 = this->x1 / n;
+    this->x2 = this->x2 / n;
+    this->y1 = this->y1 / n;
+    this->y2 = this->y2 / n;
+    return this;
+}

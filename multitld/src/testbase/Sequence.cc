@@ -69,8 +69,11 @@ bool Sequence::hasNext() {
 
 Frame* Sequence::next() {
     string imageFile = files[processedFrames];
-    processedFrames++;
+
     Frame* frame = new Frame(imageFile);
+    frame->id = processedFrames;
+
+    processedFrames++;
     return frame;
 }
 

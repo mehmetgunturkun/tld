@@ -17,6 +17,8 @@ public:
     NNScore();
     NNScore(Patch* patch, vector<float> relativeScores, vector<float> conservativeScores);
 
-    Score* merge(Score* other);
+    Score* sum(Score* other);
+    Score* divide(int n);
+    Score* clone();
 };
 #endif

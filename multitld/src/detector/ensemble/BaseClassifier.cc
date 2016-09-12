@@ -27,6 +27,9 @@ void BaseClassifier::train(Frame* frame, Box* box, int modelId, bool label) {
 
 float BaseClassifier::getProbability(ScoredBox* scoredBox, int modelId) {
     EnsembleScore* ensembleScore = (EnsembleScore*) scoredBox->getScore("ensemble");
+    if (ensembleScore->isMerged) {
+        printf("Yes it is merged!\n");
+    }
     int binaryCode = ensembleScore->binaryCodes[id];
     return decTree->getProbability(binaryCode, modelId);
 }

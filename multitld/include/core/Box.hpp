@@ -36,6 +36,10 @@ public:
 
     Box(int id, float x1, float y1, float x2, float y2);
     Box* move(float dx, float dy);
+
+    Box* sum(Box* other);
+    Box* divide(int n);
+
     Box* clone();
     vector<Box*> splitTwo();
 
@@ -115,16 +119,6 @@ public:
             overlaps[i] = Box::computeOverlap(b1, b2);
         }
         return overlaps;
-    }
-
-    static Box* merge(Box* b0, Box* b1) {
-        double x1 = (b0->x1 + b1->x1) / 2;
-        double y1 = (b0->y1 + b1->y1) / 2;
-        double x2 = (b0->x2 + b1->x2) / 2;
-        double y2 = (b0->y2 + b1->y2) / 2;
-
-        Box* meanBox = new Box(0, x1, y1, x2, y2);
-        return meanBox;
     }
 
     static Option<Box>* None;

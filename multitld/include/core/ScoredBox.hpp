@@ -46,12 +46,14 @@ private:
             for (int i = 0; i < nrOfClusters; i++) {
                 Cluster* c = cluster[i];
                 vector<int> idList = c->pointList;
-                ScoredBox* box = boxList[idList[0]]->clone();
+
                 int nrOfBoxes = c->size;
-                for (int j = 1; j < nrOfBoxes; j++) {
-                    ScoredBox* otherBox = boxList[idList[j]];
-                    box->merge(otherBox);
+                vector<ScoredBox*> scoredBoxListPerCluster(nrOfBoxes);
+                for (int j = 0; j < nrOfBoxes; j++) {
+                    scoredBoxListPerCluster[j] = boxList[idList[j]];
                 }
+
+                ScoredBox* box = ScoredBox::merge(scoredBoxListPerCluster, nrOfBoxes);
                 clusteredBoxes.push_back(box);
             }
             return clusteredBoxes;
@@ -61,10 +63,13 @@ public:
     bool isDetected;
     unordered_map<string, Score*> detailMap;
 
+    ScoredBox();
     ScoredBox(Box* box);
 
     ScoredBox* clone();
-    void merge(ScoredBox* other);
+    ScoredBox* sum(ScoredBox* other);
+    ScoredBox* divide(int n);
+
     void withScore(string classifierKey, Score* score);
     Score* getScore(string classifierKey);
     double getScoreValue(string classifierKey);
@@ -75,6 +80,16 @@ public:
         vector<Cluster*> clusters = Cluster::build(distances, distances.size(), 0.5);
         vector<ScoredBox*> clusteredBoxes = combineClusters(clusters, boxList);
         return clusteredBoxes;
+    }
+
+    static ScoredBox* merge(vector<ScoredBox*> scoredBoxList, int nrOfBoxes) {
+        ScoredBox* tempBox = scoredBoxList[0]->clone();
+        for (int i = 1; i < nrOfBoxes; i++) {
+            ScoredBox* b = scoredBoxList[i];
+            tempBox = tempBox->sum(b);
+        }
+        tempBox = tempBox->divide(nrOfBoxes);
+        return tempBox;
     }
 };
 

@@ -69,24 +69,25 @@ Option<Box>* TLD::integrate(Frame* current, Box* trackedBox, vector<ScoredBox*> 
     vector<ScoredBox*> clusteredBoxes = ScoredBox::cluster(detectedBoxes,(int) detectedBoxes.size());
     //DetectorResult* detectorResult = new DetectorResult(allBoxes);
     //vector<ScoredBox*> clusteredBoxes = detectorResult->clusteredBoxList;
-
+    printf("Frame#%3d => ", current->id);
     if (scoredTrackBox->isDetected) {
-        printf("Tracker Success ");
+        printf("Tracker " ANSI_COLOR_GREEN "Success " ANSI_COLOR_RESET);
         // Tracker.Success
         if (detectedBoxes.size() > 0) {
-            printf("Detector Success \n");
             if (isThereMoreConfidentOneBox(scoredTrackBox, clusteredBoxes)) {
+                printf("Detector " ANSI_COLOR_GREEN "Success One" ANSI_COLOR_RESET "\n");
                 ScoredBox* detectedBox = clusteredBoxes[0];
                 Option<Box>* successBox = new Option<Box>(detectedBox->box);
                 return successBox;
             } else {
+                printf("Detector " ANSI_COLOR_GREEN "Success Combine" ANSI_COLOR_RESET "\n");
                 Box* combinedBox = combineClosestBoxes(scoredTrackBox, detectedBoxes);
                 detector->learn(current, combinedBox, allBoxes, modelId);
                 Option<Box>* successBox = new Option<Box>(combinedBox);
                 return successBox;
             }
         } else {
-            printf("Detector Failed \n");
+            printf("Detector " ANSI_COLOR_RED "Failed " ANSI_COLOR_RESET "\n");
             // Detector.Fail
             Option<Box>* successBox = new Option<Box>(trackedBox);
             detector->learn(current, trackedBox, allBoxes, modelId);
@@ -94,19 +95,19 @@ Option<Box>* TLD::integrate(Frame* current, Box* trackedBox, vector<ScoredBox*> 
         }
     } else {
         // Tracker.Fail
-        printf("Tracker Failed ");
+        printf("Tracker " ANSI_COLOR_RED "Failed " ANSI_COLOR_RESET);
         if (clusteredBoxes.size() == 1) {
-            printf("Detector Success \n");
+            printf("Detector " ANSI_COLOR_GREEN "Success " ANSI_COLOR_RESET" \n");
             // Detector.Success
             ScoredBox* detectedBox = clusteredBoxes[0];
             Option<Box>* successBox = new Option<Box>(detectedBox->box);
             return successBox;
         } else if (detectedBoxes.size() > 1) {
-            printf("Detector Failed \n");
+            printf("Detector " ANSI_COLOR_GREEN "Success " ANSI_COLOR_RESET" \n");
             // There are multiple boxes no way to decide!
             return Box::None;
         } else {
-            printf("Detector Failed \n");
+            printf("Detector " ANSI_COLOR_GREEN "Success " ANSI_COLOR_RESET" \n");
             // Detector.Fail
             return Box::None;
         }

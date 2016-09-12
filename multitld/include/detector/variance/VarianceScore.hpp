@@ -4,6 +4,9 @@
 #include "core/Score.hpp"
 
 class VarianceScore: public Score {
-
+    Score* clone() {
+        VarianceScore* varianceScore = new VarianceScore();
+        return varianceScore;
+    }
 };
 #endif

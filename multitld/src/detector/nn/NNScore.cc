@@ -10,19 +10,36 @@ NNScore::NNScore() {
     this->patch = NULL;
 }
 
-Score* NNScore::merge(Score* other) {
+Score* NNScore::clone() {
+    NNScore* clone = new NNScore();
+    clone->patch = this->patch;
+    clone->relativeScores =this->relativeScores;
+    clone->conservativeScores = this->conservativeScores;
+    return clone;
+}
+
+Score* NNScore::sum(Score* other) {
     NNScore* otherNNScore = (NNScore*) other;
-    NNScore* newNNScore = new NNScore();
+    NNScore* newNNScore = (NNScore*) this->clone();
 
     for (int i = 0; i < TLDConfig::nrOfModels; i++) {
         float thisRelativeScore = relativeScores[i];
         float otherRelativeScore = otherNNScore->relativeScores[i];
-        newNNScore->relativeScores[i] = (thisRelativeScore + otherRelativeScore) / 2;
+        newNNScore->relativeScores[i] = thisRelativeScore + otherRelativeScore;
 
         float thisConervativeScore = conservativeScores[i];
         float otherConservativeScore = otherNNScore->conservativeScores[i];
-        newNNScore->conservativeScores[i] = (thisConervativeScore + otherConservativeScore) / 2;
+        newNNScore->conservativeScores[i] = thisConervativeScore + otherConservativeScore;
     }
 
     return newNNScore;
+}
+
+Score* NNScore::divide(int n) {
+    int m = relativeScores.size();
+    for (int i = 0; i < m; i++) {
+        relativeScores[i] = relativeScores[i] / n;
+        conservativeScores[i] = conservativeScores[i] / n;
+    }
+    return this;
 }

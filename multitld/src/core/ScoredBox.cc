@@ -1,5 +1,9 @@
 #include "core/ScoredBox.hpp"
 
+ScoredBox::ScoredBox() {
+    this->isDetected = false;
+}
+
 ScoredBox::ScoredBox(Box* box) {
     this->box = box;
     this->isDetected = false;
@@ -7,18 +11,36 @@ ScoredBox::ScoredBox(Box* box) {
 
 ScoredBox* ScoredBox::clone() {
     //TODO NotImplemented
-    return this;
+    ScoredBox* clone = new ScoredBox();
+    clone->box = this->box->clone();
+    clone->isDetected = this->isDetected;
+    for ( auto it = this->detailMap.begin(); it != this->detailMap.end(); ++it ) {
+        Score* score = it->second;
+        clone->detailMap[it->first] = score->clone();
+    }
+    return clone;
 }
 
-void ScoredBox::merge(ScoredBox* other) {
-    //TODO NotImplemented
-    this->box = Box::merge(this->box, other->box);
+ScoredBox* ScoredBox::sum(ScoredBox* other) {
+    ScoredBox* mergedBox = new ScoredBox();
+    mergedBox->box = this->box->sum(other->box);
     for ( auto it = this->detailMap.begin(); it != this->detailMap.end(); ++it ) {
         Score* thisScore = it->second;
         Score* otherScore = other->detailMap[it->first];
-        Score* newScore = thisScore->merge(otherScore);
-        this->detailMap[it->first] = newScore;
+
+        Score* newScore = thisScore->sum(otherScore);
+        mergedBox->detailMap[it->first] = newScore;
     }
+    return mergedBox;
+}
+
+ScoredBox* ScoredBox::divide(int n) {
+    this->box = this->box->divide(n);
+    for ( auto it = this->detailMap.begin(); it != this->detailMap.end(); ++it ) {
+        Score* thisScore = it->second;
+        thisScore = thisScore->divide(n);
+    }
+    return this;
 }
 
 void ScoredBox::withScore(string classifierKey, Score* score) {

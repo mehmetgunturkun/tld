@@ -16,7 +16,7 @@ public:
     }
 
     void print() {
-        printf("Hello, I am A(%d)\n", attribute_a);
+        printf(ANSI_COLOR_RED    "Hello, I am A(%d)"    ANSI_COLOR_RESET "\n", attribute_a);
     }
 
     BaseClass* merge(BaseClass* other) {
@@ -35,7 +35,7 @@ public:
     }
 
     void print() {
-        printf("Hello, I am B(%f)\n", attribute_b);
+        printf(ANSI_COLOR_GREEN    "Hello, I am B(%f)"    ANSI_COLOR_RESET "\n", attribute_b);
     }
 
     BaseClass* merge(BaseClass* other) {

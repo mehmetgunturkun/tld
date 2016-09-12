@@ -155,7 +155,7 @@ vector<BaseClassifier*> EnsembleClassifier::shuffleComparisons(vector<PixelCompa
 
 bool EnsembleClassifier::classify(Frame* frame, ScoredBox* scoredBox) {
     vector<float> scores(nrOfModels);
-    EnsembleScore* score = new EnsembleScore();
+    EnsembleScore* score = new EnsembleScore(nrOfModels, nrOfBaseClassifiers);
     for (int i = 0; i < nrOfBaseClassifiers; i++) {
         BaseClassifier* bc = baseClassifiers[i];
         vector<float> bcScores = bc->score(frame, scoredBox->box, score);
@@ -186,7 +186,7 @@ bool EnsembleClassifier::classify(Frame* frame, ScoredBox* scoredBox) {
 //EnsembleScore* score(Frame* frame, ScoredBox* scoredBox);
 
 EnsembleScore* EnsembleClassifier::score(Frame* frame, ScoredBox* scoredBox, int modelId) {
-    EnsembleScore* ensembleScore = new EnsembleScore();
+    EnsembleScore* ensembleScore = new EnsembleScore(nrOfModels, nrOfBaseClassifiers);
 
     float score = 0.0f;
     for (int i = 0; i < nrOfBaseClassifiers; i++) {
@@ -240,7 +240,7 @@ float EnsembleClassifier::getProbability(ScoredBox* scoredBox, int modelId) {
 
 void EnsembleClassifier::train(TrainingSet<ScoredBox> ts, int modelId) {
     vector<Labelled<ScoredBox>> samples = ts.getLabelledSamples();
-    printf("EC >> %lu samples are going to be processed for training\n", samples.size());
+    printf("EC >> %lu samples are going to be processed for training - online\n", samples.size());
     for (int i = 0; i < ts.nrOfSamples; i++) {
         Labelled<ScoredBox> sample = samples[i];
 

@@ -1,6 +1,18 @@
 #include "testbase/Sequence.hpp"
 #include "tld/TLD.hpp"
 
+void display(Frame* frame, vector<Box*> boxList) {
+    int nrOfBoxes = (int) boxList.size();
+    ImageBuilder* builder = new ImageBuilder(frame);
+    for (int i = 0; i < nrOfBoxes; i++) {
+        Box* b = boxList[i];
+        if (b != nullptr) {
+            builder->withBox(b);
+        }
+    }
+    builder->display(5);
+}
+
 int main(int argc, char** argv) {
     Sequence* sequence = new Sequence("car");
     Frame* firstFrame = sequence->next();
@@ -17,9 +29,7 @@ int main(int argc, char** argv) {
         frameNo += 1;
 
         boxList = tld->track(previous, current, boxList);
-
-        printf("Frame#%d: %s is processing...\n", frameNo, current->name.c_str());
-
+        display(current, boxList);
         previous = current;
 
     }
