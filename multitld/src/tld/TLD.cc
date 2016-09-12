@@ -154,7 +154,6 @@ bool TLD::isThereMoreConfidentOneBox(ScoredBox* trackScoredBox, vector<ScoredBox
     }
 }
 
-
 Box* TLD::combineClosestBoxes(ScoredBox* trackScoredBox, vector<ScoredBox*> detectedBoxes) {
     Box* trackBox = trackScoredBox->box;
 
