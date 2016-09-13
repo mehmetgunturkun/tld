@@ -16,11 +16,10 @@ bool NearestNeighborClassifier::classify(Frame* frame, ScoredBox* scoredBox) {
     vector<float> conservativeScores(nrOfModels);
     for (int i = 0;  i < nrOfModels; i++) {
         ObjectModel* objectModel = models[i];
-        float relativeScore = objectModel->computeRelativeScore(patch);
-        float conservativeScore = objectModel->computeConservativeScore(patch);
+        ObjectScore* objectScore = objectModel->computeScore(patch);
 
-        relativeScores[i] = relativeScore;
-        conservativeScores[i] = conservativeScore;
+        relativeScores[i] = objectScore->relativeScore;
+        conservativeScores[i] = objectScore->conservativeScore;
     }
 
     bool anyModelClassified = false;

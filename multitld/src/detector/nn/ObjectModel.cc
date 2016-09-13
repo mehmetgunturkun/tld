@@ -1,5 +1,12 @@
 #include "detector/nn/ObjectModel.hpp"
 
+ObjectScore::ObjectScore(float relativeScore, float conservativeScore, bool isInPositive, bool isInNegative) {
+    this->relativeScore = relativeScore;
+    this->conservativeScore = conservativeScore;
+    this->isInPositive = isInPositive;
+    this->isInNegative = isInNegative;
+}
+
 ObjectModel::ObjectModel() {
     nrOfPositivePatches = 0;
     nrOfNegativePatches = 0;
@@ -26,6 +33,25 @@ double ObjectModel::computeConservativeScore(Patch* sample) {
         double sim  = (negativeNNSimilarity / (positiveNNSimilarity + negativeNNSimilarity));
         return sim;
     }
+}
+
+ObjectScore* ObjectModel::computeScore(Patch* sample) {
+    float positiveNNSimilarity = (float) computePositiveSimilarity(sample);
+    float positiveInititalNNSimilarity = (float) computeInitialPositiveSimilarity(sample);
+    float negativeNNSimilarity = (float) computeNegativeSimilarity(sample);
+
+    float relativeScore = 0.0;
+    if ( positiveNNSimilarity != 0.0f || negativeNNSimilarity != 0.0f) {
+        relativeScore  = (negativeNNSimilarity / (positiveNNSimilarity + negativeNNSimilarity));
+    }
+
+    float conservativeScore = 0.0;
+    if ( positiveInititalNNSimilarity != 0.0f || negativeNNSimilarity != 0.0f) {
+        conservativeScore  = (negativeNNSimilarity / (positiveInititalNNSimilarity + negativeNNSimilarity));
+    }
+
+    ObjectScore* objectScore = new ObjectScore(relativeScore, conservativeScore, false, false);
+    return objectScore;
 }
 
 double ObjectModel::computeInitialPositiveSimilarity(Patch* sample) {

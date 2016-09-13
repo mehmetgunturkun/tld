@@ -6,6 +6,16 @@
 
 using namespace std;
 
+class ObjectScore {
+public:
+    float relativeScore;
+    float conservativeScore;
+    bool isInNegative;
+    bool isInPositive;
+
+    ObjectScore(float relativeScore, float conservativeScore, bool isInPositive, bool isInNegative);
+};
+
 class ObjectModel {
 public:
     int nrOfPositivePatches;
@@ -25,6 +35,7 @@ public:
 
     double computeRelativeScore(Patch* sample);
     double computeConservativeScore(Patch* sample);
+    ObjectScore* computeScore(Patch* patch);
     void add(Patch* patch, bool label);
 };
 #endif
