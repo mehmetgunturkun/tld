@@ -1,19 +1,18 @@
 #include "detector/ensemble/EnsembleClassifier.hpp"
 #include "util/ImageBuilder.hpp"
 EnsembleClassifier::EnsembleClassifier(Frame* firstFrame, vector<Box*> boxList) {
-        Random::seed();
+    Random::seed();
+    this->classifierName = "ensemble";
 
-        classifierName = "ensemble";
+    this->nrOfModels = (int) boxList.size();
+    this->nrOfBaseClassifiers = 10;
+    this->nrOfPixelComparisons = 13;
 
-        nrOfBaseClassifiers = 10;
-        nrOfPixelComparisons = 13;
-        nrOfModels = (int) boxList.size();
+    this->positiveUpdateThreshold = 0.5 * nrOfBaseClassifiers;
+    this->negativeUpdateThreshold = 0.5 * nrOfBaseClassifiers;
+    this->POSITIVE_SCORE_THRESHOLD = 0.5 * nrOfBaseClassifiers;
 
-        positiveUpdateThreshold = 0.5 * nrOfBaseClassifiers;
-        negativeUpdateThreshold = 0.5 * nrOfBaseClassifiers;
-
-        baseClassifiers = generateBaseClassifier();
-        this->POSITIVE_SCORE_THRESHOLD = 0.5 * nrOfBaseClassifiers;
+    this->baseClassifiers = generateBaseClassifier();
 }
 
 vector<BaseClassifier*> EnsembleClassifier::generateBaseClassifier() {
@@ -208,8 +207,8 @@ void EnsembleClassifier::train(TrainingSet<Box> ts, int modelId) {
     for (int i = 0; i < samples.size(); i++) {
         Labelled<Box> sample = samples[i];
         Frame* frame = sample.frame;
-
         Box* box = sample.item;
+
         ScoredBox* scoredBox = new ScoredBox(box);
         EnsembleScore* ensembleScore = score(frame, scoredBox, modelId);
         float probability = ensembleScore->getProbability(modelId);
@@ -223,19 +222,8 @@ void EnsembleClassifier::train(TrainingSet<Box> ts, int modelId) {
         if (label == false && probability > negativeUpdateThreshold) {
             updateBaseClassifiers(frame, scoredBox, modelId, false);
         }
-
-
     }
     printf("EC >> %lu samples were processed for training\n", samples.size());
-}
-
-float EnsembleClassifier::getProbability(ScoredBox* scoredBox, int modelId) {
-    float probability = 0.0f;
-    for (int i = 0; i < nrOfBaseClassifiers; i++) {
-        BaseClassifier* bc = baseClassifiers[i];
-        probability += bc->getProbability(scoredBox, modelId);
-    }
-    return probability;
 }
 
 void EnsembleClassifier::train(TrainingSet<ScoredBox> ts, int modelId) {
@@ -259,6 +247,15 @@ void EnsembleClassifier::train(TrainingSet<ScoredBox> ts, int modelId) {
         }
     }
     printf("EC >> %lu samples were processed for training\n", samples.size());
+}
+
+float EnsembleClassifier::getProbability(ScoredBox* scoredBox, int modelId) {
+    float probability = 0.0f;
+    for (int i = 0; i < nrOfBaseClassifiers; i++) {
+        BaseClassifier* bc = baseClassifiers[i];
+        probability += bc->getProbability(scoredBox, modelId);
+    }
+    return probability;
 }
 
 void EnsembleClassifier::updateBaseClassifiers(Frame* frame, ScoredBox* scoredBox, int modelId, bool label) {

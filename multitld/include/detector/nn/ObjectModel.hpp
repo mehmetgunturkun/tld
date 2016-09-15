@@ -37,5 +37,6 @@ public:
     double computeConservativeScore(Patch* sample);
     ObjectScore* computeScore(Patch* patch);
     void add(Patch* patch, bool label);
+    void replace(Patch* patch, int oldIndex);
 };
 #endif

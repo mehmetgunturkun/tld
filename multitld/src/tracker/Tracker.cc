@@ -195,9 +195,9 @@ Option<Box>* estimate(Frame* prev, Frame* curr, Box* box, vector<FBPoint*> track
     }
 
     float medFBE = median(fbErrors);
-
-    float medNCC = median(nccErrors);
-    if (medFBE > 0.5) {
+    float medNCC = median(nccErrors)
+    ;
+    if (medFBE > 10) {
         printf("Invalid Box -- high fb error - %f\n", medFBE);
         Option<Box>* failedBox = new Option<Box>();
         return failedBox;

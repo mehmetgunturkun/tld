@@ -50,7 +50,10 @@ ObjectScore* ObjectModel::computeScore(Patch* sample) {
         conservativeScore  = (negativeNNSimilarity / (positiveInititalNNSimilarity + negativeNNSimilarity));
     }
 
-    ObjectScore* objectScore = new ObjectScore(relativeScore, conservativeScore, false, false);
+    bool isInPositive= positiveNNSimilarity > 0.95;
+    bool isInNegative = negativeNNSimilarity > 0.95;
+
+    ObjectScore* objectScore = new ObjectScore(relativeScore, conservativeScore, isInPositive, isInNegative);
     return objectScore;
 }
 
@@ -111,4 +114,8 @@ void ObjectModel::add(Patch* patch, bool label) {
         negativePatchList.push_back(patch);
         nrOfNegativePatches += 1;
     }
+}
+
+void ObjectModel::replace(Patch* patch, int oldIndex) {
+    // this->add(patch, true);
 }

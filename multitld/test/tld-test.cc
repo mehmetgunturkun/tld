@@ -10,7 +10,7 @@ void display(Frame* frame, vector<Box*> boxList) {
             builder->withBox(b);
         }
     }
-    builder->display(5);
+    builder->display(10);
 }
 
 int main(int argc, char** argv) {

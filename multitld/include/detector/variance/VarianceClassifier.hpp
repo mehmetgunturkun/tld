@@ -10,8 +10,8 @@ using namespace std;
 
 class VarianceClassifier {
 public:
-    float minimumVariance;
     int nrOfModels;
+    float minimumVariance;
     vector<float> varianceList;
 
     VarianceClassifier(Frame* frame, vector<Box*> boxList);

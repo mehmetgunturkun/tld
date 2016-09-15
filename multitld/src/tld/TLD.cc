@@ -1,10 +1,10 @@
 #include "tld/TLD.hpp"
 
 TLD::TLD(Frame* frame, vector<Box*> boxList) {
+    this->nrOfModels = (int) boxList.size();
+
     this->tracker = new Tracker();
     this->detector = new Detector(frame, boxList);
-    this->detector->init(frame, boxList);
-    this->nrOfModels = (int) boxList.size();
 }
 
 TLD::TLD(Tracker* tracker, Detector* detector) {
@@ -62,13 +62,35 @@ vector<Box*> TLD::track(Frame* prev, Frame* curr, vector<Box*> boxList) {
     return estimatedBoxList;
 }
 
+void displayDetectedBoxes(Frame* frame, vector<ScoredBox*> detectedBoxList, vector<ScoredBox*> clusteredBoxList) {
+    ImageBuilder* builder = new ImageBuilder(frame);
+
+    int nrOfBoxes = (int) detectedBoxList.size();
+    for (int i = 0; i < nrOfBoxes; i++) {
+        ScoredBox* b = detectedBoxList[i];
+        if (b != nullptr) {
+            builder->withBox(b->box, Colors::RED);
+        }
+    }
+
+    nrOfBoxes = (int) clusteredBoxList.size();
+    for (int i = 0; i < nrOfBoxes; i++) {
+        ScoredBox* b = clusteredBoxList[i];
+        if (b != nullptr) {
+            builder->withBox(b->box, Colors::BLUE);
+        }
+    }
+
+
+    builder->withTitle("cluster-test")->display(100);
+}
+
 Option<Box>* TLD::integrate(Frame* current, Box* trackedBox, vector<ScoredBox*> allBoxes, vector<ScoredBox*> detectedBoxes, int modelId) {
     ScoredBox* scoredTrackBox = validate(current, trackedBox, modelId);
-    //TrackerResult* trackerResult = new TrackerResult(current, trackedBox, modelId);
-
     vector<ScoredBox*> clusteredBoxes = ScoredBox::cluster(detectedBoxes,(int) detectedBoxes.size());
-    //DetectorResult* detectorResult = new DetectorResult(allBoxes);
-    //vector<ScoredBox*> clusteredBoxes = detectorResult->clusteredBoxList;
+
+    //displayDetectedBoxes(current, detectedBoxes, clusteredBoxes);
+
     printf("Frame#%3d => ", current->id);
     if (scoredTrackBox->isDetected) {
         printf("Tracker " ANSI_COLOR_GREEN "Success " ANSI_COLOR_RESET);
@@ -81,7 +103,7 @@ Option<Box>* TLD::integrate(Frame* current, Box* trackedBox, vector<ScoredBox*> 
                 return successBox;
             } else {
                 printf("Detector " ANSI_COLOR_GREEN "Success Combine" ANSI_COLOR_RESET "\n");
-                Box* combinedBox = combineClosestBoxes(scoredTrackBox, detectedBoxes);
+                Box* combinedBox = combineClosestBoxes(scoredTrackBox, clusteredBoxes);
                 detector->learn(current, combinedBox, allBoxes, modelId);
                 Option<Box>* successBox = new Option<Box>(combinedBox);
                 return successBox;

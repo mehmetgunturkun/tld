@@ -3,8 +3,11 @@
 Detector::Detector(Frame* frame, vector<Box*> boxList) {
     firstFrame = frame;
     firstBox = boxList[0];
+    nrOfModels = (int) boxList.size();
 
     vClassifier = new VarianceClassifier(frame, boxList);
+    varianceThreshold = vClassifier->minimumVariance;
+
     eClassifier = new EnsembleClassifier(frame, boxList);
     nnClassifier = new NearestNeighborClassifier(frame, boxList);
 
@@ -19,7 +22,8 @@ Detector::Detector(Frame* frame, vector<Box*> boxList) {
 
     positiveBoxOverlapThreshold = 0.6;
     negativeBoxOverlapThreshold = 0.2;
-    nrOfModels = (int) boxList.size();
+
+    this->init(frame, boxList);
 }
 
 bool Detector::isPositive(Box* box) {

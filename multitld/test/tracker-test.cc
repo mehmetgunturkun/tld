@@ -4,25 +4,37 @@
 #include "common/Colors.hpp"
 #include "util/ImageBuilder.hpp"
 
+void display(Frame* frame, vector<Box*> boxList) {
+    int nrOfBoxes = (int) boxList.size();
+    ImageBuilder* builder = new ImageBuilder(frame);
+    for (int i = 0; i < nrOfBoxes; i++) {
+        Box* b = boxList[i];
+        if (b != nullptr) {
+            builder->withBox(b);
+        }
+    }
+    builder->display(100);
+}
+
 int main(int argc, char** argv) {
     Sequence* sequence = new Sequence("car");
     Frame* firstFrame = sequence->next();
-    Frame* secondFrame = sequence->next();
 
     Box* initBox = sequence->initBox;
-    vector<Box*> boxList = initBox->splitTwo();
-    boxList = { initBox, nullptr, boxList[0], boxList[1] };
+    vector<Box*> boxList = { initBox };
 
     Tracker* tracker = new Tracker();
 
-    vector<Box*> nextBoxList = tracker->track(firstFrame, secondFrame, boxList);
-    for (int i = 0; i < 4; i++) {
-        Box* box = nextBoxList[i];
-        if (box == nullptr) {
-            printf("BOX >> Failed\n");
-        } else {
-            printf("BOX >> %s\n", box->toString().c_str());
-        }
+    int frameNo = 1;
+    Frame* previous = firstFrame;
+    while (sequence->hasNext()) {
+        Frame* current = sequence->next();
+        frameNo += 1;
+
+        boxList = tracker->track(previous, current, boxList);
+        display(current, boxList);
+        previous = current;
     }
+
     return EXIT_SUCCESS;
 }
