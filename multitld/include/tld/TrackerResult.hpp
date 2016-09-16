@@ -5,9 +5,15 @@ class TrackerResult {
 public:
     bool isValid;
     ScoredBox* scoredBox;
+
+    TrackerResult() {
+        isValid = false;
+        scoredBox = NULL;
+    }
+
     TrackerResult(ScoredBox* scoredBox) {
+        this->isValid = true;
         this->scoredBox = scoredBox;
-        this->isValid = scoredBox->isDetected;
     }
 };
 #endif

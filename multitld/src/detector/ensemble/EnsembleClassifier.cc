@@ -239,10 +239,14 @@ void EnsembleClassifier::train(TrainingSet<ScoredBox> ts, int modelId) {
         float probability = getProbability(scoredBox, modelId);
 
         if (label == true && probability < positiveUpdateThreshold) {
+            // ImageBuilder* builder = new ImageBuilder(frame);
+            // builder->withBox(scoredBox->box, Colors::YELLOW)->withTitle("ensemble-pos")->display(1000);
             updateBaseClassifiers(frame, scoredBox, modelId, true);
         }
 
         if (label == false && probability > negativeUpdateThreshold) {
+            // ImageBuilder* builder = new ImageBuilder(frame);
+            // builder->withBox(scoredBox->box, Colors::YELLOW)->withTitle("ensemble-")->display(1000);
             updateBaseClassifiers(frame, scoredBox, modelId, false);
         }
     }

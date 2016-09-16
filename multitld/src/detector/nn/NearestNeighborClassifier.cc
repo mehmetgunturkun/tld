@@ -70,9 +70,13 @@ bool NearestNeighborClassifier::validate(Frame* frame, ScoredBox* scoredBox, int
 
     bool anyModelClassified = false;
     vector<int> classifiedModelIds;
-    if (conservativeScore > 0.5) {
+    printf("%s\n", box->toString().c_str());
+    if (conservativeScore > 0.7) {
         anyModelClassified = true;
+        printf("High conservative score - %f!\n", conservativeScore);
         classifiedModelIds.push_back(modelId);
+    } else {
+        printf("Low conservative score - %f!\n", conservativeScore);
     }
 
     NNScore* score = new NNScore(patch, relativeScores, conservativeScores);

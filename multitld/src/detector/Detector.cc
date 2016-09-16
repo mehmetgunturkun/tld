@@ -132,7 +132,9 @@ void Detector::learn(Frame* current,
             continue;
         }
 
-        if (isNegative(sample->box) && sample->getScoreValue("ensemble") >= 1) {
+        EnsembleScore* ensembleScore = (EnsembleScore*) sample->getScore("ensemble");
+        float confidence = ensembleScore->scores[modelId];
+        if (isNegative(sample->box) && confidence >= 1.0) {
             negativeQueue += sample;
         }
 
@@ -197,4 +199,8 @@ ScoredBox* Detector::validate(Frame* frame, Box* box, int modelId) {
     ScoredBox* scoredBox = new ScoredBox(box);
     nnClassifier->validate(frame, scoredBox, modelId);
     return scoredBox;
+}
+
+bool Detector::evaluate(Frame* frame, Box* box, int modelId) {
+    return true;
 }

@@ -7,6 +7,20 @@
 #include "tld/TrackerResult.hpp"
 #include "tld/DetectorResult.hpp"
 
+class TLDResultSet {
+public:
+    int modelId;
+    Box* maybeTrackedBox;
+    vector<ScoredBox*> scoredBoxList;
+
+    TLDResultSet(Box* maybeTrackedBox) {
+        this->maybeTrackedBox = maybeTrackedBox;
+    }
+    void add(ScoredBox* scoredBox) {
+        this->scoredBoxList.push_back(scoredBox);
+    }
+};
+
 class TLD {
 public:
     Tracker* tracker;
@@ -16,11 +30,15 @@ public:
     TLD(Tracker* tracker, Detector* detector);
     TLD(Frame* frame, vector<Box*> boxList);
 
-    vector<Box*> track(Frame* prev, Frame* curr, vector<Box*> boxList);
-    ScoredBox* validate(Frame* current, Box* trackedBox, int modelId);
-    Option<Box>* integrate(Frame* current, Box* trackedBox, vector<ScoredBox*> allBoxes, vector<ScoredBox*> detectedBoxed, int modelId);
+    vector<Box*> track(Frame* prev, Frame* curr, vector<Box*> prevBoxList);
+    vector<TLDResultSet*> groupResults(vector<Box*> boxList, vector<ScoredBox*> scoredBoxList);
+    Option<Box>* integrate(Frame* frame, Box* maybeTrackedBox, vector<ScoredBox*> scoredBoxList, int modelId);
+
+    TrackerResult* validate(Frame* current, Box* trackedBox, int modelId);
+    DetectorResult* partition(vector<ScoredBox*> scoredBoxList, int modelId);
+
     bool isThereMoreConfidentOneBox(ScoredBox* trackScoredBox, vector<ScoredBox*> detectedBoxes);
-    Option<Box>* getMoreConfidentOneBox(ScoredBox* trackScoredBox, vector<ScoredBox*> detectedBoxes);
+    vector<ScoredBox*> getMoreConfidentBoxList(ScoredBox* trackScoredBox, vector<ScoredBox*> detectedBoxes);
     Box* combineClosestBoxes(ScoredBox* trackScoredBox, vector<ScoredBox*> detectedBoxes);
 };
 #endif

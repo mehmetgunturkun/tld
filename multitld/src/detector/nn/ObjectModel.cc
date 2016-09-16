@@ -36,6 +36,11 @@ double ObjectModel::computeConservativeScore(Patch* sample) {
 }
 
 ObjectScore* ObjectModel::computeScore(Patch* sample) {
+    if (nrOfPositivePatches == 0 && nrOfNegativePatches == 0) {
+        ObjectScore* objectScore = new ObjectScore(0.0f, 0.0f, false, false);
+        return objectScore;
+    }
+
     float positiveNNSimilarity = (float) computePositiveSimilarity(sample);
     float positiveInititalNNSimilarity = (float) computeInitialPositiveSimilarity(sample);
     float negativeNNSimilarity = (float) computeNegativeSimilarity(sample);

@@ -57,7 +57,22 @@ double ScoredBox::getScoreValue(string classifierKey) {
     return score->value;
 }
 
+vector<int> ScoredBox::getCandidateModels(string classifierKey) {
+    Score* score = getScore(classifierKey);
+    return score->classifiedModelIds;
+}
+
 vector<int> ScoredBox::getCandidateModels() {
     Score* score = getScore("nn");
     return score->classifiedModelIds;
+}
+
+bool ScoredBox::isClassified(string classifierKey, int modelId) {
+    Score* score = getScore(classifierKey);
+    if (score == NULL) {
+        return false;
+    } else {
+        vector<int> classifiedModelIds = score->classifiedModelIds;
+        return std::find(classifiedModelIds.begin(), classifiedModelIds.end(), modelId) != classifiedModelIds.end();
+    }
 }

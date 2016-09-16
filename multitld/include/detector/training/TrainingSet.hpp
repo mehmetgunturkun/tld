@@ -31,6 +31,7 @@ public:
     vector<Type*> negativeSamples;
 
     int nrOfSamples;
+    int nrOfBootstrap;
     TrainingSet(Frame* f, vector<Type*> p, vector<Type*> n) {
         frame = f;
         positiveSamples = p;
