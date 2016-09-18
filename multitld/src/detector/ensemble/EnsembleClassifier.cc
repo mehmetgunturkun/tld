@@ -182,75 +182,51 @@ bool EnsembleClassifier::classify(Frame* frame, ScoredBox* scoredBox) {
     return score->isAnyModellClassified;
 }
 
-//EnsembleScore* score(Frame* frame, ScoredBox* scoredBox);
+void EnsembleClassifier::score(Frame* frame, ScoredBox* scoredBox) {
+    if (scoredBox->isScored("ensemble")) {
+        // Already defined!
+    } else {
+        EnsembleScore* ensembleScore = new EnsembleScore(nrOfModels, nrOfBaseClassifiers);
+        Box* box = scoredBox->box;
 
-EnsembleScore* EnsembleClassifier::score(Frame* frame, ScoredBox* scoredBox, int modelId) {
-    EnsembleScore* ensembleScore = new EnsembleScore(nrOfModels, nrOfBaseClassifiers);
-
-    float score = 0.0f;
-    for (int i = 0; i < nrOfBaseClassifiers; i++) {
-        BaseClassifier* bc = baseClassifiers[i];
-        float bcScore = bc->score(frame, scoredBox->box, ensembleScore, modelId);
-        score += bcScore;
-    }
-
-    vector<float> scores(nrOfModels);
-    scores[modelId] = score;
-    ensembleScore->scores = scores;
-    scoredBox->withScore("ensemble", ensembleScore);
-    return ensembleScore;
-}
-
-void EnsembleClassifier::train(TrainingSet<Box> ts, int modelId) {
-    vector<Labelled<Box>> samples = ts.getLabelledSamples(true);
-    printf("EC >> %lu samples are going to be processed for training\n", samples.size());
-    for (int i = 0; i < samples.size(); i++) {
-        Labelled<Box> sample = samples[i];
-        Frame* frame = sample.frame;
-        Box* box = sample.item;
-
-        ScoredBox* scoredBox = new ScoredBox(box);
-        EnsembleScore* ensembleScore = score(frame, scoredBox, modelId);
-        float probability = ensembleScore->getProbability(modelId);
-
-        int label = sample.label;
-
-        if (label == true && probability < positiveUpdateThreshold) {
-            updateBaseClassifiers(frame, scoredBox, modelId, true);
+        for (int i = 0; i < nrOfBaseClassifiers; i++) {
+            BaseClassifier* bc = baseClassifiers[i];
+            bc->generateBinaryCode(frame, box, ensembleScore);
         }
 
-        if (label == false && probability > negativeUpdateThreshold) {
-            updateBaseClassifiers(frame, scoredBox, modelId, false);
-        }
+        scoredBox->withScore("ensemble", ensembleScore);
     }
-    printf("EC >> %lu samples were processed for training\n", samples.size());
 }
 
 void EnsembleClassifier::train(TrainingSet<ScoredBox> ts, int modelId) {
     vector<Labelled<ScoredBox>> samples = ts.getLabelledSamples();
-    printf("EC >> %lu samples are going to be processed for training - online\n", samples.size());
-    for (int i = 0; i < ts.nrOfSamples; i++) {
-        Labelled<ScoredBox> sample = samples[i];
+    int nrOfBootstrap = ts.nrOfBootstrap;
+    // printf("EC >> %lu samples are going to be processed for training - online\n", samples.size());
+    for (int trial = 0; trial < nrOfBootstrap; trial++) {
+        for (int i = 0; i < ts.nrOfSamples; i++) {
+            Labelled<ScoredBox> sample = samples[i];
 
-        Frame* frame = sample.frame;
-        ScoredBox* scoredBox = sample.item;
+            Frame* frame = sample.frame;
+            ScoredBox* scoredBox = sample.item;
 
-        int label = sample.label;
-        float probability = getProbability(scoredBox, modelId);
+            int label = sample.label;
+            float probability = getProbability(scoredBox, modelId);
 
-        if (label == true && probability < positiveUpdateThreshold) {
             // ImageBuilder* builder = new ImageBuilder(frame);
-            // builder->withBox(scoredBox->box, Colors::YELLOW)->withTitle("ensemble-pos")->display(1000);
-            updateBaseClassifiers(frame, scoredBox, modelId, true);
-        }
+            // printf("EC >> Prob(%d): %f\n", label, probability);
 
-        if (label == false && probability > negativeUpdateThreshold) {
-            // ImageBuilder* builder = new ImageBuilder(frame);
-            // builder->withBox(scoredBox->box, Colors::YELLOW)->withTitle("ensemble-")->display(1000);
-            updateBaseClassifiers(frame, scoredBox, modelId, false);
+            if (label == true && probability < positiveUpdateThreshold) {
+                // builder->withBox(scoredBox->box, Colors::BLUE)->withTitle("ensemble-pos")->display(1000);
+                updateBaseClassifiers(frame, scoredBox, modelId, true);
+            }
+
+            if (label == false && probability > negativeUpdateThreshold) {
+                // builder->withBox(scoredBox->box, Colors::RED)->withTitle("ensemble-neg")->display(1000);
+                updateBaseClassifiers(frame, scoredBox, modelId, false);
+            }
         }
     }
-    printf("EC >> %lu samples were processed for training\n", samples.size());
+    // printf("EC >> %lu samples were processed for training\n", samples.size());
 }
 
 float EnsembleClassifier::getProbability(ScoredBox* scoredBox, int modelId) {

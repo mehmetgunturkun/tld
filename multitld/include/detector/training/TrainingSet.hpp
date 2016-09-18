@@ -32,15 +32,16 @@ public:
 
     int nrOfSamples;
     int nrOfBootstrap;
-    TrainingSet(Frame* f, vector<Type*> p, vector<Type*> n) {
-        frame = f;
-        positiveSamples = p;
-        nrOfPositiveSamples = (int) p.size();
+    TrainingSet(Frame* f, vector<Type*> p, vector<Type*> n, int nrOfBootstrap = 1) {
+        this->frame = f;
+        this->positiveSamples = p;
+        this->nrOfPositiveSamples = (int) p.size();
 
-        negativeSamples = n;
-        nrOfNegativeSamples = (int) n.size();
+        this->negativeSamples = n;
+        this->nrOfNegativeSamples = (int) n.size();
 
-        nrOfSamples = nrOfPositiveSamples + nrOfNegativeSamples;
+        this->nrOfSamples = nrOfPositiveSamples + nrOfNegativeSamples;
+        this->nrOfBootstrap = nrOfBootstrap;
     }
 
     vector<Labelled<Type>> getLabelledSamples(bool shouldWarp = false) {

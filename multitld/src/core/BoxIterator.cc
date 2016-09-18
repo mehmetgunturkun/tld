@@ -16,8 +16,8 @@ void BoxIterator::init() {
         boxPointer->height = boxPointer->height / 1.2;
         scaleNo++;
     }
-    boxPointer->x1 = 2.0;
-    boxPointer->y1 = 2.0;
+    boxPointer->x1 = 1.0;
+    boxPointer->y1 = 1.0;
 
     boxPointer->x2 = boxPointer->width + boxPointer->x1 - 1;
     boxPointer->y2 = boxPointer->height + boxPointer->y1 - 1;
@@ -48,10 +48,10 @@ void BoxIterator::scaleUp() {
     boxPointer->width = boxPointer->width * 1.2;
     boxPointer->height = boxPointer->height * 1.2;
 
-    boxPointer->x1 = 2.0;
+    boxPointer->x1 = 1.0;
     boxPointer->x2 = boxPointer->x1 + boxPointer->width - 1;
 
-    boxPointer->y1 = 2.0;
+    boxPointer->y1 = 1.0;
     boxPointer->y2 = boxPointer->y1 + boxPointer->height - 1;
 
     resetLimitsAndSteps();
@@ -67,7 +67,7 @@ Box* BoxIterator::next() {
 
     double xPointer = boxPointer->x1 + stepX;
     if (xPointer > limitX) {
-        boxPointer->x1 = 2.0;
+        boxPointer->x1 = 1.0;
         boxPointer->x2 = boxPointer->width + boxPointer->x1 - 1;
 
         float yPointer = boxPointer->y1 + stepY;

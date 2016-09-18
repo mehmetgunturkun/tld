@@ -9,21 +9,6 @@ NearestNeighborClassifier::NearestNeighborClassifier(Frame* firstFrame, vector<B
     POSITIVE_SCORE_THRESHOLD = 0.6;
 }
 
-NNScore* NearestNeighborClassifier::score(Frame* frame, Box* box, int modelId) {
-    Patch* patch = new Patch(frame, box);
-    vector<float> relativeScores(nrOfModels);
-    vector<float> conservativeScores(nrOfModels);
-
-    ObjectModel* objectModel = models[modelId];
-    ObjectScore* objectScore = objectModel->computeScore(patch);
-
-    relativeScores[modelId] = objectScore->relativeScore;
-    conservativeScores[modelId] = objectScore->conservativeScore;
-
-    NNScore* score = new NNScore(patch, relativeScores, conservativeScores);
-    return score;
-}
-
 bool NearestNeighborClassifier::classify(Frame* frame, ScoredBox* scoredBox) {
     Box* box = scoredBox->box;
     Patch* patch = new Patch(frame, box);
@@ -62,21 +47,20 @@ bool NearestNeighborClassifier::validate(Frame* frame, ScoredBox* scoredBox, int
     vector<float> conservativeScores(nrOfModels);
 
     ObjectModel* objectModel = models[modelId];
-    float relativeScore = objectModel->computeRelativeScore(patch);
-    float conservativeScore = objectModel->computeConservativeScore(patch);
+    ObjectScore* objectScore = objectModel->computeScore(patch);
+    float conservativeScore = objectScore->conservativeScore;
 
-    relativeScores[modelId] = relativeScore;
+    relativeScores[modelId] = objectScore->relativeScore;
     conservativeScores[modelId] = conservativeScore;
 
     bool anyModelClassified = false;
     vector<int> classifiedModelIds;
-    printf("%s\n", box->toString().c_str());
     if (conservativeScore > 0.7) {
         anyModelClassified = true;
-        printf("High conservative score - %f!\n", conservativeScore);
+        // printf("High conservative score - %f!\n", conservativeScore);
         classifiedModelIds.push_back(modelId);
     } else {
-        printf("Low conservative score - %f!\n", conservativeScore);
+        // printf("Low conservative score - %f!\n", conservativeScore);
     }
 
     NNScore* score = new NNScore(patch, relativeScores, conservativeScores);
@@ -89,24 +73,22 @@ bool NearestNeighborClassifier::validate(Frame* frame, ScoredBox* scoredBox, int
     return score->isAnyModellClassified;
 }
 
-void NearestNeighborClassifier::train(TrainingSet<Box> ts, int modelId) {
-    vector<Labelled<Box>> samples = ts.getLabelledSamples(false);
-    printf("NN >> %lu samples are going to be processed for training\n", samples.size());
-    ObjectModel* model = models[modelId];
-    for (int i = 0; i < ts.nrOfSamples; i++) {
-        Labelled<Box> sample = samples[i];
-        Frame* frame = sample.frame;
-        Box* box = sample.item;
-        int label = sample.label;
+void NearestNeighborClassifier::score(Frame* frame, ScoredBox* scoredBox) {
+    if (scoredBox->isScored("nn")) {
+        // Already defined!
+    } else {
+        Box* box = scoredBox->box;
         Patch* patch = new Patch(frame, box);
-        model->add(patch, label == 1);
+        NNScore* nnScore = new NNScore(patch);
+
+        scoredBox->withScore("nn", nnScore);
     }
-    printf("NN >> %lu samples were processed for training\n", samples.size());
 }
 
 void NearestNeighborClassifier::train(TrainingSet<ScoredBox> ts, int modelId) {
     vector<Labelled<ScoredBox>> samples = ts.getLabelledSamples(false);
-    printf("NN >> %lu samples are going to be processed for training\n", samples.size());
+
+    // printf("NN >> %lu samples are going to be processed for training\n", samples.size());
     ObjectModel* model = models[modelId];
     for (int i = 0; i < ts.nrOfSamples; i++) {
         Labelled<ScoredBox> sample = samples[i];
@@ -126,17 +108,31 @@ void NearestNeighborClassifier::train(TrainingSet<ScoredBox> ts, int modelId) {
         float relativeScore = objectScore->relativeScore;
         bool isInPositive = objectScore->isInPositive;
 
+        // ImageBuilder* builder = new ImageBuilder(frame);
+
         if (label == true && relativeScore <= 0.65) {
-            if (isInPositive) {
-                model->replace(patch, true);
-            } else {
-                model->add(patch, true);
-            }
+            // builder->withBox(scoredBox->box, Colors::BLUE)->withTitle("nn-pos")->display(0);
+            printf("NN(+) >> %s\n", scoredBox->box->toString().c_str());
+            model->add(patch, true);
         }
 
         if (label == false && relativeScore > 0.5) {
+            printf("NN(-) >> %s\n", scoredBox->box->toString().c_str());
+            // builder->withBox(scoredBox->box, Colors::RED)->withTitle("nn-neg")->display(0);
             model->add(patch, false);
         }
     }
-    printf("NN >> %lu samples were processed for training\n", samples.size());
+    // printf("NN >> %lu samples were processed for training\n", samples.size());
+}
+
+bool NearestNeighborClassifier::evaluate(Frame* frame, Box* box, int modelId) {
+    Patch* patch = new Patch(frame, box);
+    ObjectModel* model = models[modelId];
+    ObjectScore* objectScore = model->computeScore(patch);
+    return objectScore->relativeScore > 0.5;
+}
+
+void NearestNeighborClassifier::dumpNearestNeighborClassifier() {
+    ObjectModel* model = models[0];
+    printf("#P = %d, #N = %d\n", model->nrOfPositivePatches, model->nrOfNegativePatches);
 }

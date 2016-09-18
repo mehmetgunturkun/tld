@@ -29,7 +29,7 @@ public:
     EnsembleClassifier(Frame* firstFrame, vector<Box*> boxList);
     bool classify(Frame* frame, ScoredBox* scoredBox);
     float getProbability(ScoredBox* scoredBox, int modelId);
-    EnsembleScore* score(Frame* frame, ScoredBox* scoredBox, int modelId);
+    void score(Frame* frame, ScoredBox* scoredBox);
     void train(TrainingSet<Box> ts, int modelId);
     void train(TrainingSet<ScoredBox> ts, int modelId);
     void updateBaseClassifiers(Frame* frame, ScoredBox* scoredBox, int modelId, bool label);

@@ -34,6 +34,7 @@ private:
         }
 
         vector<Distance*> distances = distanceList.toVector();
+        std::reverse(distances.begin(), distances.end());
         return distances;
     }
 
@@ -76,10 +77,14 @@ public:
     vector<int> getCandidateModels();
     vector<int> getCandidateModels(string classifierKey);
     bool isClassified(string classifierKey, int modelId);
+    bool isScored(string classifierKey);
 
     static vector<ScoredBox*> cluster(vector<ScoredBox*> boxList, int nrOfBoxes) {
+        if (nrOfBoxes == 1) {
+            return boxList;
+        }
         vector<Distance*> distances = computeDistances(boxList, nrOfBoxes);
-        vector<Cluster*> clusters = Cluster::build(distances, distances.size(), 0.5);
+        vector<Cluster*> clusters = Cluster::build(distances, distances.size(), 0.1);
         vector<ScoredBox*> clusteredBoxes = combineClusters(clusters, boxList);
         return clusteredBoxes;
     }

@@ -29,7 +29,7 @@ public:
     double varianceThreshold;
 
     int nrOfPositiveBoxes4EnsembleAtInitialization;
-    int nrOfNegativeBoxes4EnsembleAtInitialization;
+    // int nrOfNegativeBoxes4EnsembleAtInitialization;
     int nrOfPositiveBoxes4NNAtInitialization;
     int nrOfNegativeBoxes4NNAtInitialization;
 
@@ -43,6 +43,10 @@ public:
     vector<ScoredBox*> detect(Frame* frame);
     void learn(Frame* current, Box* box, vector<ScoredBox*> grids, int modelId);
     ScoredBox* validate(Frame* frame, Box* box, int modelId);
+
+    vector<ScoredBox*> score(Frame* frame, vector<Box*> boxList);
+    void score(Frame* frame, ScoredBox* scoredBox);
+
     bool evaluate(Frame* frame, Box* box, int modelId);
 };
 #endif

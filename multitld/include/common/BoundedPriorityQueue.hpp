@@ -36,11 +36,14 @@ public:
     }
 
     vector<T*> toVector() {
-        return this->c;
-    }
-
-    T* head() {
-        return this->top();
+        vector<T*> vector;
+        for (int i = 0 ; i < count; i++) {
+            T* head = this->top();
+            vector.push_back(head);
+            this->pop();
+        }
+        std::reverse(vector.begin(), vector.end());
+        return vector;
     }
 };
 #endif

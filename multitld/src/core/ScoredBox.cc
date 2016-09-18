@@ -76,3 +76,11 @@ bool ScoredBox::isClassified(string classifierKey, int modelId) {
         return std::find(classifiedModelIds.begin(), classifiedModelIds.end(), modelId) != classifiedModelIds.end();
     }
 }
+
+bool ScoredBox::isScored(string classifierKey) {
+    if (detailMap.count(classifierKey) == 0) {
+        return false;
+    } else {
+        return true;
+    }
+}

@@ -16,6 +16,7 @@ class BaseClassifier {
 public:
     int id;
     BaseClassifier(int i, vector<PixelComparison*> comparisons);
+    int generateBinaryCode(Frame* frame, Box* box, EnsembleScore* score);
     vector<float> score(Frame* frame, Box* box, EnsembleScore* score);
     float score(Frame* frame, Box* box, EnsembleScore* score, int modelId);
     float getProbability(ScoredBox* box, int modelId);
