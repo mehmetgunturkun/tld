@@ -1,6 +1,6 @@
 #include "testbase/Sequence.hpp"
 
-vector<string> Sequence::extensions = {".jpg", ".png"};
+vector<string> Sequence::extensions = {".jpg", ".png", ".pgm"};
 
 bool endsWith (std::string const &fullString, std::string const &ending) {
     if (fullString.length() >= ending.length()) {
@@ -41,8 +41,10 @@ vector<string> listImageFiles(string directory) {
 
 Sequence::Sequence(string key, int skip) {
     this->key = key;
+
     string resourceString(RESOURCE_DIR);
     string sampleDirectory = resourceString + "/" + key;
+    this->dir = sampleDirectory;
     string sequenceDirectory = sampleDirectory + "/sequence";
 
     files = listImageFiles(sequenceDirectory);
@@ -50,6 +52,7 @@ Sequence::Sequence(string key, int skip) {
     processedFrames = skip;
 
     string initDir = sampleDirectory + "/evaluations/init.txt";
+    this->outputFile = sampleDirectory + "/evaluations/mTLD.txt";
     ifstream initFile(initDir);
     if (initFile.is_open()) {
         string line;

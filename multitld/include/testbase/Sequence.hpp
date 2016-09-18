@@ -15,8 +15,10 @@ using namespace std;
 
 class Sequence {
 public:
+    string dir;
     string key;
     vector<string> files;
+    string outputFile;
     Box* initBox;
 
     int processedFrames;
