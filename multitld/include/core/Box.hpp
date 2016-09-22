@@ -33,6 +33,7 @@ public:
     float overlap;
 
     int nrOfPoints;
+    int scaleNo;
 
     Box(int id, float x1, float y1, float x2, float y2);
     Box* move(float dx, float dy);
@@ -68,8 +69,28 @@ public:
             << x1 << ", "
             << y1 << ", "
             << x2 << ", "
-            << y2 << ")";
+            << y2 << ", "
+            << width << ", "
+            << height<< ")";
         return ss.str();
+    }
+
+    string toTLDString() {
+        stringstream ss;
+        ss  << "Box("
+            << id << ", "
+            << x1 << ", "
+            << y1 << ", "
+            << x2 << ", "
+            << y2 << ", "
+            << width << ", "
+            << height<< ")";
+        return ss.str();
+    }
+
+    const char* toCharArr() {
+        string str = this->toString();
+        return str.c_str();
     }
 
     static Box* rounded(Box* box) {
@@ -77,8 +98,7 @@ public:
             box->id,
             round(box->x1),
             round(box->y1),
-            round(box->x1) +
-            round(box->width) - 1.0,
+            round(box->x1) + round(box->width) - 1.0,
             round(box->y1) + round(box->height) - 1.0
         );
         return newBox;

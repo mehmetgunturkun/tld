@@ -20,6 +20,7 @@ public:
 
     Frame(string fileName);
     Frame(Mat* grayscale, Mat* gaussian);
+    Frame() {}
 
     int get(Point2f* point, int imageType = CV_LOAD_IMAGE_GAUSSIAN);
     int get(int x, int y, int imageType = CV_LOAD_IMAGE_GAUSSIAN);

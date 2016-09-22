@@ -106,7 +106,7 @@ Option<Box>* TLD::integrate(Frame* frame, Box* maybeTrackedBox, vector<ScoredBox
 
     // Integration
     if (trackerResult->isValid) {
-        printf("Frame#%d, Tracker " ANSI_COLOR_GREEN "Success " ANSI_COLOR_RESET " \n", frame->id);
+        printf("Frame#%d, Tracker " ANSI_COLOR_GREEN "Success(%f) " ANSI_COLOR_RESET " \n", frame->id);
         shouldLearn = scoredTrackBox->isDetected;
         if (detectedBoxList.size() > 0) {
             vector<ScoredBox*> moreConfidentBoxList = getMoreConfidentBoxList(scoredTrackBox, clusteredBoxList);

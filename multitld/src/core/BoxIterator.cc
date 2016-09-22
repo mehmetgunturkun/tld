@@ -1,85 +1,108 @@
 #include "core/BoxIterator.hpp"
 
-BoxIterator::BoxIterator(Frame* f, Box* b, int maximumScale, int minimumWindowSize) {
-    frame = f;
-    boxPointer = b->clone();
-    maxScale = maximumScale;
-    minWindowSize = minimumWindowSize;
-    init();
-}
-
-void BoxIterator::init() {
-    boxPointer = boxPointer->clone();
-    int scaleNo = 0;
-    while (boxPointer->width / 1.2 > minWindowSize && boxPointer->height / 1.2 > minWindowSize && (scaleNo < maxScale))  {
-        boxPointer->width = boxPointer->width / 1.2;
-        boxPointer->height = boxPointer->height / 1.2;
-        scaleNo++;
+double roundDouble(double n) {
+    int intN = (int) n;
+    double precision = n - intN;
+    if (precision >= 0.49) {
+        return (double) intN + 1;
+    } else {
+        return (double) intN;
     }
-    boxPointer->x1 = 1.0;
-    boxPointer->y1 = 1.0;
-
-    boxPointer->x2 = boxPointer->width + boxPointer->x1 - 1;
-    boxPointer->y2 = boxPointer->height + boxPointer->y1 - 1;
-
-    boxCount = 0;
-    levelBasedCount = 0;
-
-    resetLimitsAndSteps();
 }
 
-void BoxIterator::resetLimitsAndSteps() {
-    stepX = round(boxPointer->width) * 0.1;
-    stepY = round(boxPointer->height) * 0.1;
-    stepX = min(stepX, stepY);
+BoxScaleTemplate::BoxScaleTemplate(double boxWidth, double boxHeight, double frameWidth, double frameHeight) {
+    this->x1 = 1.0;
+    this->y1 = 1.0;
 
-    limitX = ((double) frame->width) - round(boxPointer->width) - 1.0;
-    limitY = ((double) frame->height) - round(boxPointer->height) - 1.0;
+    this->preStart = true;
+    this->nrOfBoxes = 0;
+
+    this->width = boxWidth;
+    this->height = boxHeight;
+
+    this->stepX = round(this->width) * 0.1;
+    this->stepY = round(this->height) * 0.1;
+
+    this->stepX = min(this->stepX, this->stepY);
+    this->stepY = min(this->stepX, this->stepY);
+
+    this->limitX = roundDouble(frameWidth - this->width - 1);
+    this->limitY = roundDouble(frameHeight - this->height - 1);
+}
+
+
+bool BoxScaleTemplate::hasNext() {
+    if (this->preStart) {
+        this->preStart = false;
+        return true;
+    } else {
+        double nextX1 = this->x1 + stepX;
+        if (roundDouble(nextX1) >= limitX) {
+            double nextY1 = this->y1 + stepY;
+            if (roundDouble(nextY1) >= limitY) {
+                return false;
+            }
+            this->x1 = 1.0;
+            this->y1 = nextY1;
+        } else {
+            this->x1 = nextX1;
+        }
+        return true;
+    }
+}
+
+Box* BoxScaleTemplate::next() {
+    nrOfBoxes += 1;
+    Box* box = new Box(0,
+        roundDouble(this->x1),
+        roundDouble(this->y1),
+        roundDouble(this->x1) + this->width - 1,
+        roundDouble(this->y1) + this->height - 1
+    );
+    return box;
+}
+
+BoxIterator::BoxIterator(Frame* f, Box* b, int maximumScale, int minimumWindowSize) {
+    this->currentScaleNo = 0;
+    this->maxScale = 10;
+    this->nrOfTotalScales = 0;
+
+    initBoxScaleTemplates(f, b);
+}
+
+void BoxIterator::initBoxScaleTemplates(Frame* frame, Box* box) {
+    double width = (double) box->width;
+    double height = (double) box->height;
+
+    double scaleFactor = 1.2;
+    for (int i = -10; i <= 10; i++) {
+        double scale = pow(scaleFactor, i);
+        double scaledWidth = roundDouble(((double) width) * scale);
+        double scaledHeight = roundDouble(((double) height) * scale);
+        if (scaledWidth > 24.0 && scaledHeight > 24.0  && scaledWidth < frame->width && scaledHeight < frame->height) {
+            this->nrOfTotalScales += 1;
+            BoxScaleTemplate* boxTemplate = new BoxScaleTemplate(scaledWidth, scaledHeight, frame->width, frame->height);
+            boxPerScale.push_back(boxTemplate);
+        }
+    }
 }
 
 bool BoxIterator::hasNext() {
-    bool boxSmallerFrame = !(boxPointer->width >= frame->width || boxPointer->height >= frame->height);
-    return boxSmallerFrame && maxScale > 0;
-}
-
-void BoxIterator::scaleUp() {
-    maxScale = maxScale - 1;
-
-    boxPointer->width = boxPointer->width * 1.2;
-    boxPointer->height = boxPointer->height * 1.2;
-
-    boxPointer->x1 = 1.0;
-    boxPointer->x2 = boxPointer->x1 + boxPointer->width - 1;
-
-    boxPointer->y1 = 1.0;
-    boxPointer->y2 = boxPointer->y1 + boxPointer->height - 1;
-
-    resetLimitsAndSteps();
-    levelBasedCount = 0;
+    if (this->currentScaleNo < maxScale && this->currentScaleNo < nrOfTotalScales) {
+        BoxScaleTemplate* boxTemplate = boxPerScale[this->currentScaleNo];
+        bool hasMoreTemplate = boxTemplate->hasNext();
+        if (hasMoreTemplate) {
+            return true;
+        } else {
+            this->currentScaleNo += 1;
+            return hasNext();
+        }
+    } else {
+        return false;
+    }
 }
 
 Box* BoxIterator::next() {
-    Box* box = Box::rounded(boxPointer);
-    box->id = boxCount;
-
-    boxCount++;
-    levelBasedCount++;
-
-    double xPointer = boxPointer->x1 + stepX;
-    if (xPointer > limitX) {
-        boxPointer->x1 = 1.0;
-        boxPointer->x2 = boxPointer->width + boxPointer->x1 - 1;
-
-        float yPointer = boxPointer->y1 + stepY;
-        if (yPointer > limitY) {
-            scaleUp();
-        } else {
-            boxPointer->y1 = yPointer;
-            boxPointer->y2 = yPointer + boxPointer->height - 1;
-        }
-    } else {
-        boxPointer->x1 = xPointer;
-        boxPointer->x2 = xPointer + boxPointer->width - 1;
-    }
-    return box;
+    BoxScaleTemplate* boxTemplate = boxPerScale[this->currentScaleNo];
+    return boxTemplate->next();
 }

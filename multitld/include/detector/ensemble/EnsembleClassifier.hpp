@@ -9,7 +9,7 @@
 #include "detector/training/TrainingSet.hpp"
 
 class EnsembleClassifier {
-private:
+public:
     string classifierName;
     int nrOfBaseClassifiers;
     int nrOfPixelComparisons;
@@ -25,7 +25,7 @@ private:
     vector<BaseClassifier*> shuffleComparisons(vector<PixelComparison*> allComparisons);
 
     float POSITIVE_SCORE_THRESHOLD;
-public:
+
     EnsembleClassifier(Frame* firstFrame, vector<Box*> boxList);
     bool classify(Frame* frame, ScoredBox* scoredBox);
     float getProbability(ScoredBox* scoredBox, int modelId);

@@ -4,25 +4,39 @@
 #include "core/Frame.hpp"
 #include "core/Box.hpp"
 
-class BoxIterator {
+class BoxScaleTemplate {
 private:
-    Frame* frame;
-    Box* boxPointer;
+    // double roundDouble(double n);
+public:
+    double x1;
+    double y1;
 
-    double limitX;
-    double limitY;
+    double width;
+    double height;
 
     double stepX;
     double stepY;
 
-    int maxScale;
-    int minWindowSize;
-    int boxCount;
-    int levelBasedCount;
+    double limitX;
+    double limitY;
 
-    void init();
-    void resetLimitsAndSteps();
-    void scaleUp();
+    bool preStart;
+    int nrOfBoxes;
+
+    BoxScaleTemplate(double boxWidth, double boxHeight, double frameWidth, double frameHeight);
+    bool hasNext();
+    Box* next();
+};
+
+class BoxIterator {
+private:
+    vector<BoxScaleTemplate*> boxPerScale;
+
+    int currentScaleNo;
+    int nrOfTotalScales;
+    int maxScale;
+
+    void initBoxScaleTemplates(Frame* frame, Box* box);
 public:
     BoxIterator(Frame* frame, Box* box, int maximumScale = 10, int minimumWindowSize = 24);
     bool hasNext();

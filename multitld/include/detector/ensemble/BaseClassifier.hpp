@@ -23,5 +23,6 @@ public:
     void train(Frame* frame, Box* box, int modelId, bool label);
     void train(Frame* frame, ScoredBox* box, int modelId, bool label);
     void dumpBaseClassifier();
+    void printPixelComparison();
 };
 #endif

@@ -17,6 +17,8 @@ EnsembleClassifier::EnsembleClassifier(Frame* firstFrame, vector<Box*> boxList) 
 
 vector<BaseClassifier*> EnsembleClassifier::generateBaseClassifier() {
     vector<PixelComparison*> allComparisons = produceAllComparisons();
+    printf("Number of all comparisons: %d\n", (int) allComparisons.size());
+
     vector<BaseClassifier*> classifiers = shuffleComparisons(allComparisons);
     printf("Ensemble Classifier is created with %lu base classifiers\n", classifiers.size());
     return classifiers;
@@ -137,6 +139,7 @@ vector<PixelComparison*> EnsembleClassifier::produceAllComparisons() {
 
 vector<BaseClassifier*> EnsembleClassifier::shuffleComparisons(vector<PixelComparison*> allComparisons) {
     int nrOfComparisons = (int) allComparisons.size();
+    Random::seed();
     allComparisons = Random::randomSample(allComparisons, nrOfComparisons);
 
     vector<BaseClassifier*> classifiers;

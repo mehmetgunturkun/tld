@@ -10,6 +10,7 @@ private:
 public:
     CodeGenerator(vector<PixelComparison*> pixelComparisons);
     int generateBinaryCode(Frame* frame, Box* box);
+    void printPixelComparison();
 };
 
 #endif

@@ -51,3 +51,9 @@ void BaseClassifier::dumpBaseClassifier() {
     decTree->dumpDecisionTree();
     printf("===============================\n");
 }
+
+void BaseClassifier::printPixelComparison() {
+    printf("===== BaseClassifier(%2d) =====\n", this->id);
+    codeGen->printPixelComparison();
+    printf("===============================\n");
+}

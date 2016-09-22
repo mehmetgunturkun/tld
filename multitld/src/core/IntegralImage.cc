@@ -20,7 +20,6 @@ int* IntegralImage::computeSquaredIntegralImage(Mat* img) {
     return computeIntegralImage(img, [](int pixel) {return pixel * pixel;});
 }
 
-
 int* IntegralImage::computeIntegralImage(Mat* img, int (f)(int)) {
     int* integral = (int*) malloc(sizeof(int) * width * height);
     for ( int i = 0; i < height; i++) {
@@ -46,6 +45,14 @@ int* IntegralImage::computeIntegralImage(Mat* img, int (f)(int)) {
     return integral;
 }
 
+MeanVariance* IntegralImage::computeMeanVariance(Box* b) {
+    return computeMeanVariance(
+        (int) b->x1,
+        (int) b->y1,
+        (int) b->width,
+        (int) b->height);
+}
+
 MeanVariance* IntegralImage::computeMeanVariance(int x, int y, int w, int h) {
     int windowSum = computeSubWindow(y, x, w, h, false);
     int squaredWindowSum  = computeSubWindow(y, x, w, h, true);
@@ -63,6 +70,32 @@ MeanVariance* IntegralImage::computeMeanVariance(int x, int y, int w, int h) {
     return meanVariance;
 }
 
+// int IntegralImage::computeSubWindow(int x1, int y1, int x2, int y2, bool isSquared) {
+//     int* data = NULL;
+//     if (!isSquared) {
+//             data = integralImage;
+//     } else {
+//             data = integralSquaredImage;
+//     }
+//
+//     int topLeft = 0;
+//     if (x1 > 0 && y1 > 0) {
+//         topLeft = data[( y1 * width + x1];
+//     }
+//
+//     int bottomRight = data[( y2 * width + x2];;
+//
+//     int topRight = 0;
+//     if (y1 > 0) {
+//         topRight = data[( (y1 - 1) * width + x1];
+//     }
+//
+//     int bottomLeft = 0;
+//     if (x1 > 0) {
+//         bottomLeft = data[( y1 * width + x1 - 1];
+//     }
+// }
+
 int IntegralImage::computeSubWindow(int row, int col, int pWidth, int pHeight, bool isSquared) {
         int* data = NULL;
         if (!isSquared) {
@@ -77,15 +110,15 @@ int IntegralImage::computeSubWindow(int row, int col, int pWidth, int pHeight, b
         int bottomRight = 0;
 
         if (col > 0) {
-                bottomLeft = data[(row+pHeight-1)*width + col-1];
+                bottomLeft = data[(row+pHeight-1)*width + col - 1 ];
         }
 
         if (row > 0) {
-                topRight = data[(row-1)*width + col + pWidth-1];
+                topRight = data[(row - 1)*width + col + pWidth-1];
         }
 
         if (row > 0 && col > 0) {
-                topLeft = data[(row-1)*width + col-1];
+                topLeft = data[(row - 1)*width + col - 1];
         }
 
         bottomRight = data[(row+pHeight-1)*width + col + pWidth-1];

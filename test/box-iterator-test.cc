@@ -7,7 +7,7 @@
 #include "util/Dataset.hpp"
 
 int main(int argc, char** argv) {
-    Dataset* dataset = new Dataset("car");
+    Dataset* dataset = new Dataset("tld/car");
     Frame* f = dataset->next();
     println(f->toString().c_str());
 
@@ -16,10 +16,11 @@ int main(int argc, char** argv) {
 
     BoxIterator* iterator = new BoxIterator(f, b, 10, 24);
     while (iterator->hasNext()) {
-        FrameView* view = new FrameView(f);
+        // FrameView* view = new FrameView(f);
         Box* nextBox = iterator->next();
-        view->addBox(nextBox, FrameView::RED);
-        Image::imshow("iterator", view->underlying, 1);
+        printf("%s\n", nextBox->toString().c_str());
+        // view->addBox(nextBox, FrameView::RED);
+        // Image::imshow("iterator", view->underlying, 1);
     }
     return EXIT_SUCCESS;
 }

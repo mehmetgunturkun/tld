@@ -1,4 +1,4 @@
-#include <iostream>
+    #include <iostream>
 #include <fstream>
 
 #include "testbase/Sequence.hpp"
@@ -20,13 +20,14 @@ int main(int argc, char** argv) {
 
     ofstream outputFile;
     outputFile.open (sequence->outputFile);
-
+    printf("mc1000\n");
     TLD* tld = new TLD(firstFrame, boxList);
+    printf("mc2000\n");
 
     int frameNo = 1;
     Frame* previous = firstFrame;
     printf("Started to run for %s\n", key.c_str());
-    while (sequence->hasNext() && frameNo < 100) {
+    while (sequence->hasNext()) {
         Frame* current = sequence->next();
         frameNo += 1;
 

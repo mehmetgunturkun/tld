@@ -17,3 +17,10 @@ int CodeGenerator::generateBinaryCode(Frame* frame, Box* box) {
     }
     return binaryCode;
 }
+
+void CodeGenerator::printPixelComparison() {
+    for (int i = 0 ; i < nrOfComparisons; i++) {
+        PixelComparison* comparison = pixelComparisons[i];
+        printf("%s\n", comparison->toString().c_str());
+    }
+}
