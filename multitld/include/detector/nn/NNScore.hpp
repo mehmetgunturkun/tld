@@ -21,5 +21,6 @@ public:
     Score* sum(Score* other);
     Score* divide(int n);
     Score* clone();
+    float getValue(int modelId);
 };
 #endif

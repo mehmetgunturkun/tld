@@ -17,6 +17,6 @@ public:
 
     bool isAnyModellClassified;
     vector<int> classifiedModelIds;
-
+    virtual float getValue(int modelId);
 };
 #endif

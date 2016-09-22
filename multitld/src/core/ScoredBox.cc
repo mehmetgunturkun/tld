@@ -52,9 +52,9 @@ Score* ScoredBox::getScore(string classifierKey) {
     return score;
 }
 
-double ScoredBox::getScoreValue(string classifierKey) {
+double ScoredBox::getScoreValue(string classifierKey, int modelId) {
     Score* score = getScore(classifierKey);
-    return score->value;
+    return score->getValue(modelId);
 }
 
 vector<int> ScoredBox::getCandidateModels(string classifierKey) {

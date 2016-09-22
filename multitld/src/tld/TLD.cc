@@ -106,10 +106,10 @@ Option<Box>* TLD::integrate(Frame* frame, Box* maybeTrackedBox, vector<ScoredBox
 
     // Integration
     if (trackerResult->isValid) {
-        printf("Frame#%d, Tracker " ANSI_COLOR_GREEN "Success(%f) " ANSI_COLOR_RESET " \n", frame->id);
+        printf("Frame#%d, Tracker " ANSI_COLOR_GREEN "Success(%f) " ANSI_COLOR_RESET " \n", frame->id, scoredTrackBox->getScoreValue("nn", modelId));
         shouldLearn = scoredTrackBox->isDetected;
         if (detectedBoxList.size() > 0) {
-            vector<ScoredBox*> moreConfidentBoxList = getMoreConfidentBoxList(scoredTrackBox, clusteredBoxList);
+            vector<ScoredBox*> moreConfidentBoxList = getMoreConfidentBoxList(scoredTrackBox, clusteredBoxList, modelId);
             if (moreConfidentBoxList.size() == 1) {
                 // Detector.Override
                 printf("Detector " ANSI_COLOR_GREEN "Success Override " ANSI_COLOR_RESET " \n");
@@ -215,17 +215,18 @@ DetectorResult* TLD::partition(vector<ScoredBox*> scoredBoxList, int modelId) {
     return new DetectorResult(scoredBoxList, candidateBoxList, detectedBoxList, clusteredBoxList, modelId);
 }
 
-vector<ScoredBox*> TLD::getMoreConfidentBoxList(ScoredBox* trackScoredBox, vector<ScoredBox*> detectedBoxes) {
+vector<ScoredBox*> TLD::getMoreConfidentBoxList(ScoredBox* trackScoredBox, vector<ScoredBox*> detectedBoxes, int modelId) {
     float minOverlap = 0.5;
     vector<ScoredBox*> moreConfidentBoxList;
     int nrOfBoxes = (int) detectedBoxes.size();
 
-    double trackScore = trackScoredBox->getScoreValue("nn");
+    float trackScore = trackScoredBox->getScoreValue("nn", modelId);
     Box* trackBox = trackScoredBox->box;
 
     for (int i = 0; i < nrOfBoxes; i++) {
         ScoredBox* scoredBox = detectedBoxes[i];
-        double detectScore = scoredBox->getScoreValue("nn");;
+        float detectScore = scoredBox->getScoreValue("nn", modelId);
+
         float overlap = Box::computeOverlap(trackBox, scoredBox->box);
         if (overlap < minOverlap && detectScore > trackScore) {
             moreConfidentBoxList.push_back(scoredBox);
@@ -233,31 +234,6 @@ vector<ScoredBox*> TLD::getMoreConfidentBoxList(ScoredBox* trackScoredBox, vecto
     }
 
     return moreConfidentBoxList;
-}
-
-bool TLD::isThereMoreConfidentOneBox(ScoredBox* trackScoredBox, vector<ScoredBox*> detectedBoxes) {
-    float minOverlap = 0.0;
-
-    int detectedSize = (int) detectedBoxes.size();
-    if (detectedSize == 1) {
-        bool moreConfident = false;
-
-        double trackScore = trackScoredBox->getScoreValue("nn");
-        Box* trackBox = trackScoredBox->box;
-
-        for (int i = 0; i < detectedSize; i++) {
-            ScoredBox* scoredBox = detectedBoxes[i];
-            double detectScore = scoredBox->getScoreValue("nn");;
-            float overlap = Box::computeOverlap(trackBox, scoredBox->box);
-            if (overlap < minOverlap && detectScore > trackScore) {
-                moreConfident = true;
-                break;
-            }
-        }
-        return moreConfident;
-    } else {
-        return false;
-    }
 }
 
 Box* TLD::combineClosestBoxes(ScoredBox* trackScoredBox, vector<ScoredBox*> detectedBoxes) {

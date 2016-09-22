@@ -36,9 +36,8 @@ public:
 
     TrackerResult* validate(Frame* current, Box* trackedBox, int modelId);
     DetectorResult* partition(vector<ScoredBox*> scoredBoxList, int modelId);
-
-    bool isThereMoreConfidentOneBox(ScoredBox* trackScoredBox, vector<ScoredBox*> detectedBoxes);
-    vector<ScoredBox*> getMoreConfidentBoxList(ScoredBox* trackScoredBox, vector<ScoredBox*> detectedBoxes);
+    
+    vector<ScoredBox*> getMoreConfidentBoxList(ScoredBox* trackScoredBox, vector<ScoredBox*> detectedBoxes, int modelId);
     Box* combineClosestBoxes(ScoredBox* trackScoredBox, vector<ScoredBox*> detectedBoxes);
 };
 #endif

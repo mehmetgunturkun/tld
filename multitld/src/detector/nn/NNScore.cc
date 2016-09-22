@@ -47,3 +47,8 @@ Score* NNScore::divide(int n) {
     }
     return this;
 }
+
+float NNScore::getValue(int modelId) {
+    printf("Returns conservative score for %d\n", modelId);
+    return conservativeScores[modelId];
+}

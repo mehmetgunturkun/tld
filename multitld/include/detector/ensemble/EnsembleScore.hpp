@@ -51,6 +51,10 @@ public:
     float getProbability(int modelId) {
         return scores[modelId];
     }
+
+    float getValue(int modelId) {
+        return scores[modelId];
+    }
 };
 
 #endif

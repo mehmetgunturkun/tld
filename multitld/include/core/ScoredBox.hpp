@@ -73,7 +73,8 @@ public:
 
     void withScore(string classifierKey, Score* score);
     Score* getScore(string classifierKey);
-    double getScoreValue(string classifierKey);
+    double getScoreValue(string classifierKey, int modelId);
+
     vector<int> getCandidateModels();
     vector<int> getCandidateModels(string classifierKey);
     bool isClassified(string classifierKey, int modelId);
