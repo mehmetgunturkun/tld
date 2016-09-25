@@ -5,6 +5,7 @@ TLD::TLD(Frame* frame, vector<Box*> boxList) {
 
     this->tracker = new Tracker();
     this->detector = new Detector(frame, boxList);
+    printf("TLD is created\n");
 }
 
 TLD::TLD(Tracker* tracker, Detector* detector) {
@@ -65,7 +66,7 @@ void display(Frame* frame, vector<ScoredBox*> b1, vector<ScoredBox*> b2, vector<
     for (int i = 0; i < nrOfBoxes; i++) {
         ScoredBox* b = b1[i];
         if (b != nullptr) {
-            builder->withBox(b->box, Colors::RED)->withTitle("detection");
+            builder->withBox(b->box, Colors::YELLOW);
         }
     }
 
@@ -73,7 +74,7 @@ void display(Frame* frame, vector<ScoredBox*> b1, vector<ScoredBox*> b2, vector<
     for (int i = 0; i < nrOfBoxes; i++) {
         ScoredBox* b = b2[i];
         if (b != nullptr) {
-            builder->withBox(b->box, Colors::YELLOW)->withTitle("detection");
+            builder->withBox(b->box, Colors::RED);
         }
     }
 
@@ -81,11 +82,11 @@ void display(Frame* frame, vector<ScoredBox*> b1, vector<ScoredBox*> b2, vector<
     for (int i = 0; i < nrOfBoxes; i++) {
         ScoredBox* b = b3[i];
         if (b != nullptr) {
-            builder->withBox(b->box, Colors::BLUE)->withTitle("detection");
+            builder->withBox(b->box, Colors::BLUE);
         }
     }
 
-    builder->display(1);
+    builder->withTitle("detection")->display(1);
 }
 
 Option<Box>* TLD::integrate(Frame* frame, Box* maybeTrackedBox, vector<ScoredBox*> scoredBoxList, int modelId) {
@@ -99,56 +100,58 @@ Option<Box>* TLD::integrate(Frame* frame, Box* maybeTrackedBox, vector<ScoredBox
     vector<ScoredBox*> detectedBoxList = detectorResult->detectedBoxList;
     vector<ScoredBox*> clusteredBoxList = detectorResult->clusteredBoxList;
 
-    //display(frame, candidateBoxList, detectedBoxList, clusteredBoxList);
+    display(frame, candidateBoxList, detectedBoxList, clusteredBoxList);
 
     bool shouldLearn = false;
     Option<Box>* maybeFinalBox = Box::None;
 
     // Integration
     if (trackerResult->isValid) {
-        printf("Frame#%d, Tracker " ANSI_COLOR_GREEN "Success(%f) " ANSI_COLOR_RESET " \n", frame->id, scoredTrackBox->getScoreValue("nn", modelId));
+        printf("Frame#%d, Tracker " COLOR_GREEN "Success(%f) " COLOR_RESET " \n", frame->id, scoredTrackBox->getScoreValue("nn", modelId));
         shouldLearn = scoredTrackBox->isDetected;
         if (detectedBoxList.size() > 0) {
             vector<ScoredBox*> moreConfidentBoxList = getMoreConfidentBoxList(scoredTrackBox, clusteredBoxList, modelId);
             if (moreConfidentBoxList.size() == 1) {
                 // Detector.Override
-                printf("Detector " ANSI_COLOR_GREEN "Success Override " ANSI_COLOR_RESET " \n");
+                printf("Detector " COLOR_GREEN "Success Override " COLOR_RESET " \n");
                 ScoredBox* detectedBox = moreConfidentBoxList[0];
+                // ImageBuilder* builder = new ImageBuilder(frame);
+                // builder->withBox(detectedBox->box, Colors::BLUE)->withTitle("override")->display(0);
                 maybeFinalBox = new Option<Box>(detectedBox->box);
             } else {
                 // Detector.Combine
-                printf("Detector " ANSI_COLOR_GREEN "Success Combine " ANSI_COLOR_RESET " \n");
+                printf("Detector " COLOR_GREEN "Success Combine " COLOR_RESET " \n");
                 Box* combinedBox = combineClosestBoxes(scoredTrackBox, candidateBoxList);
                 maybeFinalBox = new Option<Box>(combinedBox);
                 // detector->learn(current, combinedBox, allBoxes, modelId);
                 shouldLearn = shouldLearn && true;
             }
         } else {
-            printf("Detector " ANSI_COLOR_RED "Failed " ANSI_COLOR_RESET " \n");
+            printf("Detector " COLOR_RED "Failed " COLOR_RESET " \n");
             // Detector.Fail
             maybeFinalBox = new Option<Box>(scoredTrackBox->box);
             // detector->learn(current, trackedBox, allBoxes, modelId);
         }
     } else {
         // Tracker.Fail
-        printf("Tracker " ANSI_COLOR_RED "Failed " ANSI_COLOR_RESET " \n");
+        printf("Tracker " COLOR_RED "Failed " COLOR_RESET " \n");
         if (detectedBoxList.size() > 0) {
             if (clusteredBoxList.size() == 1) {
-                printf("Detector " ANSI_COLOR_GREEN "Success One " ANSI_COLOR_RESET " \n");
+                printf("Detector " COLOR_GREEN "Success One " COLOR_RESET " \n");
                 // Detector.Success
                 ScoredBox* detectedBox = clusteredBoxList[0];
                 maybeFinalBox = new Option<Box>(detectedBox->box);
             } else if (clusteredBoxList.size() > 1) {
-                printf("Detector " ANSI_COLOR_RED "Failed Too Many Items " ANSI_COLOR_RESET " \n");
+                printf("Detector " COLOR_RED "Failed Too Many Items " COLOR_RESET " \n");
                 // There are multiple boxes no way to decide!
                 maybeFinalBox = Box::None;
             } else {
-                printf("Detector " ANSI_COLOR_RED " Should not happen " ANSI_COLOR_RESET " \n");
+                printf("Detector " COLOR_RED " Should not happen " COLOR_RESET " \n");
                 // Detector.Fail
                 maybeFinalBox = Box::None;
             }
         } else {
-            printf("Detector " ANSI_COLOR_RED "Failed " ANSI_COLOR_RESET " \n");
+            printf("Detector " COLOR_RED "Failed " COLOR_RESET " \n");
             // Detector.Fail
             maybeFinalBox = Box::None;
         }
@@ -160,9 +163,9 @@ Option<Box>* TLD::integrate(Frame* frame, Box* maybeTrackedBox, vector<ScoredBox
         bool isValid = detector->evaluate(frame, finalBox, modelId);
 
         if (isValid) {
-            printf("Evaluation" ANSI_COLOR_GREEN " Success " ANSI_COLOR_RESET " \n");
+            printf("Evaluation" COLOR_GREEN " Success " COLOR_RESET " \n");
         } else {
-            printf("Evaluation" ANSI_COLOR_RED " Failed " ANSI_COLOR_RESET " \n");
+            printf("Evaluation" COLOR_RED " Failed " COLOR_RESET " \n");
             shouldLearn = false;
         }
     } else {
@@ -173,9 +176,9 @@ Option<Box>* TLD::integrate(Frame* frame, Box* maybeTrackedBox, vector<ScoredBox
     if (shouldLearn) {
         Box* finalBox = maybeFinalBox->get();
         detector->learn(frame, finalBox, scoredBoxList, modelId);
-        printf("Learner " ANSI_COLOR_GREEN "Success" ANSI_COLOR_RESET " \n");
+        printf("Learner " COLOR_GREEN "Success" COLOR_RESET " \n");
     } else {
-        printf("Learner " ANSI_COLOR_RED "No Need" ANSI_COLOR_RESET " \n");
+        printf("Learner " COLOR_RED "No Need" COLOR_RESET " \n");
     }
 
     return maybeFinalBox;
@@ -209,7 +212,13 @@ DetectorResult* TLD::partition(vector<ScoredBox*> scoredBoxList, int modelId) {
     vector<ScoredBox*> clusteredBoxList = ScoredBox::cluster(detectedBoxList, (int) detectedBoxList.size());
 
     if ((int) detectedBoxList.size() > 0 && clusteredBoxList.size() == 0) {
-        printf(ANSI_COLOR_RED "What The Fuck!\n" ANSI_COLOR_RESET);
+        printf(COLOR_RED "What The Fuck!\n" COLOR_RESET);
+
+        for (int i = 0; i < detectedBoxList.size(); i++) {
+            ScoredBox* sb = detectedBoxList[i];
+            printf("%s\n", sb->box->toString().c_str());
+        }
+
     }
 
     return new DetectorResult(scoredBoxList, candidateBoxList, detectedBoxList, clusteredBoxList, modelId);
@@ -229,6 +238,7 @@ vector<ScoredBox*> TLD::getMoreConfidentBoxList(ScoredBox* trackScoredBox, vecto
 
         float overlap = Box::computeOverlap(trackBox, scoredBox->box);
         if (overlap < minOverlap && detectScore > trackScore) {
+            printf("%f > %f\n", detectScore, trackScore);
             moreConfidentBoxList.push_back(scoredBox);
         }
     }

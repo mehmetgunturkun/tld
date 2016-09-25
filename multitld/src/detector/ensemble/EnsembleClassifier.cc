@@ -1,5 +1,11 @@
 #include "detector/ensemble/EnsembleClassifier.hpp"
 #include "util/ImageBuilder.hpp"
+
+#define POS_X_DIR 1
+#define NEG_X_DIR 2
+#define POS_Y_DIR 3
+#define NEG_Y_DIR 4
+
 EnsembleClassifier::EnsembleClassifier(Frame* firstFrame, vector<Box*> boxList) {
     Random::seed();
     this->classifierName = "ensemble";
@@ -29,15 +35,54 @@ Point2f* shift(Point2f* point, double x, double y) {
     return shiftedPoint;
 }
 
-vector<Point2f*> shiftPoints(vector<Point2f*> points, int size, double x, double y) {
+Point2f* shift(Point2f* point, int direction) {
+    Point2f* shiftedPoint;
+    double random = (double) Random::randomFloat();
+    switch (direction)
+    {
+    case POS_X_DIR:
+        /* code */
+        shiftedPoint = shift(point, random + 0.2, 0.0);
+        break;
+    case NEG_X_DIR:
+        /* code */
+        shiftedPoint = shift(point, -(random + 0.2), 0.0);
+        break;
+    case POS_Y_DIR:
+        /* code */
+        shiftedPoint = shift(point, 0.0, random + 0.2);
+        break;
+    case NEG_Y_DIR:
+        /* code */
+        shiftedPoint = shift(point, 0.0, -(random + 0.2));
+        break;
+    default:
+        /* code */
+        shiftedPoint = point;
+        break;
+    }
+    return shiftedPoint;
+}
+
+vector<Point2f*> shiftPoints(vector<Point2f*> points, int size, int direction) {
     vector<Point2f*> shiftedPoints;
     for (int i = 0; i < size; i++) {
         Point2f* point = points[i];
-        Point2f* shiftedPoint = shift(point, x, y);
+        Point2f* shiftedPoint = shift(point, direction);
         shiftedPoints.push_back(shiftedPoint);
     }
     return shiftedPoints;
 }
+
+// vector<Point2f*> shiftPoints(vector<Point2f*> points, int size, double x, double y) {
+//     vector<Point2f*> shiftedPoints;
+//     for (int i = 0; i < size; i++) {
+//         Point2f* point = points[i];
+//         Point2f* shiftedPoint = shift(point, x, y);
+//         shiftedPoints.push_back(shiftedPoint);
+//     }
+//     return shiftedPoints;
+// }
 
 vector<PixelComparison*> EnsembleClassifier::produceAllComparisons() {
     vector<Point2f*> fromList;
@@ -58,21 +103,23 @@ vector<PixelComparison*> EnsembleClassifier::produceAllComparisons() {
     vector<Point2f*> toList;
     toList.insert(toList.end(), fromList.begin(), fromList.end());
 
+    printf("List: %lu\n", fromList.size());
+
     // printf("------- R ------\n");
-    double random = (double) Random::randomFloat();
-    vector<Point2f*> rightShiftedList = shiftPoints(toList, nrOfPoints, random + 0.2, 0.0);
+    // double random = (double) Random::randomFloat();
+    vector<Point2f*> rightShiftedList = shiftPoints(toList, nrOfPoints, POS_X_DIR);
 
     // printf("------- L ------\n");
-    random = (double) Random::randomFloat();
-    vector<Point2f*> leftShiftedList = shiftPoints(toList, nrOfPoints, -(random + 0.2), 0.0);
+    // random = (double) Random::randomFloat();
+    vector<Point2f*> leftShiftedList = shiftPoints(toList, nrOfPoints, NEG_X_DIR);
 
     // printf("------- T ------\n");
-    random = (double) Random::randomFloat();
-    vector<Point2f*> topShiftedList = shiftPoints(toList, nrOfPoints, 0.0, -(random + 0.2));
+    // random = (double) Random::randomFloat();
+    vector<Point2f*> topShiftedList = shiftPoints(toList, nrOfPoints, NEG_Y_DIR);
 
     // printf("------- B ------\n");
-    random = (double) Random::randomFloat();
-    vector<Point2f*> bottomShiftedList = shiftPoints(toList, nrOfPoints, 0.0, random + 0.2);
+    // random = (double) Random::randomFloat();
+    vector<Point2f*> bottomShiftedList = shiftPoints(toList, nrOfPoints, POS_Y_DIR);
 
     vector<Point2f*> finalFromList;
     vector<Point2f*> finalToList;
@@ -139,7 +186,6 @@ vector<PixelComparison*> EnsembleClassifier::produceAllComparisons() {
 
 vector<BaseClassifier*> EnsembleClassifier::shuffleComparisons(vector<PixelComparison*> allComparisons) {
     int nrOfComparisons = (int) allComparisons.size();
-    Random::seed();
     allComparisons = Random::randomSample(allComparisons, nrOfComparisons);
 
     vector<BaseClassifier*> classifiers;
@@ -149,7 +195,7 @@ vector<BaseClassifier*> EnsembleClassifier::shuffleComparisons(vector<PixelCompa
             PixelComparison* pc = allComparisons[i*nrOfPixelComparisons+j];
             comparisons.push_back(pc);
         }
-        BaseClassifier* classifier = new BaseClassifier(i, comparisons);
+        BaseClassifier* classifier = new BaseClassifier(i, comparisons, this->nrOfModels);
         classifiers.push_back(classifier);
     }
     return classifiers;
@@ -202,17 +248,17 @@ void EnsembleClassifier::score(Frame* frame, ScoredBox* scoredBox) {
 }
 
 void EnsembleClassifier::train(TrainingSet<ScoredBox> ts, int modelId) {
-    vector<Labelled<ScoredBox>> samples = ts.getLabelledSamples();
+    vector<Labelled<ScoredBox>*> samples = ts.getLabelledSamples();
     int nrOfBootstrap = ts.nrOfBootstrap;
     // printf("EC >> %lu samples are going to be processed for training - online\n", samples.size());
     for (int trial = 0; trial < nrOfBootstrap; trial++) {
         for (int i = 0; i < ts.nrOfSamples; i++) {
-            Labelled<ScoredBox> sample = samples[i];
+            Labelled<ScoredBox>* sample = samples[i];
 
-            Frame* frame = sample.frame;
-            ScoredBox* scoredBox = sample.item;
+            Frame* frame = sample->frame;
+            ScoredBox* scoredBox = sample->item;
+            int label = sample->label;
 
-            int label = sample.label;
             float probability = getProbability(scoredBox, modelId);
 
             // ImageBuilder* builder = new ImageBuilder(frame);

@@ -1,5 +1,5 @@
 #include "tracker/Tracker.hpp"
-
+#include "common/Colors.hpp"
 Tracker::Tracker() {
     this->MARGIN = 5;
     this->TERM_CRITERIA = new TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, 20, 0.03);
@@ -44,7 +44,7 @@ vector<Box*> Tracker::track(Frame* prev, Frame* curr, vector<Box*> boxList) {
 }
 
 float Tracker::computeStep(float start, float end, int pointCount) {
-    return ((end - MARGIN - 1) - (start + MARGIN)) / (pointCount - 1);
+    return ((end - MARGIN) - (start + MARGIN)) / (pointCount - 1);
 }
 
 vector<tld::Point*> Tracker::decomposePoints(vector<Box*> boxList, int nrOfBoxes) {

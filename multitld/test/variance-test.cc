@@ -1,4 +1,5 @@
 #include "testbase/Sequence.hpp"
+#include "detector/nn/Patch.hpp"
 
 void printBoxPixels(Frame* frame, Box* box) {
     Mat* grayscale = frame->grayscale;
@@ -14,15 +15,24 @@ void printBoxPixels(Frame* frame, Box* box) {
 }
 
 double computeVariance(Frame* frame, Box* box) {
-    Mat* grayscale = frame->grayscale;
+    Patch* patch = new Patch(frame, box);
+    Mat* grayscale = patch->data;
 
-    vector<int> pixels;
-    for (int i = box->y1; i <= box->y2; i++) {
-        for (int j = box->x1; j <= box->x2; j++) {
-            uchar value = grayscale->at<uchar>(i, j);
-            pixels.push_back((int) value);
+    vector<double> pixels;
+    // for (int i = 0; i <= patch->height; i++) {
+    //     for (int j = box->x1; j <= box->x2; j++) {
+    //         double value = grayscale->at<double>(i, j);
+    //
+    //     }
+    // }
+
+    for (int i = 0; i < Patch::HEIGHT; i++) {
+        for (int j = 0; j < Patch::WIDTH; j++) {
+            double value = grayscale->at<double>(i,j);
+            pixels.push_back(value);
         }
     }
+
 
     int nrOfPixels = (int) pixels.size();
 
@@ -69,9 +79,10 @@ int main(int argc, char** argv) {
 
     printf("------------------------------------------------------\n");
 
-    Box* b2 = new Box(0, 1, 1, 63, 28);
-    int sum = frame->integral->computeSubWindow(b2->y1, b2->x1, b2->width, b2->height, false);
-    printf("SUM >>> %d\n", sum);
+    Box* b2 = new Box(0, 141, 125, 231, 164);
+    double variance = computeVariance(frame, b2);
+    // int sum = frame->integral->computeSubWindow(b2->y1, b2->x1, b2->width, b2->height, false);
+    printf("VAR >>> %g\n", variance /  4.0);
 
     // for (int i = 0; i < 240 * 320; i++) {
     //         int pixel = integralImage[i];
@@ -82,7 +93,7 @@ int main(int argc, char** argv) {
 
 
     // printBoxPixels(frame, b2);
-    // double variance = computeVariance(frame, b2);
+
 
 
 

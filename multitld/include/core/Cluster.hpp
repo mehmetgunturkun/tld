@@ -1,6 +1,7 @@
 #ifndef CLUSTER_H
 #define CLUSTER_H
 
+#include "common/Colors.hpp"
 #include <vector>
 #include <deque>
 #include <unordered_map>
@@ -40,55 +41,93 @@ public:
     static vector<Cluster*> build(vector<Distance*> distances, int nrOfDistances, double maximumDistance) {
         unordered_map<int, Cluster*> index;
         unordered_map<int, Cluster*> clusterIndex;
+
+        int processedDistance = 0;
+
         for (int i = 0; i < nrOfDistances; i++) {
             Distance* distance = distances[i];
-
-            if (distance->value > maximumDistance) {
-                break;
-            }
+            processedDistance = i;
 
             bool p0Clustered = index.count(distance->point0) > 0;
             bool p1Clustered = index.count(distance->point1) > 0;
 
-            if (p0Clustered && p1Clustered) {
-                // Both have clusters.
-                // Might merge those clusters,
-                // if they are in different clusters
+            if (distance->value >= maximumDistance) {
+                if (p0Clustered && p1Clustered) {
 
-                Cluster* c0 = index[distance->point0];
-                Cluster* c1 = index[distance->point1];
+                } else if (p0Clustered) {
+                    int groupId = Cluster::getId();
+                    Cluster* c1 = new Cluster(groupId);
+                    c1->add(distance->point1);
 
-                if (c0->groupId != c1->groupId) {
-                    Cluster* c3 = c0->merge(c1);
+                    clusterIndex[c1->groupId] = c1;
+                    index[distance->point1] = c1;
+                } else if (p1Clustered) {
+                    int groupId = Cluster::getId();
+                    Cluster* c0 = new Cluster(groupId);
+                    c0->add(distance->point0);
 
-                    clusterIndex.erase(c0->groupId);
-                    clusterIndex.erase(c1->groupId);
-                    clusterIndex[c3->groupId] = c3;
+                    clusterIndex[c0->groupId] = c0;
+                    index[distance->point0] = c0;
+                } else {
+                    int groupId0 = Cluster::getId();
+                    Cluster* c0 = new Cluster(groupId0);
+                    c0->add(distance->point0);
 
-                    for (int i = 0; i < c3->size; i++) {
-                        int pid = c3->pointList[i];
-                        index[pid] = c3;
-                    }
+                    clusterIndex[c0->groupId] = c0;
+                    index[distance->point0] = c0;
+
+                    int groupId1 = Cluster::getId();
+                    Cluster* c1 = new Cluster(groupId1);
+                    c1->add(distance->point1);
+
+                    clusterIndex[c1->groupId] = c1;
+                    index[distance->point1] = c1;
                 }
-            } else if (p0Clustered) {
-                Cluster* c0 = index[distance->point0];
-                c0->add(distance->point1);
-                index[distance->point1] = c0;
-            } else if (p1Clustered) {
-                Cluster* c1 = index[distance->point1];
-                c1->add(distance->point0);
-                index[distance->point0] = c1;
             } else {
-                int groupId = Cluster::getId();
-                Cluster* c0 = new Cluster(groupId);
+                if (p0Clustered && p1Clustered) {
+                    // Both have clusters.
+                    // Might merge those clusters,
+                    // if they are in different clusters
 
-                c0->add(distance->point0);
-                c0->add(distance->point1);
+                    Cluster* c0 = index[distance->point0];
+                    Cluster* c1 = index[distance->point1];
 
-                clusterIndex[c0->groupId] = c0;
-                index[distance->point0] = c0;
-                index[distance->point1] = c0;
+                    if (c0->groupId != c1->groupId) {
+                        Cluster* c3 = c0->merge(c1);
+
+                        clusterIndex.erase(c0->groupId);
+                        clusterIndex.erase(c1->groupId);
+                        clusterIndex[c3->groupId] = c3;
+
+                        for (int i = 0; i < c3->size; i++) {
+                            int pid = c3->pointList[i];
+                            index[pid] = c3;
+                        }
+                    }
+                } else if (p0Clustered) {
+                    Cluster* c0 = index[distance->point0];
+                    c0->add(distance->point1);
+                    index[distance->point1] = c0;
+                } else if (p1Clustered) {
+                    Cluster* c1 = index[distance->point1];
+                    c1->add(distance->point0);
+                    index[distance->point0] = c1;
+                } else {
+                    int groupId = Cluster::getId();
+                    Cluster* c0 = new Cluster(groupId);
+
+                    c0->add(distance->point0);
+                    c0->add(distance->point1);
+
+                    clusterIndex[c0->groupId] = c0;
+                    index[distance->point0] = c0;
+                    index[distance->point1] = c0;
+                }
             }
+        }
+
+        if (processedDistance + 1 < nrOfDistances) {
+            printf(COLOR_YELLOW "What the fuck %d < %d" COLOR_RESET " \n",processedDistance,  nrOfDistances);
         }
 
         vector<Cluster*> clusters;

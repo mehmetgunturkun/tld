@@ -160,12 +160,25 @@ public:
     template <class T>
     static vector<T> randomSample(vector<T> vector, int portion) {
         std::vector<T> randomIndices(portion);
+
         std::vector<int> v = Random::randPerm((int) vector.size());
+        std::sort (v.begin(), v.begin()+portion);
+
         for (int i = 0; i < portion; i++) {
             int index = v[i];
             randomIndices[i] = vector[index];
         }
         return randomIndices;
+    }
+
+    template <class T>
+    static vector<T> splitData(vector<T> vector, int part) {
+        int size = (int) vector.size();
+        std::vector<T> shuffledVector = Random::randomSample(vector, size);
+
+        int partSize = size / part;
+        std::vector<T> firstPart(shuffledVector.begin(), shuffledVector.begin() + partSize);
+        return firstPart;
     }
 };
 #endif

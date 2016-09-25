@@ -15,7 +15,7 @@ class BaseClassifier {
     DecisionTree* decTree;
 public:
     int id;
-    BaseClassifier(int i, vector<PixelComparison*> comparisons);
+    BaseClassifier(int i, vector<PixelComparison*> comparisons, int nrOfModels);
     int generateBinaryCode(Frame* frame, Box* box, EnsembleScore* score);
     vector<float> score(Frame* frame, Box* box, EnsembleScore* score);
     float score(Frame* frame, Box* box, EnsembleScore* score, int modelId);

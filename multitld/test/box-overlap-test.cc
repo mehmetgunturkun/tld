@@ -3,6 +3,11 @@
 #include "core/BoxIterator.hpp"
 #include "util/ImageBuilder.hpp"
 
+
+#include <iostream>
+#include <string>
+#include <math.h>
+
 struct OverlapOrderedV2 {
   bool operator() (Box* box1, Box* box2) {
       return box1->overlap > box2->overlap;
@@ -19,13 +24,13 @@ int main(int argc, char** argv) {
         (int) firstBox->y1,
         (int) firstBox->width,
         (int) firstBox->height);
-    float initialVarianceLimit = initialMeanVariance->variance * 0.5;
+    float initialVarianceLimit = 453.45 * 0.5;
     printf("Initial Variance Limit: %f\n", initialVarianceLimit);
 
     BoxIterator* boxIterator = new BoxIterator(firstFrame, firstBox, 10, 24);
 
     BoundedPriorityQueue<Box, OverlapOrderedV2> positiveQueue = BoundedPriorityQueue<Box, OverlapOrderedV2>(100);
-    BoundedPriorityQueue<Box, OverlapOrderedV2> negativeQueue = BoundedPriorityQueue<Box, OverlapOrderedV2>(INT_MAX);
+    vector<Box*> negativeQueue;
 
     int nrOfTotalBoxes = 0;
     while (boxIterator->hasNext()) {
@@ -38,14 +43,14 @@ int main(int argc, char** argv) {
         }
 
         if (overlap < 0.2) {
-            negativeQueue += box;
+            negativeQueue.push_back(box);
         }
     }
 
     vector<Box*> positiveBoxList = positiveQueue.toVector();
     int nrOfPositiveBoxes = (int) positiveBoxList.size();
 
-    vector<Box*> negativeBoxList = negativeQueue.toVector();
+    vector<Box*> negativeBoxList = negativeQueue;
     int nrOfNegativeBoxes = (int) negativeBoxList.size();
 
     printf("%5d positive patches\n", nrOfPositiveBoxes);
@@ -62,18 +67,20 @@ int main(int argc, char** argv) {
             (int) box->width,
             (int) box->height);
         float varianceValue = meanVariance->variance;
-        if (varianceValue > initialVarianceLimit) {
+        if (varianceValue >= initialVarianceLimit) {
             negativeBoxListWithHighVariance.push_back(box);
         }
     }
     int nrOfNegativeBoxesWithHighVariance = (int) negativeBoxListWithHighVariance.size();
     printf("%5d negative patches has high variance\n", nrOfNegativeBoxesWithHighVariance);
+    for (int i = 0; i < nrOfNegativeBoxesWithHighVariance; i++) {
+        Box* box = negativeBoxListWithHighVariance[i];
+        printf("%s\n", box->toCharArr());
+    }
 
-    // vector<Box*> sampledNegativeBoxList = Random::randomSample(negativeBoxList, 100);
-    // int nrOfSampleNegativeBoxes = (int) sampledNegativeBoxList.size();
-    //
-    // for (int i = 0; i < nrOfSampleNegativeBoxes; i++) {
-    //     Box* box = sampledNegativeBoxList[i];
-    //     printf("%s - %f\n", box->toCharArr(), box->overlap);
-    // }
+
+    vector<Box*> sampledNegativeBoxList = Random::randomSample(negativeBoxList, 100);
+    int nrOfSampleNegativeBoxes = (int) sampledNegativeBoxList.size();
+
+
 }

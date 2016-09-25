@@ -141,7 +141,37 @@ int main(int argc, char** argv) {
 
     printf(" ----- training begin -----\n");
     TLD* tld = new TLD(firstFrame, boxList);
-    Detector* detector =tld->detector;
     printf(" ----- training end -----\n");
+
+    Detector* detector = tld->detector;
+    vector<ScoredBox*> scoredBoxList = detector->detect(secondFrame);
+    vector<ScoredBox*> candidateBoxList;
+    vector<ScoredBox*> detectedBoxList;
+
+    int nrOfBoxes = scoredBoxList.size();
+    for (int i = 0; i < nrOfBoxes; i++) {
+        ScoredBox* scoredBox = scoredBoxList[i];
+        if (scoredBox->isClassified("ensemble", modelId)) {
+            candidateBoxList.push_back(scoredBox);
+        }
+
+        if (scoredBox->isClassified("nn", modelId)) {
+            detectedBoxList.push_back(scoredBox);
+        }
+    }
+
+    nrOfBoxes = candidateBoxList.size();
+    printf("===== candidate ======\n");
+    for (int i = 0; i < nrOfBoxes; i++) {
+        ScoredBox* scoredBox = candidateBoxList[i];
+        printf("%s\n", scoredBox->box->toCharArr());
+    }
+
+    printf("===== detected ======\n");
+    nrOfBoxes = detectedBoxList.size();
+    for (int i = 0; i < nrOfBoxes; i++) {
+        ScoredBox* scoredBox = detectedBoxList[i];
+        printf("%s\n", scoredBox->box->toCharArr());
+    }
     return EXIT_SUCCESS;
 }

@@ -78,9 +78,6 @@ bool ScoredBox::isClassified(string classifierKey, int modelId) {
 }
 
 bool ScoredBox::isScored(string classifierKey) {
-    if (detailMap.count(classifierKey) == 0) {
-        return false;
-    } else {
-        return true;
-    }
+    Score* scoreItem = getScore(classifierKey);
+    return scoreItem != NULL;
 }

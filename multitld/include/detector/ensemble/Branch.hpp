@@ -10,7 +10,7 @@ private:
 
 public:
     bool dirtyBit;
-    Branch();
+    Branch(int nrOfModels);
     vector<float> getProbabilities();
     float getProbability(int modelId);
     void update(int modelId, bool label);

@@ -1,9 +1,9 @@
 #include "detector/ensemble/DecisionTree.hpp"
 
-DecisionTree::DecisionTree() {
+DecisionTree::DecisionTree(int nrOfModels) {
     tree.resize(pow(2, 13));
     for (int i = 0; i < pow(2, 13); i++) {
-        tree[i] = new Branch();
+        tree[i] = new Branch(nrOfModels);
     }
 }
 

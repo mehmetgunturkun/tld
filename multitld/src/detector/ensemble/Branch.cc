@@ -1,7 +1,7 @@
 #include "detector/ensemble/Branch.hpp"
 
-Branch::Branch() {
-    nrOfLeaves = 1;
+Branch::Branch(int nrOfModels) {
+    nrOfLeaves = nrOfModels;
     dirtyBit = false;
     branch.resize(nrOfLeaves);
     for (int i = 0; i < nrOfLeaves; i++) {

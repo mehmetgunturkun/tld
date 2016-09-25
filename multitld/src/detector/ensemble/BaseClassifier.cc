@@ -1,9 +1,9 @@
 #include "detector/ensemble/BaseClassifier.hpp"
 
-BaseClassifier::BaseClassifier(int id, vector<PixelComparison*> comparisons) {
+BaseClassifier::BaseClassifier(int id, vector<PixelComparison*> comparisons, int nrOfModels) {
     this->id = id;
     this->codeGen = new CodeGenerator(comparisons);
-    this->decTree = new DecisionTree();
+    this->decTree = new DecisionTree(nrOfModels);
 }
 
 int BaseClassifier::generateBinaryCode(Frame* frame, Box* box, EnsembleScore* score) {
