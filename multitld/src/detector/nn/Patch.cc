@@ -12,7 +12,7 @@ Rect* toRect(Frame* frame, Box* box) {
     if (box->x1 <= 0) {
         left = 0.0;
     } else {
-        left = box->x1 - 1;
+        left = box->x1;
     }
 
     double right = 0.0;
@@ -26,7 +26,7 @@ Rect* toRect(Frame* frame, Box* box) {
     if (box->y1 <= 0) {
         top = 0.0;
     } else {
-        top = box->y1 - 1;
+        top = box->y1;
     }
 
     double bottom = 0.0;
@@ -36,7 +36,7 @@ Rect* toRect(Frame* frame, Box* box) {
         bottom = box->y2;
     }
 
-    Rect* rect = new Rect(left, top, right - left, bottom - top - 1);
+    Rect* rect = new Rect(left, top, right - left + 1, bottom - top + 1);
     return rect;
 }
 

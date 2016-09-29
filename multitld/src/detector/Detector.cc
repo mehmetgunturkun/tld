@@ -83,17 +83,17 @@ void Detector::init(Frame* frame, Box* box, int modelId) {
     vector<ScoredBox*> negativeScoredBoxList4Ensemble = score(frame, negativeQueue);
     negativeScoredBoxList4Ensemble = Random::splitData(negativeScoredBoxList4Ensemble, 2);
 
-    // printf("====== TRAINING DATA FOR EC ======\n");
-    // for (int i = 0; i < (int) positiveScoredBoxList4Ensemble.size(); i++) {
-    //     ScoredBox* scoredBox = positiveScoredBoxList4Ensemble[i];
-    //     printf(COLOR_GREEN "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
-    // }
-    //
-    // for (int i = 0; i < (int) negativeScoredBoxList4Ensemble.size(); i++) {
-    //     ScoredBox* scoredBox = negativeScoredBoxList4Ensemble[i];
-    //     printf(COLOR_RED "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
-    // }
-    // printf("==================================\n");
+    printf("====== TRAINING DATA FOR EC ======\n");
+    for (int i = 0; i < (int) positiveScoredBoxList4Ensemble.size(); i++) {
+        ScoredBox* scoredBox = positiveScoredBoxList4Ensemble[i];
+        printf(COLOR_GREEN "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
+    }
+
+    for (int i = 0; i < (int) negativeScoredBoxList4Ensemble.size(); i++) {
+        ScoredBox* scoredBox = negativeScoredBoxList4Ensemble[i];
+        printf(COLOR_RED "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
+    }
+    printf("==================================\n");
 
     vector<ScoredBox*> positiveScoredBoxList4NN = { positiveScoredBoxList4Ensemble[0] };
     Random::seed();

@@ -103,8 +103,6 @@ vector<PixelComparison*> EnsembleClassifier::produceAllComparisons() {
     vector<Point2f*> toList;
     toList.insert(toList.end(), fromList.begin(), fromList.end());
 
-    printf("List: %lu\n", fromList.size());
-
     // printf("------- R ------\n");
     // double random = (double) Random::randomFloat();
     vector<Point2f*> rightShiftedList = shiftPoints(toList, nrOfPoints, POS_X_DIR);
@@ -186,7 +184,16 @@ vector<PixelComparison*> EnsembleClassifier::produceAllComparisons() {
 
 vector<BaseClassifier*> EnsembleClassifier::shuffleComparisons(vector<PixelComparison*> allComparisons) {
     int nrOfComparisons = (int) allComparisons.size();
-    allComparisons = Random::randomSample(allComparisons, nrOfComparisons);
+    for (int i = 0; i < nrOfComparisons; i++) {
+        printf("%s\n", allComparisons[i]->toString().c_str());
+    }
+
+    printf("===============================\n");
+
+    allComparisons = Random::randomSample(allComparisons);
+    for (int i = 0; i < nrOfComparisons; i++) {
+        printf("%s\n", allComparisons[i]->toString().c_str());
+    }
 
     vector<BaseClassifier*> classifiers;
     for (int i = 0; i < nrOfBaseClassifiers; i++) {
@@ -240,7 +247,8 @@ void EnsembleClassifier::score(Frame* frame, ScoredBox* scoredBox) {
 
         for (int i = 0; i < nrOfBaseClassifiers; i++) {
             BaseClassifier* bc = baseClassifiers[i];
-            bc->generateBinaryCode(frame, box, ensembleScore);
+            int binaryCode = bc->generateBinaryCode(frame, box, ensembleScore);
+            printf("BC(%d).binaryCode(%s) >> %d\n", i, box->toCharArr(), binaryCode);
         }
 
         scoredBox->withScore("ensemble", ensembleScore);

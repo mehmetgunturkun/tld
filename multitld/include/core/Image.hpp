@@ -2,6 +2,7 @@
 #define IMAGE_H
 
 #define CV_LOAD_IMAGE_GAUSSIAN -1
+#include <iostream>
 
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"

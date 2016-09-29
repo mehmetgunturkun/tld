@@ -13,7 +13,7 @@ Frame::Frame(string fileName) {
         integral = new IntegralImage(grayscale);
 
         Mat* grayscaleForGaussian = new Mat(grayscale->clone());
-        gaussian = Image::gaussian(grayscaleForGaussian, 2.0);
+        gaussian = Gaussian::blur(grayscaleForGaussian, 2.0);
         free(grayscaleForGaussian);
 
         flowPyramid = Image::pyramid(grayscale, Size(4, 4), 2, true);
@@ -23,7 +23,7 @@ Frame::Frame(string fileName) {
         integral = new IntegralImage(grayscale);
 
         Mat* grayscaleForGaussian = Image::bgr2gray(colored);
-        gaussian = Image::gaussian(grayscaleForGaussian, 2.0);
+        gaussian = Gaussian::blur(grayscaleForGaussian, 2.0);
         free(grayscaleForGaussian);
 
         flowPyramid = Image::pyramid(grayscale, Size(4, 4), 2, true);

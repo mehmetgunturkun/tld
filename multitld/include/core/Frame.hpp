@@ -2,6 +2,7 @@
 #define FRAME_H
 
 #include "core/Image.hpp"
+#include "core/Gaussian.hpp"
 #include "core/IntegralImage.hpp"
 
 class Frame {

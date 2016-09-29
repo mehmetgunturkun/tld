@@ -3,9 +3,18 @@
 #include "detector/nn/Patch.hpp"
 #include "detector/nn/ObjectModel.hpp"
 
+void printDoubleImage(Mat* m) {
+    for (int i = 0; i < m->rows; i++) {
+        for (int j = 0; j < m->cols; j++) {
+            double p = m->at<double>(i, j);
+            printf("% 02.6g ", p);
+        }
+        printf("\n------------------------------------------------\n");
+    }
+}
 
 int main() {
-    Sequence* sequence = new Sequence("car");
+    Sequence* sequence = new Sequence("tld/car");
     Frame* f0 = sequence->next();
     Frame* f1 = sequence->next();
 

@@ -158,6 +158,20 @@ public:
     }
 
     template <class T>
+    static vector<T> randomSample(vector<T> vector) {
+        int portion = (int) vector.size();
+        std::vector<T> randomIndices(portion);
+
+        std::vector<int> v = Random::randPerm((int) vector.size());
+
+        for (int i = 0; i < portion; i++) {
+            int index = v[i];
+            randomIndices[i] = vector[index];
+        }
+        return randomIndices;
+    }
+
+    template <class T>
     static vector<T> randomSample(vector<T> vector, int portion) {
         std::vector<T> randomIndices(portion);
 
