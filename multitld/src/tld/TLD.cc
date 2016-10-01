@@ -108,6 +108,7 @@ Option<Box>* TLD::integrate(Frame* frame, Box* maybeTrackedBox, vector<ScoredBox
     // Integration
     if (trackerResult->isValid) {
         printf("Frame#%d, Tracker " COLOR_GREEN "Success(%f) " COLOR_RESET " \n", frame->id, scoredTrackBox->getScoreValue("nn", modelId));
+        printf(COLOR_GREEN "\t%s " COLOR_RESET " \n", scoredTrackBox->box->toCharArr());
         shouldLearn = scoredTrackBox->isDetected;
         if (detectedBoxList.size() > 0) {
             vector<ScoredBox*> moreConfidentBoxList = getMoreConfidentBoxList(scoredTrackBox, clusteredBoxList, modelId);
@@ -189,6 +190,7 @@ TrackerResult* TLD::validate(Frame* current, Box* trackedBox, int modelId) {
         return new TrackerResult();
         // return new ScoredBox(trackedBox);
     } else {
+        detector->validate(current, new Box(0, 138.23, 124.59, 227.08, 163.52), 0);
         ScoredBox* scoredBox = detector->validate(current, trackedBox, modelId);
         return new TrackerResult(scoredBox);
     }
@@ -212,13 +214,10 @@ DetectorResult* TLD::partition(vector<ScoredBox*> scoredBoxList, int modelId) {
     vector<ScoredBox*> clusteredBoxList = ScoredBox::cluster(detectedBoxList, (int) detectedBoxList.size());
 
     if ((int) detectedBoxList.size() > 0 && clusteredBoxList.size() == 0) {
-        printf(COLOR_RED "What The Fuck!\n" COLOR_RESET);
-
         for (int i = 0; i < detectedBoxList.size(); i++) {
             ScoredBox* sb = detectedBoxList[i];
             printf("%s\n", sb->box->toString().c_str());
         }
-
     }
 
     return new DetectorResult(scoredBoxList, candidateBoxList, detectedBoxList, clusteredBoxList, modelId);

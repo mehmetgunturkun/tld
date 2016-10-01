@@ -36,6 +36,8 @@ private:
     int nrOfTotalScales;
     int maxScale;
 
+    int nrOfBoxes;
+
     void initBoxScaleTemplates(Frame* frame, Box* box);
 public:
     BoxIterator(Frame* frame, Box* box, int maximumScale = 10, int minimumWindowSize = 24);

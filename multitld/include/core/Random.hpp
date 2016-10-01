@@ -188,7 +188,7 @@ public:
     template <class T>
     static vector<T> splitData(vector<T> vector, int part) {
         int size = (int) vector.size();
-        std::vector<T> shuffledVector = Random::randomSample(vector, size);
+        std::vector<T> shuffledVector = Random::randomSample(vector);
 
         int partSize = size / part;
         std::vector<T> firstPart(shuffledVector.begin(), shuffledVector.begin() + partSize);

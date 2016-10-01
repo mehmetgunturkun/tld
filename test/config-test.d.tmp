@@ -1,0 +1,2 @@
+test/config-test.o test/config-test.d:  test/config-test.cc include/common/Config.hpp \
+  include/common/StringUtils.hpp include/util/Util.h

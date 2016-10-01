@@ -4,15 +4,12 @@ int main(int argc, char** args) {
     // ------------------------------------------------------------------------------------------
     Mat* jpgImage = Image::imread("resources/test.jpg");
     printf("Image(JPG) type: %d, #channels: %d\n", jpgImage->type(), jpgImage->channels());
-    Image::imshow("jpg - 0", jpgImage, 1000);
 
     Mat* jpgImageGray1 = Image::rgb2gray(jpgImage);
     printf("Image(JPG-Gray) type: %d, #channels: %d\n", jpgImageGray1->type(), jpgImageGray1->channels());
-    Image::imshow("jpg - 1", jpgImageGray1, 1000);
 
     Mat* jpgImageGray2 = Image::bgr2gray(jpgImage);
     printf("Image(JPG-Gray) type: %d, #channels: %d\n", jpgImageGray2->type(), jpgImageGray2->channels());
-    Image::imshow("jpg - 2", jpgImageGray2, 1000);
 
     // ------------------------------------------------------------------------------------------
 

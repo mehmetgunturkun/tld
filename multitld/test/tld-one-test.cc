@@ -27,23 +27,19 @@ int main(int argc, char** argv) {
     int frameNo = 1;
     Frame* previous = firstFrame;
     printf("Started to run for %s\n", key.c_str());
-    while (sequence->hasNext()) {
-        Frame* current = sequence->next();
-        frameNo += 1;
+    Frame* secondFrame = sequence->next();
 
-        boxList = tld->track(previous, current, boxList);
+    boxList = tld->track(firstFrame, secondFrame, boxList);
 
-        ImageBuilder* builder = new ImageBuilder(current);
-        Box* box = boxList[0];
-        if (box != nullptr) {
-            builder->withBox(box);
-            outputFile << box->toString() << "\n";
-        } else {
-            outputFile << "Box(nan, nan, nan, nan)";
-        }
-        builder->display(1);
-        previous = current;
+    ImageBuilder* builder = new ImageBuilder(secondFrame);
+    Box* box = boxList[0];
+    if (box != nullptr) {
+        builder->withBox(box);
+        outputFile << box->toString() << "\n";
+    } else {
+        outputFile << "Box(nan, nan, nan, nan)";
     }
+    builder->display(0);
 
     outputFile.close();
     return EXIT_SUCCESS;

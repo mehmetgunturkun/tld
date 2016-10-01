@@ -50,6 +50,52 @@ public:
         this->nrOfBootstrap = nrOfBootstrap;
     }
 
+    vector<Labelled<Type>*> getShuffledSamples() {
+        vector<Labelled<Type>*> labelledSamples;
+
+        for (int i = 0; i < nrOfPositiveSamples; i++) {
+            Type* sample = positiveSamples[i];
+            Labelled<Type>* positiveSample = new Labelled<Type>(frame, sample, 1);
+            labelledSamples.push_back(positiveSample);
+        }
+
+        for (int i = 0; i < nrOfNegativeSamples; i++) {
+            Type* sample = negativeSamples[i];
+            Labelled<Type>* negativeSample = new Labelled<Type>(frame, sample, 0);
+            labelledSamples.push_back(negativeSample);
+        }
+        Random::seed();
+        labelledSamples = Random::randomSample(labelledSamples);
+        return labelledSamples;
+    };
+
+
+    vector<Labelled<Type>*> getPositiveFirstSamples() {
+        vector<Labelled<Type>*> labelledSamples;
+
+        for (int i = 0; i < nrOfPositiveSamples; i++) {
+            Type* sample = positiveSamples[i];
+            Labelled<Type>* positiveSample = new Labelled<Type>(frame, sample, 1);
+            labelledSamples.push_back(positiveSample);
+        }
+
+        for (int i = 0; i < nrOfNegativeSamples; i++) {
+            Type* sample = negativeSamples[i];
+            Labelled<Type>* negativeSample = new Labelled<Type>(frame, sample, 0);
+            labelledSamples.push_back(negativeSample);
+        }
+        Random::seed();
+        labelledSamples = Random::randomSample(labelledSamples);
+
+        if (nrOfPositiveSamples > 0) {
+            Type* sample = positiveSamples[0];
+            Labelled<Type>* positiveSample = new Labelled<Type>(frame, sample, 1);
+            labelledSamples.insert(labelledSamples.begin(), positiveSample);
+        }
+
+        return labelledSamples;
+    };
+
     vector<Labelled<Type>*> getLabelledSamples(bool shouldWarp = false,
         bool useGaussian = true,
         bool positiveFirst = false,

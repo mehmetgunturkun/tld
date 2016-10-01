@@ -60,6 +60,8 @@ vector<tld::Point*> Tracker::decomposePoints(vector<Box*> boxList, int nrOfBoxes
                 Point2f point2f = Point2f(box->x1 + i, box->y1 + j);
                 tld::Point* point = new tld::Point(point2f);
 
+                printf("points.push_back(new SamplePoint(%g, %g));\n", point2f.x, point2f.y);
+
                 nrOfPoints += 1;
                 points.push_back(point);
                 id++;
@@ -110,8 +112,8 @@ vector<tld::Point*> Tracker::lkTrack(Frame* prev, Frame* curr, vector<tld::Point
 
     vector<uchar> status(nrOfPoints);
     vector<float> errors(nrOfPoints);
-    calcOpticalFlowPyrLK(prev->flowPyramid,
-                         curr->flowPyramid,
+    calcOpticalFlowPyrLK(*(prev->grayscale),
+                         *(curr->grayscale),
                          fromPoints,
                          toPoints,
                          status,
@@ -119,7 +121,7 @@ vector<tld::Point*> Tracker::lkTrack(Frame* prev, Frame* curr, vector<tld::Point
                          *WIN_SIZE,
                          5,
                          *TERM_CRITERIA,
-                         CV_LKFLOW_INITIAL_GUESSES | CV_LKFLOW_PYR_A_READY | CV_LKFLOW_PYR_B_READY,
+                         CV_LKFLOW_INITIAL_GUESSES,
                          0.0001);
 
     vector<tld::Point*> targetPoints;
@@ -176,9 +178,11 @@ float median(vector<float> floatVector) {
 Option<Box>* estimate(Frame* prev, Frame* curr, Box* box, vector<FBPoint*> trackedPoints, int start, int end) {
     vector<float> fbErrors;
     vector<float> nccErrors;
+    int nrOfStablePoints = 0;
     for (int i = start; i < end; i++) {
         FBPoint* fbPoint = trackedPoints[i];
         if (fbPoint->state) {
+            nrOfStablePoints += 1;
             tld::Point* srcPoint = fbPoint->src;
             tld::Point* targetPoint = fbPoint->to;
             tld::Point* bwPoint = fbPoint->backwardPoint;
@@ -194,9 +198,15 @@ Option<Box>* estimate(Frame* prev, Frame* curr, Box* box, vector<FBPoint*> track
         }
     }
 
+    if (nrOfStablePoints == 0) {
+        printf("Invalid Box -- No Stable Point - %d\n", nrOfStablePoints);
+        Option<Box>* failedBox = new Option<Box>();
+        return failedBox;
+    }
+
     float medFBE = median(fbErrors);
-    float medNCC = median(nccErrors)
-    ;
+    float medNCC = median(nccErrors);
+
     if (medFBE > 10) {
         printf("Invalid Box -- high fb error - %f\n", medFBE);
         Option<Box>* failedBox = new Option<Box>();

@@ -36,8 +36,13 @@ double ObjectModel::computeConservativeScore(Patch* sample) {
 }
 
 ObjectScore* ObjectModel::computeScore(Patch* sample) {
-    if (nrOfPositivePatches == 0 && nrOfNegativePatches == 0) {
+    if (nrOfPositivePatches == 0) {
         ObjectScore* objectScore = new ObjectScore(0.0f, 0.0f, false, false);
+        return objectScore;
+    }
+
+    if (nrOfNegativePatches == 0) {
+        ObjectScore* objectScore = new ObjectScore(1.0f, 1.0f, false, false);
         return objectScore;
     }
 

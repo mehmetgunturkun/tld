@@ -35,5 +35,6 @@ ImageBuilder* ImageBuilder::withTitle(string title) {
 }
 
 void ImageBuilder::display(int delay) {
-    Image::imshow(this->title, img, delay);
+    cv::imshow(this->title, *(this->img));
+    cv::waitKey(delay);
 }

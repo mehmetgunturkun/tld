@@ -2,7 +2,6 @@
 #define IMAGE_BUILDER_H
 
 #include "opencv2/imgproc/imgproc.hpp"
-#include "opencv2/highgui/highgui.hpp"
 
 #include "common/Colors.hpp"
 #include "core/Frame.hpp"

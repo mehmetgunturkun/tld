@@ -12,12 +12,14 @@ VarianceClassifier::VarianceClassifier(Frame* frame, vector<Box*> boxList) {
             (int) b->y1,
             (int) b->width,
             (int) b->height);
-        float variance = initialMeanVariance->variance * 0.5;
+        float variance = 490.47;
 
         this->varianceList[i] = variance;
         if (minimumVariance > variance) {
             minimumVariance = variance;
         }
+
+        minimumVariance = 490.47;
     }
 }
 

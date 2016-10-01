@@ -184,16 +184,7 @@ vector<PixelComparison*> EnsembleClassifier::produceAllComparisons() {
 
 vector<BaseClassifier*> EnsembleClassifier::shuffleComparisons(vector<PixelComparison*> allComparisons) {
     int nrOfComparisons = (int) allComparisons.size();
-    for (int i = 0; i < nrOfComparisons; i++) {
-        printf("%s\n", allComparisons[i]->toString().c_str());
-    }
-
-    printf("===============================\n");
-
     allComparisons = Random::randomSample(allComparisons);
-    for (int i = 0; i < nrOfComparisons; i++) {
-        printf("%s\n", allComparisons[i]->toString().c_str());
-    }
 
     vector<BaseClassifier*> classifiers;
     for (int i = 0; i < nrOfBaseClassifiers; i++) {
@@ -247,8 +238,7 @@ void EnsembleClassifier::score(Frame* frame, ScoredBox* scoredBox) {
 
         for (int i = 0; i < nrOfBaseClassifiers; i++) {
             BaseClassifier* bc = baseClassifiers[i];
-            int binaryCode = bc->generateBinaryCode(frame, box, ensembleScore);
-            printf("BC(%d).binaryCode(%s) >> %d\n", i, box->toCharArr(), binaryCode);
+            bc->generateBinaryCode(frame, box, ensembleScore);
         }
 
         scoredBox->withScore("ensemble", ensembleScore);
@@ -256,7 +246,7 @@ void EnsembleClassifier::score(Frame* frame, ScoredBox* scoredBox) {
 }
 
 void EnsembleClassifier::train(TrainingSet<ScoredBox> ts, int modelId) {
-    vector<Labelled<ScoredBox>*> samples = ts.getLabelledSamples();
+    vector<Labelled<ScoredBox>*> samples = ts.getShuffledSamples();
     int nrOfBootstrap = ts.nrOfBootstrap;
     // printf("EC >> %lu samples are going to be processed for training - online\n", samples.size());
     for (int trial = 0; trial < nrOfBootstrap; trial++) {

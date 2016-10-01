@@ -8,7 +8,5 @@ int main(int argc, char** args) {
 
     builder->withBox(new Box(1, 50, 50, 100, 100));
     builder->withBox(new Box(2, 75, 75, 125, 125), Colors::YELLOW);
-
-
-    Image::imshow("Frame", builder->img, 0);
+    builder->display(0);
 }

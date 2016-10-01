@@ -66,6 +66,7 @@ BoxIterator::BoxIterator(Frame* f, Box* b, int maximumScale, int minimumWindowSi
     this->currentScaleNo = 0;
     this->maxScale = 10;
     this->nrOfTotalScales = 0;
+    this->nrOfBoxes = 0;
 
     initBoxScaleTemplates(f, b);
 }
@@ -104,5 +105,8 @@ bool BoxIterator::hasNext() {
 
 Box* BoxIterator::next() {
     BoxScaleTemplate* boxTemplate = boxPerScale[this->currentScaleNo];
-    return boxTemplate->next();
+    Box* b = boxTemplate->next();
+    this->nrOfBoxes += 1;
+    b->id = this->nrOfBoxes;
+    return b;
 }

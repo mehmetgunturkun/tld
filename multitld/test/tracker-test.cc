@@ -20,7 +20,7 @@ int main(int argc, char** argv) {
     Sequence* sequence = new Sequence("tld/car");
     Frame* firstFrame = sequence->next();
 
-    Box* initBox = new Box(0, 141, 125, 231, 164);
+    Box* initBox = sequence->initBox;
     printf("%s\n", initBox->toCharArr());
     vector<Box*> boxList = { initBox };
 

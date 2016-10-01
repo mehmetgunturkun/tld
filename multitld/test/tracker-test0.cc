@@ -18,11 +18,8 @@ int main(int argc, char** argv) {
         Frame* current = sequence->next();
         printf("---  #%3d. %s. Frame ---\n", frameNo, current->name.c_str());
         boxList = tracker->track(previous, current, boxList);
-        if (frameNo == 20) {
-            Image::imshow("Failure", current->displayImg, 0);
-        }
+
         if (boxList.size() == 0) {
-            current->show();
             return EXIT_FAILURE;
         }
 

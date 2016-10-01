@@ -85,7 +85,7 @@ public:
             return boxList;
         }
         vector<Distance*> distances = computeDistances(boxList, nrOfBoxes);
-        vector<Cluster*> clusters = Cluster::build(distances, distances.size(), 0.5);
+        vector<Cluster*> clusters = Cluster::build(distances, distances.size(), 0.1);
         vector<ScoredBox*> clusteredBoxes = combineClusters(clusters, boxList);
         return clusteredBoxes;
     }

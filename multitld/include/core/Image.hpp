@@ -8,6 +8,7 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/video/tracking.hpp"
 
+#include "core/IO.hpp"
 #include "core/Random.hpp"
 
 using namespace std;
@@ -27,11 +28,6 @@ public:
         return image;
     }
 
-    static void imshow(string title, Mat* image, int delay = 0) {
-        cv::imshow(title, *image);
-        cv::waitKey(delay);
-    }
-
     static Mat* rgb2gray(Mat* image) {
         Mat* dest = new Mat(*image);
         cv::cvtColor(*image, *dest, CV_RGB2GRAY);
@@ -46,12 +42,12 @@ public:
 
     static vector<Mat> pyramid(Mat* image, Size size, int maxLevel, bool withDerivatives) {
         vector<Mat> pyramid;
-        cv::buildOpticalFlowPyramid(*image,
-            pyramid,
-            size,
-            maxLevel,
-            withDerivatives
-        );
+        // cv::buildOpticalFlowPyramid(*image,
+        //     pyramid,
+        //     size,
+        //     maxLevel,
+        //     withDerivatives
+        // );
         return pyramid;
     }
 

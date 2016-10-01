@@ -2,7 +2,6 @@
 #define COLORS_H
 
 #include "opencv2/imgproc/imgproc.hpp"
-#include "opencv2/highgui/highgui.hpp"
 
 // #define ANSI_COLOR_GREEN   "\x1b[32m"
 // #define ANSI_COLOR_RED     "\x1b[31m"

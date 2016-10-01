@@ -16,7 +16,6 @@ int main(int argc, char** args) {
 
     while (sequence->hasNext()) {
         Frame* current = sequence->next();
-        current->show();
     }
     return EXIT_SUCCESS;
 }

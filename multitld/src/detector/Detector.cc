@@ -17,7 +17,7 @@ Detector::Detector(Frame* frame, vector<Box*> boxList) {
     nrOfPositiveBoxes4NNAtInitialization = 1;
     nrOfNegativeBoxes4NNAtInitialization = 50;
 
-    varianceThreshold = 453.45 * 0.5;
+    varianceThreshold = 490.47 * 0.5;
     positiveBoxOverlapThreshold = 0.6;
     negativeBoxOverlapThreshold = 0.2;
 
@@ -81,26 +81,30 @@ void Detector::init(Frame* frame, Box* box, int modelId) {
     vector<Box*> positiveBoxList4Ensemble = positiveQueue.toVector();
     vector<ScoredBox*> positiveScoredBoxList4Ensemble = score(frame, positiveBoxList4Ensemble);
     vector<ScoredBox*> negativeScoredBoxList4Ensemble = score(frame, negativeQueue);
-    negativeScoredBoxList4Ensemble = Random::splitData(negativeScoredBoxList4Ensemble, 2);
 
-    printf("====== TRAINING DATA FOR EC ======\n");
-    for (int i = 0; i < (int) positiveScoredBoxList4Ensemble.size(); i++) {
-        ScoredBox* scoredBox = positiveScoredBoxList4Ensemble[i];
-        printf(COLOR_GREEN "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
-    }
+    Random::seed();
+    vector<ScoredBox*> negativeScoredBoxList4EnsembleFirstPart = Random::splitData(negativeScoredBoxList4Ensemble, 2);
 
-    for (int i = 0; i < (int) negativeScoredBoxList4Ensemble.size(); i++) {
-        ScoredBox* scoredBox = negativeScoredBoxList4Ensemble[i];
-        printf(COLOR_RED "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
-    }
-    printf("==================================\n");
+    // printf("====== TRAINING DATA FOR EC ======\n");
+    // for (int i = 0; i < (int) positiveScoredBoxList4Ensemble.size(); i++) {
+    //     ScoredBox* scoredBox = positiveScoredBoxList4Ensemble[i];
+    //     printf(COLOR_GREEN "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
+    // }
+    //
+    // for (int i = 0; i < (int) negativeScoredBoxList4Ensemble.size(); i++) {
+    //     ScoredBox* scoredBox = negativeScoredBoxList4Ensemble[i];
+    //     printf(COLOR_RED "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
+    // }
+    // printf("==================================\n");
 
     vector<ScoredBox*> positiveScoredBoxList4NN = { positiveScoredBoxList4Ensemble[0] };
     Random::seed();
     vector<ScoredBox*> negativeScoredBoxList4NN = Random::randomSample(
         negativeScoredBoxList4Ensemble,
         100);
-    negativeScoredBoxList4NN = Random::splitData(negativeScoredBoxList4NN, 2);
+
+    Random::seed();
+    vector<ScoredBox*> negativeScoredBoxList4NNFirstPart = Random::splitData(negativeScoredBoxList4NN, 2);
 
     // printf("====== TRAINING DATA FOR NN ======\n");
     // for (int i = 0; i < (int) positiveScoredBoxList4NN.size(); i++) {
@@ -108,8 +112,8 @@ void Detector::init(Frame* frame, Box* box, int modelId) {
     //     printf(COLOR_GREEN "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
     // }
     //
-    // for (int i = 0; i < (int) negativeScoredBoxList4NN.size(); i++) {
-    //     ScoredBox* scoredBox = negativeScoredBoxList4NN[i];
+    // for (int i = 0; i < (int) negativeScoredBoxList4NNFirstPart.size(); i++) {
+    //     ScoredBox* scoredBox = negativeScoredBoxList4NNFirstPart[i];
     //     printf(COLOR_RED "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
     // }
     // printf("==================================\n");
@@ -117,13 +121,13 @@ void Detector::init(Frame* frame, Box* box, int modelId) {
     TrainingSet<ScoredBox> trainingSet4Ensemble = TrainingSet<ScoredBox>(
         frame,
         positiveScoredBoxList4Ensemble,
-        negativeScoredBoxList4Ensemble,
+        negativeScoredBoxList4EnsembleFirstPart,
         2);
 
     TrainingSet<ScoredBox> trainingSet4NN = TrainingSet<ScoredBox>(
         frame,
         positiveScoredBoxList4NN,
-        negativeScoredBoxList4NN,
+        negativeScoredBoxList4NNFirstPart,
         1);
 
     eClassifier->train(trainingSet4Ensemble, modelId);

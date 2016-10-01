@@ -37,7 +37,6 @@ public:
             << ")";
         return ss.str();
     }
-    void show();
 };
 
 #endif
