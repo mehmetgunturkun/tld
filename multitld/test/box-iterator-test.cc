@@ -259,10 +259,14 @@ int main(int argc, char** argv) {
     Box* firstBox = sequence->initBox;
 
     BoxIterator* boxTracer = new BoxIterator(firstFrame, firstBox, 10, 24);
+    int nrOfBoxes = 0;
     while (boxTracer->hasNext()) {
         Box* b = boxTracer->next();
+        nrOfBoxes += 1;
         // printf("%s\n", b->toCharArr());
     }
+
+    printf("NrOfBox: %d\n", nrOfBoxes);
 
 
     // while (boxTracer->hasNext()) {
