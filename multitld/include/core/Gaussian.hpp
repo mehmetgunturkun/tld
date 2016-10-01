@@ -2,7 +2,7 @@
 #define GAUSSIAN_BLUR_H
 
 #include "opencv2/imgproc/imgproc.hpp"
-
+#include "core/Image.hpp"
 using namespace cv;
 
 
@@ -14,8 +14,8 @@ public:
         return result;
     }
 
-    static Mat* blur(Mat* img, int sigma) {
-        Mat M = *img;
+    static Mat* blur(Image* img, int sigma) {
+        Mat M = img->underlying->clone();
 
         cv::Mat gaussianKernel = cv::getGaussianKernel(12, 2, CV_64F);
         cv::mulTransposed(gaussianKernel, gaussianKernel, false);

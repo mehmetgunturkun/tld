@@ -20,6 +20,7 @@ ARFLAGS = ruv
 
 lib2_sources := \
 	src/common/Colors.cc \
+	src/core/Image.cc \
 	src/core/IO.cc \
 	src/core/TLDConfig.cc \
 	src/core/Random.cc \

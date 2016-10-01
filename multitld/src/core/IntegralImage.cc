@@ -4,12 +4,12 @@ MeanVariance::MeanVariance(float m, float v) {
         variance = v;
 }
 
-IntegralImage::IntegralImage(Mat* img) {
-    step = img->cols;
-    width = img->cols;
-    height = img->rows;
-    integralImage = computeIntegralImage(img);
-    integralSquaredImage = computeSquaredIntegralImage(img);
+IntegralImage::IntegralImage(Image* img) {
+    step = img->width;
+    width = img->width;
+    height = img->height;
+    integralImage = computeIntegralImage(img->underlying);
+    integralSquaredImage = computeSquaredIntegralImage(img->underlying);
 }
 
 int* IntegralImage::computeIntegralImage(Mat* img) {

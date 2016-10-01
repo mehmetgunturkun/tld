@@ -1,6 +1,7 @@
 #ifndef FRAME_H
 #define FRAME_H
 
+#include "core/IO.hpp"
 #include "core/Image.hpp"
 #include "core/Gaussian.hpp"
 #include "core/IntegralImage.hpp"
@@ -13,9 +14,14 @@ public:
     int width;
     int height;
 
-    Mat* displayImg;
-    Mat* grayscale;
-    Mat* gaussian;
+    // Mat* displayImg;
+    // Mat* grayscale;
+    // Mat* gaussian;
+
+    Image* displayImg;
+    Image* grayscale;
+    Image* gaussian;
+
     IntegralImage* integral;
     vector<Mat> flowPyramid;
 

@@ -4,6 +4,7 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
 
+#include "core/Image.hpp"
 #include "core/Box.hpp"
 
 using namespace std;
@@ -27,7 +28,7 @@ public:
     int* computeIntegralImage(Mat* sourceImage);
     int* computeSquaredIntegralImage(Mat* sourceImage);
 
-    IntegralImage(Mat* img);
+    IntegralImage(Image* img);
     MeanVariance* computeMeanVariance(Box* box);
     MeanVariance* computeMeanVariance(int x, int y, int width, int height);
     int computeSubWindow(int row, int col, int pWidth, int pHeight, bool isSquared);

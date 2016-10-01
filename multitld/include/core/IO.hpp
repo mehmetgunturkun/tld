@@ -4,12 +4,13 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
 
-#include "core/Image2.hpp"
+#include "core/Image.hpp"
 
 using namespace cv;
 
 class IO {
 public:
-    static Image2* imread(string fileName);
+    static Image* imread(string fileName);
+    static Image* imread(string fileName, int imageType);
 };
 #endif
