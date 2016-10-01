@@ -102,9 +102,10 @@ void NearestNeighborClassifier::train(TrainingSet<ScoredBox> ts, int modelId) {
         float relativeScore = objectScore->relativeScore;
         bool isInPositive = objectScore->isInPositive;
 
-        // ImageBuilder* builder = new ImageBuilder(frame);
+        Frame* frame = ts.frame;
+        ImageBuilder* builder = new ImageBuilder(frame);
         if (label == 1) {
-            // builder->withBox(scoredBox->box, Colors::BLUE)->withTitle("nn-pos")->display(0);
+            builder->withBox(scoredBox->box, Colors::BLUE)->withTitle("nn-pos")->display(0);
             if (relativeScore <= 0.65) {
                 if (isInPositive == true) {
                     // int patchIndex = objectScore->getClosestPositivePatchIndex;

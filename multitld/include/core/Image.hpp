@@ -8,7 +8,6 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/video/tracking.hpp"
 
-#include "core/IO.hpp"
 #include "core/Random.hpp"
 
 using namespace std;

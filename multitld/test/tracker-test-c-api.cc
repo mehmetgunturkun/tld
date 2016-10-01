@@ -137,8 +137,7 @@ int main(int argc, char** args) {
 
     for (int i = 0; i < nPts; i++) {
         SamplePoint* p = points[i];
-        fromPoints[i].x = p->x;
-        
+        fromPoints[i].x = p->x;    
         fromPoints[i].y = p->y;
 
         toPoints[i].x = p->x;

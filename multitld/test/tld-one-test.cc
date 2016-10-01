@@ -1,4 +1,4 @@
-    #include <iostream>
+#include <iostream>
 #include <fstream>
 
 #include "testbase/Sequence.hpp"
@@ -17,7 +17,7 @@ int main(int argc, char** argv) {
 
     Box* initBox = sequence->initBox;
     vector<Box*> boxList = { initBox };
-
+    printf("INIT >>> %s\n", initBox->toCharArr());
     ofstream outputFile;
     outputFile.open (sequence->outputFile);
     printf("mc1000\n");

@@ -57,10 +57,9 @@ vector<tld::Point*> Tracker::decomposePoints(vector<Box*> boxList, int nrOfBoxes
         float verticalStep = computeStep(box->y1, box->y2, 10);
         for (float j = MARGIN; j <= box->height - MARGIN; j = j + verticalStep) {
             for (float i = MARGIN; i <= box->width - MARGIN; i = i + horizontalStep) {
-                Point2f point2f = Point2f(box->x1 + i, box->y1 + j);
+                printf("%s, + %f, +%f\n", box->toCharArr(), i, j);
+                Point2f point2f = Point2f(box->x1 + i, box->y1 + j + 1);
                 tld::Point* point = new tld::Point(point2f);
-
-                printf("points.push_back(new SamplePoint(%g, %g));\n", point2f.x, point2f.y);
 
                 nrOfPoints += 1;
                 points.push_back(point);
@@ -97,32 +96,60 @@ vector<FBPoint*> Tracker::track(Frame* prev, Frame* curr, vector<tld::Point*> po
 vector<tld::Point*> Tracker::lkTrack(Frame* prev, Frame* curr, vector<tld::Point*> srcPoints) {
     int pointCount = (int) srcPoints.size();
 
-    vector<Point2f> fromPoints;
-    vector<Point2f> toPoints;
+    // vector<Point2f> fromPoints;
+    // vector<Point2f> toPoints;
+
+    CvPoint2D32f* fromPoints = (CvPoint2D32f*)cvAlloc(pointCount*sizeof(CvPoint2D32f));
+    CvPoint2D32f* toPoints = (CvPoint2D32f*)cvAlloc(pointCount*sizeof(CvPoint2D32f));
 
     int nrOfPoints = 0;
     for (int i = 0; i < pointCount; i++) {
         tld::Point* point = srcPoints[i];
         if (point->state) {
             nrOfPoints += 1;
-            fromPoints.push_back(point->underlying);
-            toPoints.push_back(point->underlying);
+            fromPoints[i].x = point->underlying.x;
+            fromPoints[i].y = point->underlying.y;
+
+            toPoints[i].x = point->underlying.x;
+            toPoints[i].y = point->underlying.y;
         }
     }
 
-    vector<uchar> status(nrOfPoints);
-    vector<float> errors(nrOfPoints);
-    calcOpticalFlowPyrLK(*(prev->grayscale),
-                         *(curr->grayscale),
-                         fromPoints,
-                         toPoints,
-                         status,
-                         errors,
-                         *WIN_SIZE,
-                         5,
-                         *TERM_CRITERIA,
-                         CV_LKFLOW_INITIAL_GUESSES,
-                         0.0001);
+    CvSize imageSize = cvSize(320, 240);
+    char* status = (char*)  cvAlloc(nrOfPoints);
+
+    IplImage* from = new IplImage(*(prev->grayscale));
+    IplImage* fromPyramid = cvCreateImage( imageSize, 8, 1 );
+
+    IplImage* to = new IplImage(*(curr->grayscale));
+    IplImage* toPyramid = cvCreateImage( imageSize, 8, 1 );
+
+    cvCalcOpticalFlowPyrLK(
+        from,
+        to,
+        fromPyramid,
+        toPyramid,
+        fromPoints,
+        toPoints,
+        nrOfPoints,
+        cvSize(4, 4),
+        5,
+        status,
+        0,
+        cvTermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS, 20,0.03),
+        CV_LKFLOW_INITIAL_GUESSES);
+
+
+    for (int i = 0; i < nrOfPoints; i++) {
+        int state = (int) status[i];
+        CvPoint2D32f p0 = fromPoints[i];
+        CvPoint2D32f p1 = toPoints[i];
+        if (state == 1) {
+            printf(COLOR_GREEN "%3d. P0(%g, %g) >> P1(%g, %g)\n" COLOR_RESET, i, p0.x, p0.y, p1.x, p1.y);
+        } else {
+            printf(COLOR_RED "%3d P0(%g, %g) >> P1(%g, %g)\n" COLOR_RESET, i, p0.x, p0.y, p1.x, p1.y);
+        }
+    }
 
     vector<tld::Point*> targetPoints;
     int id = 0;
@@ -130,10 +157,11 @@ vector<tld::Point*> Tracker::lkTrack(Frame* prev, Frame* curr, vector<tld::Point
         tld::Point* srcPoint = srcPoints[i];
         tld::Point* targetPoint;
         if (srcPoint->state) {
-            Point2f toPoint = toPoints[id];
-            uchar state = status[id];
-            if (state) {
-                 targetPoint = new tld::Point(toPoint);
+            CvPoint2D32f toPoint = toPoints[id];
+            int state = (int) status[id];
+            if (state == 1) {
+                Point2f toPoint2f = Point2f(toPoint.x, toPoint.y);
+                targetPoint = new tld::Point(toPoint2f);
             } else {
                 targetPoint = tld::Point::failed;
             }

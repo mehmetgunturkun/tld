@@ -36,6 +36,7 @@ void Detector::init(Frame* frame, vector<Box*> boxList) {
     int nrOfBoxes = (int) boxList.size();
     for (int i = 0; i < nrOfBoxes; i++) {
             Box* box = boxList[i];
+            printf("INIT2 >>> %s\n", box->toCharArr());
             this->init(frame, box, i);
     }
 }
@@ -97,6 +98,7 @@ void Detector::init(Frame* frame, Box* box, int modelId) {
     // }
     // printf("==================================\n");
 
+    printf("INIT3 >>> %s\n", positiveScoredBoxList4Ensemble[0]->box->toCharArr());
     vector<ScoredBox*> positiveScoredBoxList4NN = { positiveScoredBoxList4Ensemble[0] };
     Random::seed();
     vector<ScoredBox*> negativeScoredBoxList4NN = Random::randomSample(
@@ -106,17 +108,17 @@ void Detector::init(Frame* frame, Box* box, int modelId) {
     Random::seed();
     vector<ScoredBox*> negativeScoredBoxList4NNFirstPart = Random::splitData(negativeScoredBoxList4NN, 2);
 
-    // printf("====== TRAINING DATA FOR NN ======\n");
-    // for (int i = 0; i < (int) positiveScoredBoxList4NN.size(); i++) {
-    //     ScoredBox* scoredBox = positiveScoredBoxList4NN[i];
-    //     printf(COLOR_GREEN "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
-    // }
-    //
-    // for (int i = 0; i < (int) negativeScoredBoxList4NNFirstPart.size(); i++) {
-    //     ScoredBox* scoredBox = negativeScoredBoxList4NNFirstPart[i];
-    //     printf(COLOR_RED "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
-    // }
-    // printf("==================================\n");
+    printf("====== TRAINING DATA FOR NN ======\n");
+    for (int i = 0; i < (int) positiveScoredBoxList4NN.size(); i++) {
+        ScoredBox* scoredBox = positiveScoredBoxList4NN[i];
+        printf(COLOR_GREEN "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
+    }
+
+    for (int i = 0; i < (int) negativeScoredBoxList4NNFirstPart.size(); i++) {
+        ScoredBox* scoredBox = negativeScoredBoxList4NNFirstPart[i];
+        printf(COLOR_RED "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
+    }
+    printf("==================================\n");
 
     TrainingSet<ScoredBox> trainingSet4Ensemble = TrainingSet<ScoredBox>(
         frame,

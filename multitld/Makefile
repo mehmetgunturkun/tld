@@ -6,7 +6,7 @@ CC := gcc
 CXX := g++
 AR := ar
 
-OPENCV_CFLAGS := `pkg-config opencv --cflags`
+OPENCV_CFLAGS := `pkg-config opencv--cflags`
 OPENCV_LIBS := `pkg-config opencv --libs`
 # -L/usr/local/cuda/lib64
 #LAPACK_LIBS := ./lapack_LINUX.a ./blas_LINUX.a ./libf2c.a
@@ -20,7 +20,6 @@ ARFLAGS = ruv
 
 lib2_sources := \
 	src/common/Colors.cc \
-	src/core/IO.cc \
 	src/core/TLDConfig.cc \
 	src/core/Random.cc \
 	src/core/Cluster.cc \
