@@ -25,6 +25,10 @@ vector<Box*> Tracker::track(Frame* prev, Frame* curr, vector<Box*> boxList) {
     vector<Box*> stableBoxList = getStableBoxes(nrOfBoxes, boxList);
     int nrOfStableBoxes = (int) stableBoxList.size();
 
+    for (int i = 0; i < nrOfStableBoxes; i++) {
+        printf("%s\n", stableBoxList[i]->toCharArr());
+    }
+
     if (nrOfStableBoxes == 0) {
         return boxList;
     } else {
@@ -57,7 +61,7 @@ vector<tld::Point*> Tracker::decomposePoints(vector<Box*> boxList, int nrOfBoxes
         float verticalStep = computeStep(box->y1, box->y2, 10);
         for (float j = MARGIN; j <= box->height - MARGIN; j = j + verticalStep) {
             for (float i = MARGIN; i <= box->width - MARGIN; i = i + horizontalStep) {
-                Point2f point2f = Point2f(box->x1 + i, box->y1 + j);
+                Point2f point2f = Point2f(box->x1 + i - 2, box->y1 + j);
                 tld::Point* point = new tld::Point(point2f);
 
                 nrOfPoints += 1;
@@ -75,6 +79,7 @@ vector<FBPoint*> Tracker::track(Frame* prev, Frame* curr, vector<tld::Point*> po
     int nrOfPoints = points.size();
 
     vector<tld::Point*> toPoints = lkTrack(prev, curr, points);
+    printf("------\n");
     vector<tld::Point*> backwardPoints = lkTrack(curr, prev, toPoints);
 
     for (int i = 0; i < nrOfPoints; i++) {
@@ -132,7 +137,9 @@ vector<tld::Point*> Tracker::lkTrack(Frame* prev, Frame* curr, vector<tld::Point
             uchar state = status[id];
             if (state) {
                  targetPoint = new tld::Point(toPoint);
+                 printf(GREEN("PO(%f, %f) >> P0(%f, %f)\n"), srcPoint->underlying.x, srcPoint->underlying.y, toPoint.x, toPoint.y);
             } else {
+                printf(RED("PO(%f, %f) >> P0(%f, %f)\n"), srcPoint->underlying.x, srcPoint->underlying.y, toPoint.x, toPoint.y);
                 targetPoint = tld::Point::failed;
             }
             id += 1;

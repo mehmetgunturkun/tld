@@ -17,7 +17,7 @@ int main(int argc, char** argv) {
 
     Box* initBox = sequence->initBox;
     vector<Box*> boxList = { initBox };
-    
+
     ofstream outputFile;
     outputFile.open (sequence->outputFile);
 
@@ -36,12 +36,11 @@ int main(int argc, char** argv) {
     ImageBuilder* builder = new ImageBuilder(current);
     if (box != nullptr) {
         builder->withBox(box);
-        builder->display(1);
+        builder->display(10);
         // outputFile << box->toString() << "\n";
     } else {
         // outputFile << "Box(nan, nan, nan, nan)";
     }
-    builder->display(0);
 
     outputFile.close();
     return EXIT_SUCCESS;

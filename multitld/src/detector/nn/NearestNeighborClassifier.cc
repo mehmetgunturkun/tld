@@ -135,13 +135,6 @@ bool NearestNeighborClassifier::evaluate(Frame* frame, Box* box, int modelId) {
     Patch* patch = new Patch(frame, box);
     ObjectModel* model = models[modelId];
     ObjectScore* objectScore = model->computeScore(patch);
-    printf("RS: %f, CS: %f, IsPos: %d, IsNeg: %d, CloPosIdx: %d",
-        objectScore->relativeScore,
-        objectScore->conservativeScore,
-        objectScore->isInPositive,
-        objectScore->isInNegative,
-        0
-    );
     return objectScore->relativeScore > 0.7;
 }
 

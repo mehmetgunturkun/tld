@@ -17,7 +17,7 @@ Detector::Detector(Frame* frame, vector<Box*> boxList) {
     nrOfPositiveBoxes4NNAtInitialization = 1;
     nrOfNegativeBoxes4NNAtInitialization = 50;
 
-    varianceThreshold = 490.47 * 0.5;
+    varianceThreshold = 1297 * 0.5;
     positiveBoxOverlapThreshold = 0.6;
     negativeBoxOverlapThreshold = 0.2;
 }
@@ -204,12 +204,12 @@ void Detector::learn(Frame* current, Box* box, vector<ScoredBox*> grids, int mod
 
     vector<ScoredBox*> positiveBoxList4Ensemble = positiveQueue.toVector();
 
-    printf("====== 1 %d %5d======\n", nrOfPositive, nrOfNegativeEC);
-    for (int i = 0; i < (int) positiveBoxList4Ensemble.size(); i++) {
-        ScoredBox* scoredBox = positiveBoxList4Ensemble[i];
-        printf(COLOR_GREEN "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
-    }
-    printf("==================================\n");
+    // printf("====== 1 %d %5d======\n", nrOfPositive, nrOfNegativeEC);
+    // for (int i = 0; i < (int) positiveBoxList4Ensemble.size(); i++) {
+    //     ScoredBox* scoredBox = positiveBoxList4Ensemble[i];
+    //     printf(COLOR_GREEN "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
+    // }
+    // printf("==================================\n");
 
     vector<ScoredBox*> negativeBoxList4Ensemble = negativeQueue.toVector();
     TrainingSet<ScoredBox> trainingSet4Ensemble = TrainingSet<ScoredBox>(
