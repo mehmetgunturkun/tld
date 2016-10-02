@@ -60,8 +60,6 @@ vector<tld::Point*> Tracker::decomposePoints(vector<Box*> boxList, int nrOfBoxes
                 Point2f point2f = Point2f(box->x1 + i, box->y1 + j);
                 tld::Point* point = new tld::Point(point2f);
 
-                printf("points.push_back(new SamplePoint(%g, %g));\n", point2f.x, point2f.y);
-
                 nrOfPoints += 1;
                 points.push_back(point);
                 id++;

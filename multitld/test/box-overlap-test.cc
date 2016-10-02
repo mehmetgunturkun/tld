@@ -41,7 +41,7 @@ int main(int argc, char** argv) {
         float overlap = Box::computeOverlap(firstBox, box);
 
         if (overlap > 1.0) {
-            printf("%d. %s %f\n", nrOfTotalBoxes, box->toCharArr(), overlap);    
+            printf(COLOR_GREEN "%d. %s %f\n" COLOR_RESET, nrOfTotalBoxes, box->toCharArr(), overlap);    
         }
 
 
