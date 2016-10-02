@@ -13,6 +13,8 @@
 #include <unordered_set>
 
 #define NR_OF_MODELS 2
+#define MIN_DOUBLE(a,b) (a < b ? a : b)
+#define MAX_DOUBLE(a,b) (a > b ? a : b)
 
 using namespace std;
 
@@ -105,15 +107,15 @@ public:
     }
 
     static double computeOverlap(Box* b1, Box* b2) {
-        double x11 = b1->x1;
-        double x12 = b1->x2;
-        double y11 = b1->y1;
-        double y12 = b1->y2;
+        double x11 = (double) b1->x1;
+        double x12 = (double) b1->x2;
+        double y11 = (double) b1->y1;
+        double y12 = (double) b1->y2;
 
-        double x21 = b2->x1;
-        double x22 = b2->x2;
-        double y21 = b2->y1;
-        double y22 = b2->y2;
+        double x21 = (double) b2->x1;
+        double x22 = (double) b2->x2;
+        double y21 = (double) b2->y1;
+        double y22 = (double) b2->y2;
 
         if (x11 > x22 ||
             y11 > y22 ||
@@ -122,13 +124,31 @@ public:
                 return 0;
         }
 
-        double intersectionX = min(x12, x22) - max(x11, x21) + 1;
-        double intersectionY = min(y12, y22) - max(y11, y21) + 1;
+        double intersectionX = MIN_DOUBLE(x12, x22) - MAX_DOUBLE(x11, x21) + 1;
+        double intersectionY = MIN_DOUBLE(y12, y22) - MAX_DOUBLE(y11, y21) + 1;
         double intersection = intersectionX * intersectionY;
 
         double area1 = (x12 - x11 + 1) * (y12 - y11 + 1);
         double area2 = (x22 - x21 + 1) * (y22 - y21 + 1);
         double overlap = intersection / (area1 + area2 - intersection);
+
+        if (overlap > 1.0) {
+            printf("Compare:\n");
+            printf("\t%s:\n", b1->toCharArr());
+            printf("\t%s:\n", b2->toCharArr());
+
+            printf("MIN(%g, %g) = %g\n", x12, x22, MIN_DOUBLE(x12, x22));
+            printf("MAX(%g, %g) = %g\n", x11, x21, MAX_DOUBLE(x11, x21));
+            printf("MIN(%g, %g) = %g\n", y12, y22, MIN_DOUBLE(y12, y22));
+            printf("MAX(%g, %g) = %g\n", y11, y21, MAX_DOUBLE(y11, y21));
+
+            printf("INTx: %g\n", intersectionX);
+            printf("INTy: %g\n", intersectionY);
+            printf("INTxy: %g\n", intersection);
+            printf("AREA1: %g\n", area1);
+            printf("AREA2: %g\n", area2);
+        }
+
         return overlap;
     }
 
