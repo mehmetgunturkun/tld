@@ -22,24 +22,30 @@ int main(int argc, char** argv) {
     outputFile.open (sequence->outputFile);
     printf("mc1000\n");
     TLD* tld = new TLD(firstFrame, boxList);
+    boxList = tld->init();
     printf("mc2000\n");
 
     int frameNo = 1;
     Frame* previous = firstFrame;
     printf("Started to run for %s\n", key.c_str());
-    Frame* secondFrame = sequence->next();
 
-    boxList = tld->track(firstFrame, secondFrame, boxList);
+    while (sequence->hasNext()) {
+        Frame* current = sequence->next();
+        frameNo += 1;
 
-    ImageBuilder* builder = new ImageBuilder(secondFrame);
-    Box* box = boxList[0];
-    if (box != nullptr) {
-        builder->withBox(box);
-        outputFile << box->toString() << "\n";
-    } else {
-        outputFile << "Box(nan, nan, nan, nan)";
+        boxList = tld->track(previous, current, boxList);
+        Box* box = boxList[0];
+        ImageBuilder* builder = new ImageBuilder(current);
+        if (box != nullptr) {
+            builder->withBox(box);
+            builder->display(1);
+            // outputFile << box->toString() << "\n";
+        } else {
+            // outputFile << "Box(nan, nan, nan, nan)";
+        }
+        builder->display(1);
+        previous = current;
     }
-    builder->display(0);
 
     outputFile.close();
     return EXIT_SUCCESS;

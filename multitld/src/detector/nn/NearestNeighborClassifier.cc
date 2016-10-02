@@ -17,7 +17,7 @@ bool NearestNeighborClassifier::classify(Frame* frame, ScoredBox* scoredBox) {
     for (int i = 0;  i < nrOfModels; i++) {
         ObjectModel* objectModel = models[i];
         ObjectScore* objectScore = objectModel->computeScore(patch);
-        printf("Rel: %f, Con: %f\n", objectScore->relativeScore, objectScore->conservativeScore);
+
         relativeScores[i] = objectScore->relativeScore;
         conservativeScores[i] = objectScore->conservativeScore;
     }
@@ -102,10 +102,10 @@ void NearestNeighborClassifier::train(TrainingSet<ScoredBox> ts, int modelId) {
         float relativeScore = objectScore->relativeScore;
         bool isInPositive = objectScore->isInPositive;
 
-        Frame* frame = ts.frame;
-        ImageBuilder* builder = new ImageBuilder(frame);
+        // Frame* frame = ts.frame;
+        // ImageBuilder* builder = new ImageBuilder(frame);
         if (label == 1) {
-            builder->withBox(scoredBox->box, Colors::BLUE)->withTitle("nn-pos")->display(0);
+            // builder->withBox(scoredBox->box, Colors::BLUE)->withTitle("nn-pos")->display(0);
             if (relativeScore <= 0.65) {
                 if (isInPositive == true) {
                     // int patchIndex = objectScore->getClosestPositivePatchIndex;
@@ -135,6 +135,13 @@ bool NearestNeighborClassifier::evaluate(Frame* frame, Box* box, int modelId) {
     Patch* patch = new Patch(frame, box);
     ObjectModel* model = models[modelId];
     ObjectScore* objectScore = model->computeScore(patch);
+    printf("RS: %f, CS: %f, IsPos: %d, IsNeg: %d, CloPosIdx: %d",
+        objectScore->relativeScore,
+        objectScore->conservativeScore,
+        objectScore->isInPositive,
+        objectScore->isInNegative,
+        0
+    );
     return objectScore->relativeScore > 0.7;
 }
 

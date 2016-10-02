@@ -60,8 +60,9 @@ ObjectScore* ObjectModel::computeScore(Patch* sample) {
         conservativeScore  = (negativeNNSimilarity / (positiveInititalNNSimilarity + negativeNNSimilarity));
     }
 
-    bool isInPositive= positiveNNSimilarity > 0.95;
-    bool isInNegative = negativeNNSimilarity > 0.95;
+    printf("POS: %f\n", positiveNNSimilarity);
+    bool isInPositive = (1.0 - positiveNNSimilarity) > 0.95;
+    bool isInNegative = (1.0 - negativeNNSimilarity) > 0.95;
 
     ObjectScore* objectScore = new ObjectScore(relativeScore, conservativeScore, isInPositive, isInNegative);
     return objectScore;

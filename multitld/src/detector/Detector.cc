@@ -20,8 +20,6 @@ Detector::Detector(Frame* frame, vector<Box*> boxList) {
     varianceThreshold = 490.47 * 0.5;
     positiveBoxOverlapThreshold = 0.6;
     negativeBoxOverlapThreshold = 0.2;
-
-    this->init(frame, boxList);
 }
 
 bool Detector::isPositive(Box* box) {
@@ -32,16 +30,18 @@ bool Detector::isNegative(Box* box) {
     return (box->overlap < negativeBoxOverlapThreshold) && (box->variance > varianceThreshold);
 }
 
-void Detector::init(Frame* frame, vector<Box*> boxList) {
+vector<Box*> Detector::init(Frame* frame, vector<Box*> boxList) {
     int nrOfBoxes = (int) boxList.size();
+    vector<Box*> correctedBoxList;
     for (int i = 0; i < nrOfBoxes; i++) {
             Box* box = boxList[i];
-            printf("INIT2 >>> %s\n", box->toCharArr());
-            this->init(frame, box, i);
+            Box* correctedBox = this->init(frame, box, i);
+            correctedBoxList.push_back(correctedBox);
     }
+    return correctedBoxList;
 }
 
-void Detector::init(Frame* frame, Box* box, int modelId) {
+Box* Detector::init(Frame* frame, Box* box, int modelId) {
     BoundedPriorityQueue<Box, OverlapOrdered> positiveQueue =
         BoundedPriorityQueue<Box, OverlapOrdered>(nrOfPositiveBoxes4EnsembleAtInitialization);
     vector<Box*> negativeQueue;
@@ -98,7 +98,7 @@ void Detector::init(Frame* frame, Box* box, int modelId) {
     // }
     // printf("==================================\n");
 
-    printf("INIT3 >>> %s\n", positiveScoredBoxList4Ensemble[0]->box->toCharArr());
+    Box* closestBox = positiveScoredBoxList4Ensemble[0]->box;
     vector<ScoredBox*> positiveScoredBoxList4NN = { positiveScoredBoxList4Ensemble[0] };
     Random::seed();
     vector<ScoredBox*> negativeScoredBoxList4NN = Random::randomSample(
@@ -108,17 +108,17 @@ void Detector::init(Frame* frame, Box* box, int modelId) {
     Random::seed();
     vector<ScoredBox*> negativeScoredBoxList4NNFirstPart = Random::splitData(negativeScoredBoxList4NN, 2);
 
-    printf("====== TRAINING DATA FOR NN ======\n");
-    for (int i = 0; i < (int) positiveScoredBoxList4NN.size(); i++) {
-        ScoredBox* scoredBox = positiveScoredBoxList4NN[i];
-        printf(COLOR_GREEN "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
-    }
-
-    for (int i = 0; i < (int) negativeScoredBoxList4NNFirstPart.size(); i++) {
-        ScoredBox* scoredBox = negativeScoredBoxList4NNFirstPart[i];
-        printf(COLOR_RED "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
-    }
-    printf("==================================\n");
+    // printf("====== TRAINING DATA FOR NN ======\n");
+    // for (int i = 0; i < (int) positiveScoredBoxList4NN.size(); i++) {
+    //     ScoredBox* scoredBox = positiveScoredBoxList4NN[i];
+    //     printf(COLOR_GREEN "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
+    // }
+    //
+    // for (int i = 0; i < (int) negativeScoredBoxList4NNFirstPart.size(); i++) {
+    //     ScoredBox* scoredBox = negativeScoredBoxList4NNFirstPart[i];
+    //     printf(COLOR_RED "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
+    // }
+    // printf("==================================\n");
 
     TrainingSet<ScoredBox> trainingSet4Ensemble = TrainingSet<ScoredBox>(
         frame,
@@ -134,6 +134,8 @@ void Detector::init(Frame* frame, Box* box, int modelId) {
 
     eClassifier->train(trainingSet4Ensemble, modelId);
     nnClassifier->train(trainingSet4NN, modelId);
+
+    return closestBox;
 }
 
 vector<ScoredBox*> Detector::score(Frame* frame, vector<Box*> boxList) {
@@ -166,6 +168,9 @@ void Detector::learn(Frame* current, Box* box, vector<ScoredBox*> grids, int mod
     BoundedPriorityQueue<ScoredBox, ScoredBoxOverlapOrdered> negativeQueue4NN =
         BoundedPriorityQueue<ScoredBox, ScoredBoxOverlapOrdered>(INT_MAX);
 
+    int nrOfPositive = 0;
+    int nrOfNegativeEC = 0;
+
     for (int i = 0; i < gridSize; i++) {
         ScoredBox* sample = grids[i];
 
@@ -176,6 +181,7 @@ void Detector::learn(Frame* current, Box* box, vector<ScoredBox*> grids, int mod
         sampleBox->overlap = overlap;
 
         if (isPositive(sample->box)) {
+            nrOfPositive += 1;
             score(current, sample);
             positiveQueue += sample;
             continue;
@@ -184,6 +190,7 @@ void Detector::learn(Frame* current, Box* box, vector<ScoredBox*> grids, int mod
         EnsembleScore* ensembleScore = (EnsembleScore*) sample->getScore("ensemble");
         float confidence = ensembleScore->scores[modelId];
         if (isNegative(sample->box) && confidence >= 1.0) {
+            nrOfNegativeEC += 1;
             score(current, sample);
             negativeQueue += sample;
         }
@@ -196,6 +203,14 @@ void Detector::learn(Frame* current, Box* box, vector<ScoredBox*> grids, int mod
     }
 
     vector<ScoredBox*> positiveBoxList4Ensemble = positiveQueue.toVector();
+
+    printf("====== 1 %d %5d======\n", nrOfPositive, nrOfNegativeEC);
+    for (int i = 0; i < (int) positiveBoxList4Ensemble.size(); i++) {
+        ScoredBox* scoredBox = positiveBoxList4Ensemble[i];
+        printf(COLOR_GREEN "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
+    }
+    printf("==================================\n");
+
     vector<ScoredBox*> negativeBoxList4Ensemble = negativeQueue.toVector();
     TrainingSet<ScoredBox> trainingSet4Ensemble = TrainingSet<ScoredBox>(
         current,

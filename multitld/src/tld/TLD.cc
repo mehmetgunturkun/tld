@@ -1,11 +1,19 @@
 #include "tld/TLD.hpp"
 
 TLD::TLD(Frame* frame, vector<Box*> boxList) {
+    this->firstFrame = frame;
+    this->firstBoxList = boxList;
+
     this->nrOfModels = (int) boxList.size();
 
     this->tracker = new Tracker();
     this->detector = new Detector(frame, boxList);
     printf("TLD is created\n");
+}
+
+vector<Box*> TLD::init() {
+    vector<Box*> correctedBox = this->detector->init(this->firstFrame, this->firstBoxList);
+    return correctedBox;
 }
 
 TLD::TLD(Tracker* tracker, Detector* detector) {
@@ -123,6 +131,7 @@ Option<Box>* TLD::integrate(Frame* frame, Box* maybeTrackedBox, vector<ScoredBox
                 // Detector.Combine
                 printf("Detector " COLOR_GREEN "Success Combine " COLOR_RESET " \n");
                 Box* combinedBox = combineClosestBoxes(scoredTrackBox, candidateBoxList);
+                printf("TLD(Combine) >> %s\n", combinedBox->toCharArr());
                 maybeFinalBox = new Option<Box>(combinedBox);
                 // detector->learn(current, combinedBox, allBoxes, modelId);
                 shouldLearn = shouldLearn && true;
@@ -159,6 +168,7 @@ Option<Box>* TLD::integrate(Frame* frame, Box* maybeTrackedBox, vector<ScoredBox
     }
 
     // Evaluation
+    printf("Evaluation" COLOR_GREEN " Started " COLOR_RESET " \n");
     if (maybeFinalBox->isDefined()) {
         Box* finalBox = maybeFinalBox->get();
         bool isValid = detector->evaluate(frame, finalBox, modelId);
@@ -190,7 +200,8 @@ TrackerResult* TLD::validate(Frame* current, Box* trackedBox, int modelId) {
         return new TrackerResult();
         // return new ScoredBox(trackedBox);
     } else {
-        detector->validate(current, new Box(0, 138.23, 124.59, 227.08, 163.52), 0);
+        // printf("TR >> %s\n", trackedBox->toCharArr());
+        detector->validate(current, trackedBox, 0);
         ScoredBox* scoredBox = detector->validate(current, trackedBox, modelId);
         return new TrackerResult(scoredBox);
     }
@@ -212,6 +223,18 @@ DetectorResult* TLD::partition(vector<ScoredBox*> scoredBoxList, int modelId) {
         }
     }
     vector<ScoredBox*> clusteredBoxList = ScoredBox::cluster(detectedBoxList, (int) detectedBoxList.size());
+
+    for (int i = 0; i < candidateBoxList.size(); i++) {
+        printf("EC >> %s\n", candidateBoxList[i]->box->toCharArr());
+    }
+
+    for (int i = 0; i < detectedBoxList.size(); i++) {
+        printf("NN >> %s\n", detectedBoxList[i]->box->toCharArr());
+    }
+
+    for (int i = 0; i < clusteredBoxList.size(); i++) {
+        printf("CB >> %s, %f\n", clusteredBoxList[i]->box->toCharArr(), clusteredBoxList[i]->getScoreValue("nn", 0));
+    }
 
     if ((int) detectedBoxList.size() > 0 && clusteredBoxList.size() == 0) {
         for (int i = 0; i < detectedBoxList.size(); i++) {
@@ -260,6 +283,7 @@ Box* TLD::combineClosestBoxes(ScoredBox* trackScoredBox, vector<ScoredBox*> dete
         Box* box = scoredBox->box;
         float overlap = Box::computeOverlap(trackBox, box);
         if (overlap > 0.7) {
+            printf("EC(Combine) >> %s\n", box->toCharArr());
             x1 += box->x1;
             y1 += box->y1;
             x2 += box->x2;
