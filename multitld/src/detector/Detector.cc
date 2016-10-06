@@ -5,9 +5,9 @@ Detector::Detector(Frame* frame, vector<Box*> boxList) {
     firstBox = boxList[0];
     nrOfModels = (int) boxList.size();
 
-    vClassifier = new VarianceClassifier(frame, boxList);
-    eClassifier = new EnsembleClassifier(frame, boxList);
-    nnClassifier = new NearestNeighborClassifier(frame, boxList);
+    vClassifier = new VarianceClassifier();
+    eClassifier = new EnsembleClassifier();
+    nnClassifier = new NearestNeighborClassifier();
 
     maxScaleLimit = 10;
     minimumPatchSize = 24;
@@ -31,6 +31,11 @@ bool Detector::isNegative(Box* box) {
 }
 
 vector<Box*> Detector::init(Frame* frame, vector<Box*> boxList) {
+
+    vClassifier->init(frame, boxList);
+    eClassifier->init(frame, boxList);
+    nnClassifier->init(frame, boxList);
+
     int nrOfBoxes = (int) boxList.size();
     vector<Box*> correctedBoxList;
     for (int i = 0; i < nrOfBoxes; i++) {

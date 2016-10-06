@@ -7,7 +7,8 @@ int main(int argc, char** argv) {
     Frame* firstFrame = sequence->next();
     Box* firstBox = sequence->initBox;
 
-    EnsembleClassifier* eClassifer = new EnsembleClassifier(firstFrame, {firstBox} );
+    EnsembleClassifier* eClassifer = new EnsembleClassifier();
+    eClassifer->init(firstFrame, {firstBox} );
 
     int nrOfBaseClassifiers = eClassifer->nrOfBaseClassifiers;
     vector<BaseClassifier*> classifiers = eClassifer->baseClassifiers;

@@ -39,8 +39,9 @@ vector<string> listImageFiles(string directory) {
      return fileList;
 }
 
-Sequence::Sequence(string key, int skip) {
+Sequence::Sequence(string key, int skip, int limit) {
     this->key = key;
+    this->limit = limit;
 
     string resourceString(RESOURCE_DIR);
     string sampleDirectory = resourceString + "/" + key;
@@ -67,7 +68,7 @@ Sequence::Sequence(string key, int skip) {
 }
 
 bool Sequence::hasNext() {
-    return processedFrames < nrOfFrames;
+    return processedFrames < nrOfFrames && processedFrames < limit;
 }
 
 Frame* Sequence::next() {

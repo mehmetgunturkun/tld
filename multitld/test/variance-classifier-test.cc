@@ -17,7 +17,8 @@ int main(int argc, char** argv) {
 
 
     vector<Box*> boxList = { b0, b1, b2, b3, b4 };
-    VarianceClassifier* varianceClassifier = new VarianceClassifier(frame, boxList);
+    VarianceClassifier* varianceClassifier = new VarianceClassifier();
+    varianceClassifier->init(frame, boxList);
     printf("Minimum Variance Value: %f\n", varianceClassifier->minimumVariance);
 
 

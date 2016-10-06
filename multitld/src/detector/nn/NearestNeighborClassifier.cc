@@ -1,12 +1,14 @@
 #include "detector/nn/NearestNeighborClassifier.hpp"
 
-NearestNeighborClassifier::NearestNeighborClassifier(Frame* firstFrame, vector<Box*> boxList) {
-    nrOfModels = (int) boxList.size();
-    for (int i = 0; i < nrOfModels; i++) {
-        models.push_back(new ObjectModel());
-    }
-
+NearestNeighborClassifier::NearestNeighborClassifier() {
     POSITIVE_SCORE_THRESHOLD = 0.65;
+}
+
+void NearestNeighborClassifier::init(Frame* firstFrame, vector<Box*> boxList) {
+    this->nrOfModels = (int) boxList.size();
+    for (int i = 0; i < nrOfModels; i++) {
+        this->models.push_back(new ObjectModel());
+    }
 }
 
 bool NearestNeighborClassifier::classify(Frame* frame, ScoredBox* scoredBox) {

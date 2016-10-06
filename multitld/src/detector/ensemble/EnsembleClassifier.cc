@@ -6,18 +6,21 @@
 #define POS_Y_DIR 3
 #define NEG_Y_DIR 4
 
-EnsembleClassifier::EnsembleClassifier(Frame* firstFrame, vector<Box*> boxList) {
+EnsembleClassifier::EnsembleClassifier() {
     Random::seed();
     this->classifierName = "ensemble";
 
-    this->nrOfModels = (int) boxList.size();
     this->nrOfBaseClassifiers = 10;
     this->nrOfPixelComparisons = 13;
 
     this->positiveUpdateThreshold = 0.5 * nrOfBaseClassifiers;
     this->negativeUpdateThreshold = 0.5 * nrOfBaseClassifiers;
     this->POSITIVE_SCORE_THRESHOLD = 0.5 * nrOfBaseClassifiers;
+}
 
+void EnsembleClassifier::init(Frame* firstFrame, vector<Box*> boxList) {
+    // do nothing for now
+    this->nrOfModels = (int) boxList.size();
     this->baseClassifiers = generateBaseClassifier();
 }
 

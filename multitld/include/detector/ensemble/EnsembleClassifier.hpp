@@ -26,7 +26,8 @@ public:
 
     float POSITIVE_SCORE_THRESHOLD;
 
-    EnsembleClassifier(Frame* firstFrame, vector<Box*> boxList);
+    EnsembleClassifier();
+    void init(Frame* firstFrame, vector<Box*> boxList);
     bool classify(Frame* frame, ScoredBox* scoredBox);
     float getProbability(ScoredBox* scoredBox, int modelId);
     void score(Frame* frame, ScoredBox* scoredBox);

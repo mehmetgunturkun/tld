@@ -11,8 +11,12 @@ int main(int argc, char** argv) {
     }
 
     string key(argv[2]);
+
+    string limitString(argv[4]);
+    int limit = std::stoi(limitString);
+
     printf("Going to run for %s\n", key.c_str());
-    Sequence* sequence = new Sequence(key);
+    Sequence* sequence = new Sequence(key, 0, limit);
     Frame* firstFrame = sequence->next();
 
     Box* initBox = sequence->initBox;

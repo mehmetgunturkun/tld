@@ -10,12 +10,14 @@ using namespace std;
 
 class VarianceClassifier {
 public:
+    bool initiated;
     int nrOfModels;
     float minimumVariance;
     vector<float> varianceList;
 
-    VarianceClassifier(Frame* frame, vector<Box*> boxList);
+    VarianceClassifier();
     VarianceClassifier(double minVariance);
+    void init(Frame* frame, vector<Box*> boxList);
     bool classify(Frame* frame, ScoredBox *scoredBox);
 };
 #endif

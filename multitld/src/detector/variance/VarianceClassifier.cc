@@ -1,6 +1,11 @@
 #include "detector/variance/VarianceClassifier.hpp"
 
-VarianceClassifier::VarianceClassifier(Frame* frame, vector<Box*> boxList) {
+VarianceClassifier::VarianceClassifier() {
+    this->initiated = false;
+}
+
+void VarianceClassifier::init(Frame* frame, vector<Box*> boxList) {
+    this->initiated = true;
     this->nrOfModels = (int) boxList.size();
     this->varianceList.resize(nrOfModels);
 

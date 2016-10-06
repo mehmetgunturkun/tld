@@ -21,7 +21,8 @@ int main(int argc, char** argv) {
     Frame* firstFrame = sequence->next();
     Box* firstBox = sequence->initBox;
     vector<Box*> boxList = { firstBox };
-    EnsembleClassifier* eClassifier = new EnsembleClassifier(firstFrame, boxList);
+    EnsembleClassifier* eClassifier = new EnsembleClassifier();
+    eClassifier->init(firstFrame, boxList);
 
     vector<BaseClassifier*> classifierList = eClassifier->baseClassifiers;
     for (int i = 0; i < classifierList.size(); i++) {
