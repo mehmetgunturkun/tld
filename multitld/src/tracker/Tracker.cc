@@ -98,34 +98,48 @@ vector<FBPoint*> Tracker::track(Frame* prev, Frame* curr, vector<tld::Point*> po
 }
 
 vector<tld::Point*> Tracker::lkTrack(Frame* prev, Frame* curr, vector<tld::Point*> srcPoints) {
-    int pointCount = (int) srcPoints.size();
+    CvSize imageSize = cvSize(prev->width, prev->height);
 
-    vector<Point2f> fromPoints;
-    vector<Point2f> toPoints;
+    IplImage* fromImage = new IplImage(*(prev->grayscale));
+    IplImage* fromPyramid = cvCreateImage( imageSize, 8, 1 );
+
+    IplImage* toImage = new IplImage(*(curr->grayscale));
+    IplImage* toPyramid = cvCreateImage( imageSize, 8, 1 );
+
+    int pointCount = (int) srcPoints.size();
+    CvPoint2D32f* fromPoints = (CvPoint2D32f*)cvAlloc(pointCount*sizeof(CvPoint2D32f));
+    CvPoint2D32f* toPoints = (CvPoint2D32f*)cvAlloc(pointCount*sizeof(CvPoint2D32f));
 
     int nrOfPoints = 0;
     for (int i = 0; i < pointCount; i++) {
         tld::Point* point = srcPoints[i];
         if (point->state) {
+            fromPoints[nrOfPoints].x = point->underlying.x;
+            fromPoints[nrOfPoints].y = point->underlying.y;
+
+            toPoints[nrOfPoints].x = point->underlying.x;
+            toPoints[nrOfPoints].y = point->underlying.y;
+
             nrOfPoints += 1;
-            fromPoints.push_back(point->underlying);
-            toPoints.push_back(point->underlying);
         }
     }
 
-    vector<uchar> status(nrOfPoints);
-    vector<float> errors(nrOfPoints);
-    calcOpticalFlowPyrLK(prev->flowPyramid,
-                         curr->flowPyramid,
-                         fromPoints,
-                         toPoints,
-                         status,
-                         errors,
-                         *WIN_SIZE,
-                         5,
-                         *TERM_CRITERIA,
-                         CV_LKFLOW_INITIAL_GUESSES | CV_LKFLOW_PYR_A_READY | CV_LKFLOW_PYR_B_READY,
-                         0.0001);
+    char* status = (char*)  cvAlloc(nrOfPoints);
+
+    cvCalcOpticalFlowPyrLK(
+        fromImage,
+        toImage,
+        fromPyramid,
+        toPyramid,
+        fromPoints,
+        toPoints,
+        nrOfPoints,
+        cvSize(4, 4),
+        5,
+        status,
+        0,
+        cvTermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS, 20,0.03),
+        CV_LKFLOW_INITIAL_GUESSES);
 
     vector<tld::Point*> targetPoints;
     int id = 0;
@@ -133,13 +147,12 @@ vector<tld::Point*> Tracker::lkTrack(Frame* prev, Frame* curr, vector<tld::Point
         tld::Point* srcPoint = srcPoints[i];
         tld::Point* targetPoint;
         if (srcPoint->state) {
-            Point2f toPoint = toPoints[id];
+            CvPoint2D32f toPoint2f = toPoints[id];
+            Point2f toPoint = Point2f(toPoint2f.x, toPoint2f.y);
             uchar state = status[id];
             if (state) {
-                 targetPoint = new tld::Point(toPoint);
-                 printf(GREEN("PO(%f, %f) >> P0(%f, %f)\n"), srcPoint->underlying.x, srcPoint->underlying.y, toPoint.x, toPoint.y);
+                targetPoint = new tld::Point(toPoint);
             } else {
-                printf(RED("PO(%f, %f) >> P0(%f, %f)\n"), srcPoint->underlying.x, srcPoint->underlying.y, toPoint.x, toPoint.y);
                 targetPoint = tld::Point::failed;
             }
             id += 1;

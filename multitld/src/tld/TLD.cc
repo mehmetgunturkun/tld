@@ -193,10 +193,12 @@ Option<Box>* TLD::integrate(Frame* frame, Box* maybeTrackedBox, vector<ScoredBox
     if (shouldLearn) {
         Box* finalBox = maybeFinalBox->get();
         detector->learn(frame, finalBox, scoredBoxList, modelId);
-        // printf("Learner " COLOR_GREEN "Success" COLOR_RESET " \n");
+        printf("Going to learn\n");
     } else {
-        // printf("Learner " COLOR_RED "No Need" COLOR_RESET " \n");
+        printf("Not going to learn\n");
     }
+
+    detector->dumpDetector();
     printf(YELLOW("==== Learner is completed ====\n"));
 
     return maybeFinalBox;

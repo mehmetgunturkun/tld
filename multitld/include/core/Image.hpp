@@ -41,12 +41,12 @@ public:
 
     static vector<Mat> pyramid(Mat* image, Size size, int maxLevel, bool withDerivatives) {
         vector<Mat> pyramid;
-        cv::buildOpticalFlowPyramid(*image,
-            pyramid,
-            size,
-            maxLevel,
-            withDerivatives
-        );
+        // cv::buildOpticalFlowPyramid(*image,
+        //     pyramid,
+        //     size,
+        //     maxLevel,
+        //     withDerivatives
+        // );
         return pyramid;
     }
 

@@ -86,17 +86,17 @@ Box* Detector::init(Frame* frame, Box* box, int modelId) {
     Random::seed();
     vector<ScoredBox*> negativeScoredBoxList4EnsembleFirstPart = Random::splitData(negativeScoredBoxList4Ensemble, 2);
 
-    // printf("====== TRAINING DATA FOR EC ======\n");
-    // for (int i = 0; i < (int) positiveScoredBoxList4Ensemble.size(); i++) {
-    //     ScoredBox* scoredBox = positiveScoredBoxList4Ensemble[i];
-    //     printf(COLOR_GREEN "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
-    // }
-    //
-    // for (int i = 0; i < (int) negativeScoredBoxList4Ensemble.size(); i++) {
-    //     ScoredBox* scoredBox = negativeScoredBoxList4Ensemble[i];
-    //     printf(COLOR_RED "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
-    // }
-    // printf("==================================\n");
+    printf("====== TRAINING DATA FOR EC ======\n");
+    for (int i = 0; i < (int) positiveScoredBoxList4Ensemble.size(); i++) {
+        ScoredBox* scoredBox = positiveScoredBoxList4Ensemble[i];
+        printf(COLOR_GREEN "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
+    }
+
+    for (int i = 0; i < (int) negativeScoredBoxList4Ensemble.size(); i++) {
+        ScoredBox* scoredBox = negativeScoredBoxList4Ensemble[i];
+        printf(COLOR_RED "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
+    }
+    printf("==================================\n");
 
     Box* closestBox = positiveScoredBoxList4Ensemble[0]->box;
     vector<ScoredBox*> positiveScoredBoxList4NN = { positiveScoredBoxList4Ensemble[0] };
@@ -108,17 +108,17 @@ Box* Detector::init(Frame* frame, Box* box, int modelId) {
     Random::seed();
     vector<ScoredBox*> negativeScoredBoxList4NNFirstPart = Random::splitData(negativeScoredBoxList4NN, 2);
 
-    // printf("====== TRAINING DATA FOR NN ======\n");
-    // for (int i = 0; i < (int) positiveScoredBoxList4NN.size(); i++) {
-    //     ScoredBox* scoredBox = positiveScoredBoxList4NN[i];
-    //     printf(COLOR_GREEN "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
-    // }
-    //
-    // for (int i = 0; i < (int) negativeScoredBoxList4NNFirstPart.size(); i++) {
-    //     ScoredBox* scoredBox = negativeScoredBoxList4NNFirstPart[i];
-    //     printf(COLOR_RED "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
-    // }
-    // printf("==================================\n");
+    printf("====== TRAINING DATA FOR NN ======\n");
+    for (int i = 0; i < (int) positiveScoredBoxList4NN.size(); i++) {
+        ScoredBox* scoredBox = positiveScoredBoxList4NN[i];
+        printf(COLOR_GREEN "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
+    }
+
+    for (int i = 0; i < (int) negativeScoredBoxList4NNFirstPart.size(); i++) {
+        ScoredBox* scoredBox = negativeScoredBoxList4NNFirstPart[i];
+        printf(COLOR_RED "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
+    }
+    printf("==================================\n");
 
     TrainingSet<ScoredBox> trainingSet4Ensemble = TrainingSet<ScoredBox>(
         frame,
@@ -202,35 +202,53 @@ void Detector::learn(Frame* current, Box* box, vector<ScoredBox*> grids, int mod
         }
     }
 
-    vector<ScoredBox*> positiveBoxList4Ensemble = positiveQueue.toVector();
+    vector<ScoredBox*> positiveScoredBoxList4Ensemble = positiveQueue.toVector();
+    vector<ScoredBox*> negativeScoredBoxList4Ensemble = negativeQueue.toVector();
 
-    // printf("====== 1 %d %5d======\n", nrOfPositive, nrOfNegativeEC);
-    // for (int i = 0; i < (int) positiveBoxList4Ensemble.size(); i++) {
-    //     ScoredBox* scoredBox = positiveBoxList4Ensemble[i];
-    //     printf(COLOR_GREEN "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
-    // }
-    // printf("==================================\n");
+    printf("====== TRAINING DATA FOR EC ======\n");
+    for (int i = 0; i < (int) positiveScoredBoxList4Ensemble.size(); i++) {
+        ScoredBox* scoredBox = positiveScoredBoxList4Ensemble[i];
+        printf(COLOR_GREEN "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
+    }
 
-    vector<ScoredBox*> negativeBoxList4Ensemble = negativeQueue.toVector();
+    for (int i = 0; i < (int) negativeScoredBoxList4Ensemble.size(); i++) {
+        ScoredBox* scoredBox = negativeScoredBoxList4Ensemble[i];
+        printf(COLOR_RED "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
+    }
+    printf("==================================\n");
+
+
+    vector<ScoredBox*> positiveScoredBoxList4NN;
+    if (positiveScoredBoxList4Ensemble.size() > 0) {
+        positiveScoredBoxList4NN = { positiveScoredBoxList4Ensemble[0] };
+    }
+    vector<ScoredBox*> negativeScoredBoxList4NN = negativeQueue4NN.toVector();
+
+    printf("====== TRAINING DATA FOR NN ======\n");
+    for (int i = 0; i < (int) positiveScoredBoxList4NN.size(); i++) {
+        ScoredBox* scoredBox = positiveScoredBoxList4NN[i];
+        printf(COLOR_GREEN "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
+    }
+
+    for (int i = 0; i < (int) negativeScoredBoxList4NN.size(); i++) {
+        ScoredBox* scoredBox = negativeScoredBoxList4NN[i];
+        printf(COLOR_RED "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
+    }
+    printf("==================================\n");
+
     TrainingSet<ScoredBox> trainingSet4Ensemble = TrainingSet<ScoredBox>(
         current,
-        positiveBoxList4Ensemble,
-        negativeBoxList4Ensemble
+        positiveScoredBoxList4Ensemble,
+        negativeScoredBoxList4Ensemble
+    );
+
+    TrainingSet<ScoredBox> trainingSet4NN = TrainingSet<ScoredBox>(
+        current,
+        positiveScoredBoxList4NN,
+        negativeScoredBoxList4NN
     );
 
     eClassifier->train(trainingSet4Ensemble, modelId);
-
-    vector<ScoredBox*> positiveBoxList4NN;
-    if (positiveBoxList4Ensemble.size() > 0) {
-        positiveBoxList4NN = { positiveBoxList4Ensemble[0] };
-    }
-
-    vector<ScoredBox*> negativeBoxList4NN = negativeQueue4NN.toVector();
-    TrainingSet<ScoredBox> trainingSet4NN = TrainingSet<ScoredBox>(
-        current,
-        positiveBoxList4NN,
-        negativeBoxList4NN
-    );
     nnClassifier->train(trainingSet4NN, modelId);
 }
 
@@ -268,4 +286,9 @@ ScoredBox* Detector::validate(Frame* frame, Box* box, int modelId) {
 
 bool Detector::evaluate(Frame* frame, Box* box, int modelId) {
     return nnClassifier->evaluate(frame, box, modelId);
+}
+
+void Detector::dumpDetector() {
+    eClassifier->dumpEnsembleClassifier();
+    nnClassifier->dumpNearestNeighborClassifier();
 }

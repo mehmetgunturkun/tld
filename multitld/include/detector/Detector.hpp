@@ -48,5 +48,6 @@ public:
     void score(Frame* frame, ScoredBox* scoredBox);
 
     bool evaluate(Frame* frame, Box* box, int modelId);
+    void dumpDetector();
 };
 #endif
