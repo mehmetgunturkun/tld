@@ -13,7 +13,8 @@ void Cluster::add(int point) {
 }
 
 Cluster* Cluster::merge(Cluster* other) {
-    Cluster* c = new Cluster(gId);
+    int newGroupId = Cluster::getId();
+    Cluster* c = new Cluster(newGroupId);
 
     for (int i = 0; i < this->size; i++) {
         c->add(pointList[i]);

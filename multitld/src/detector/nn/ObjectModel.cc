@@ -1,6 +1,6 @@
 #include "detector/nn/ObjectModel.hpp"
 
-ObjectScore::ObjectScore(float relativeScore, float conservativeScore, bool isInPositive, bool isInNegative) {
+ObjectScore::ObjectScore(double relativeScore, double conservativeScore, bool isInPositive, bool isInNegative) {
     this->relativeScore = relativeScore;
     this->conservativeScore = conservativeScore;
     this->isInPositive = isInPositive;

@@ -21,33 +21,35 @@ int main(int argc, char** argv) {
 
     Box* initBox = sequence->initBox;
     vector<Box*> boxList = { initBox };
-    printf("INIT >>> %s\n", initBox->toCharArr());
+
     ofstream outputFile;
     outputFile.open (sequence->outputFile);
-    printf("mc1000\n");
+
     TLD* tld = new TLD(firstFrame, boxList);
     boxList = tld->init();
-    printf("mc2000\n");
+    tld->detector->dumpDetector();
 
-    int frameNo = 1;
+    int frameNo = 0;
     Frame* previous = firstFrame;
     printf("Started to run for %s\n", key.c_str());
 
     while (sequence->hasNext()) {
+        printf("Frame(%d) >> Frame(%d)\n", frameNo, frameNo + 1);
         Frame* current = sequence->next();
         frameNo += 1;
 
         boxList = tld->track(previous, current, boxList);
         Box* box = boxList[0];
-        ImageBuilder* builder = new ImageBuilder(current);
+        // ImageBuilder* builder = new ImageBuilder(current);
         if (box != nullptr) {
-            builder->withBox(box);
-            builder->display(1);
+            // printf("FINAL >>> %s\n", box->toCharArr());
+            // builder->withBox(box);
+            // builder->display(1);
             // outputFile << box->toString() << "\n";
         } else {
             // outputFile << "Box(nan, nan, nan, nan)";
         }
-        builder->display(1);
+        // builder->display(1);
         previous = current;
     }
 

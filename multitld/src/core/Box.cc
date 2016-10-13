@@ -2,7 +2,7 @@
 
 Option<Box>* Box::None = new Option<Box>();
 
-Box::Box(int id, float x1, float y1, float x2, float y2) {
+Box::Box(int id, double x1, double y1, double x2, double y2) {
     this->id = id;
 
     this->x1 = x1;
@@ -12,6 +12,7 @@ Box::Box(int id, float x1, float y1, float x2, float y2) {
     this->y2 = y2;
     this->width = x2 - x1 + 1;
     this->height = y2 - y1 + 1;
+    // this->isValid = false;
 }
 
 Box* Box::move(float dx, float dy) {
@@ -42,6 +43,8 @@ Box* Box::sum(Box* other) {
 }
 
 Box* Box::divide(int n) {
+    printf("X1: %g, Y1: %g, X2: %g, Y2: %g / %d\n", this->x1, this->y1, this->x2, this->y1, n);
+
     this->x1 = this->x1 / n;
     this->x2 = this->x2 / n;
     this->y1 = this->y1 / n;

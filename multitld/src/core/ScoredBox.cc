@@ -70,6 +70,7 @@ vector<int> ScoredBox::getCandidateModels() {
 bool ScoredBox::isClassified(string classifierKey, int modelId) {
     Score* score = getScore(classifierKey);
     if (score == NULL) {
+        printf("There is no score for %s\n", classifierKey.c_str());
         return false;
     } else {
         vector<int> classifiedModelIds = score->classifiedModelIds;

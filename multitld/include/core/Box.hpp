@@ -22,10 +22,10 @@ class Box {
 public:
     int id;
 
-    float x1;
-    float y1;
-    float x2;
-    float y2;
+    double x1;
+    double y1;
+    double x2;
+    double y2;
 
     float width;
     float height;
@@ -34,10 +34,12 @@ public:
     float variance;
     float overlap;
 
+    double mockedScore;
+
     int nrOfPoints;
     int scaleNo;
 
-    Box(int id, float x1, float y1, float x2, float y2);
+    Box(int id, double x1, double y1, double x2, double y2);
     Box* move(float dx, float dy);
 
     Box* sum(Box* other);

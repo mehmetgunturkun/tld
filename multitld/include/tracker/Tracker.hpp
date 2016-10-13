@@ -17,7 +17,7 @@ private:
     int MARGIN;
     TermCriteria* TERM_CRITERIA = new TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, 20, 0.03);
     Size* WIN_SIZE = new Size(4, 4);
-    float computeStep(float start, float end, int pointCount);
+    double computeStep(double start, double end, int pointCount);
 public:
     Tracker();
     vector<tld::Point*> decomposePoints(vector<Box*> boxList, int nrOfBoxes);

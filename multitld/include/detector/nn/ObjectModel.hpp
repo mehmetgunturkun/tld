@@ -8,12 +8,12 @@ using namespace std;
 
 class ObjectScore {
 public:
-    float relativeScore;
-    float conservativeScore;
+    double relativeScore;
+    double conservativeScore;
     bool isInNegative;
     bool isInPositive;
 
-    ObjectScore(float relativeScore, float conservativeScore, bool isInPositive, bool isInNegative);
+    ObjectScore(double relativeScore, double conservativeScore, bool isInPositive, bool isInNegative);
 };
 
 class ObjectModel {
@@ -31,7 +31,6 @@ public:
     double computeNegativeSimilarity(Patch* sample);
     double computeNearestSimilarity(vector<Patch*> templatePatchList, int size, Patch* sample);
     double computeSimilarity(Patch* templatePatch, Patch* samplePatch);
-
 
     double computeRelativeScore(Patch* sample);
     double computeConservativeScore(Patch* sample);

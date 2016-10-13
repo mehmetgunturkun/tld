@@ -19,6 +19,7 @@ int main(int argc, char** argv) {
     vector<Box*> boxList = { initBox };
 
     ofstream outputFile;
+    
     outputFile.open (sequence->outputFile);
 
     TLD* tld = new TLD(firstFrame, boxList);

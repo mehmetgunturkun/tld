@@ -14,7 +14,7 @@ Frame::Frame(string fileName) {
 
         Mat* grayscaleForGaussian = new Mat(grayscale->clone());
         gaussian = Gaussian::blur(grayscaleForGaussian, 2.0);
-        free(grayscaleForGaussian);
+        // free(grayscaleForGaussian);
 
         flowPyramid = Image::pyramid(grayscale, Size(4, 4), 2, true);
     } else {
@@ -24,7 +24,7 @@ Frame::Frame(string fileName) {
 
         Mat* grayscaleForGaussian = Image::bgr2gray(colored);
         gaussian = Gaussian::blur(grayscaleForGaussian, 2.0);
-        free(grayscaleForGaussian);
+        // free(grayscaleForGaussian);
 
         flowPyramid = Image::pyramid(grayscale, Size(4, 4), 2, true);
     }

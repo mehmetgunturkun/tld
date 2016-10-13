@@ -14,8 +14,10 @@ public:
     int height;
 
     Mat* displayImg;
+    Mat* colored2;
     Mat* grayscale;
     Mat* gaussian;
+    
     IntegralImage* integral;
     vector<Mat> flowPyramid;
 

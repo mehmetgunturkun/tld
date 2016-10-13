@@ -43,21 +43,18 @@ Rect* toRect(Frame* frame, Box* box) {
 Patch::Patch(Frame* frame, Box* box) {
     //TODO Review if we can do with memcpy?
     Rect* rect = toRect(frame, box);
-    Mat* patch = new Mat(*(frame->grayscale), *rect);
-    Mat* normalizedTmpPatch = new Mat(Patch::HEIGHT, Patch::WIDTH, CV_8U, 0.0);
+    Mat patch = Mat(*(frame->grayscale), *rect);
+    Mat normalizedTmpPatch = Mat(Patch::HEIGHT, Patch::WIDTH, CV_8U, 0.0);
     Mat* normalizedPatch = new Mat(Patch::HEIGHT, Patch::WIDTH, CV_64F, 0.0);
-    cv::resize(*patch, *normalizedTmpPatch, normalizedPatch->size(), INTER_LINEAR);
+    cv::resize(patch, normalizedTmpPatch, normalizedTmpPatch.size(), INTER_LINEAR);
 
-    Scalar tempVal = cv::mean(*normalizedTmpPatch);
+    Scalar tempVal = cv::mean(normalizedTmpPatch);
     double meanNorm = (double) tempVal[0];
     for (int i = 0 ; i < Patch::HEIGHT; i++) {
         for (int j = 0 ; j < Patch::WIDTH; j++) {
-            double diff = (double) normalizedTmpPatch->at<uchar>(i,j) - meanNorm;
+            double diff = (double) normalizedTmpPatch.at<uchar>(i,j) - meanNorm;
             normalizedPatch->at<double>(i,j) =(double) diff;
         }
     }
-    free(rect);
-    free(patch);
-    free(normalizedTmpPatch);
     data = normalizedPatch;
 }

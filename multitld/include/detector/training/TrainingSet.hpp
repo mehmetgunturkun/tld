@@ -34,8 +34,11 @@ public:
     int nrOfSamples;
     int nrOfBootstrap;
 
-    TrainingSet(Frame* f, vector<Type*> p, vector<Type*> n, int nrOfBootstrap = 1) {
+    bool shouldShuffle;
+
+    TrainingSet(Frame* f, vector<Type*> p, vector<Type*> n, int nrOfBootstrap = 1, bool shuffle = false) {
         construct(f, p, n, nrOfBootstrap);
+        this->shouldShuffle = shuffle;
     }
 
     void construct(Frame* f, vector<Type*> p, vector<Type*> n, int nrOfBootstrap = 1) {
@@ -48,6 +51,31 @@ public:
 
         this->nrOfSamples = nrOfPositiveSamples + nrOfNegativeSamples;
         this->nrOfBootstrap = nrOfBootstrap;
+    }
+
+    vector<Labelled<Type>*> getSamples() {
+        if (shouldShuffle == true) {
+            return getShuffledSamples();
+        } else {
+            return getAllSamples();
+        }
+    }
+
+    vector<Labelled<Type>*> getAllSamples() {
+        vector<Labelled<Type>*> labelledSamples;
+
+        for (int i = 0; i < nrOfPositiveSamples; i++) {
+            Type* sample = positiveSamples[i];
+            Labelled<Type>* positiveSample = new Labelled<Type>(frame, sample, 1);
+            labelledSamples.push_back(positiveSample);
+        }
+
+        for (int i = 0; i < nrOfNegativeSamples; i++) {
+            Type* sample = negativeSamples[i];
+            Labelled<Type>* negativeSample = new Labelled<Type>(frame, sample, 0);
+            labelledSamples.push_back(negativeSample);
+        }
+        return labelledSamples;
     }
 
     vector<Labelled<Type>*> getShuffledSamples() {

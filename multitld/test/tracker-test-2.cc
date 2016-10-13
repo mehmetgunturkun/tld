@@ -112,16 +112,16 @@ int main(int argc, char** argv) {
         new tld::Point(134.551, 148.054)
     };
 
-    vector<tld::Point*> newPointList = tracker->lkTrack(frame1, frame2, pointList);
-
-    cout << "------------------\n";
-    for (int i = 0; i < pointList.size(); i++) {
-        tld::Point* p1 = pointList[i];
-        tld::Point* p2 = newPointList[i];
-        cout << p1->toString() << "\n";
-        cout << p2->toString() << "\n";
-        cout << "------------------\n";
-    }
+    // vector<tld::Point*> newPointList = tracker->lkTrack(frame1, frame2, pointList);
+    //
+    // cout << "------------------\n";
+    // for (int i = 0; i < pointList.size(); i++) {
+    //     tld::Point* p1 = pointList[i];
+    //     tld::Point* p2 = newPointList[i];
+    //     cout << p1->toString() << "\n";
+    //     cout << p2->toString() << "\n";
+    //     cout << "------------------\n";
+    // }
 
     return EXIT_SUCCESS;
 }

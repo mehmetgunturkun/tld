@@ -10,6 +10,9 @@ class Gaussian {
 public:
     static Mat flip(Mat M) {
         Mat result = Mat();
+        /*
+            http://docs.opencv.org/2.4/modules/core/doc/operations_on_arrays.html#void flip(InputArray src, OutputArray dst, int flipCode)
+        */
         cv::flip(M, result, -1);
         return result;
     }

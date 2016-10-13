@@ -6,7 +6,7 @@ CC := gcc
 CXX := g++
 AR := ar
 
-OPENCV_CFLAGS := `pkg-config opencv--cflags`
+OPENCV_CFLAGS := `pkg-config opencv --cflags`
 OPENCV_LIBS := `pkg-config opencv --libs`
 # -L/usr/local/cuda/lib64
 #LAPACK_LIBS := ./lapack_LINUX.a ./blas_LINUX.a ./libf2c.a
@@ -27,7 +27,7 @@ lib2_sources := \
 	src/core/Box.cc \
 	src/core/Point.cc \
 	src/tracker/FBPoint.cc \
-	src/tracker/Tracker.cc \
+	src/tracker/MockedTracker.cc \
 	src/testbase/Sequence.cc \
 	src/core/Score.cc \
 	src/core/ScoredBox.cc \
@@ -78,7 +78,7 @@ $(lib2_target) : $(lib2_objects) Makefile
 	@echo ----------------------------------------
 
 $(tool2_targets): $(test_target)/%-app: test/%.o $(lib2_target) Makefile
-	$(CXX) $(CXXFLAGS) $< $(lib2_target) libjsoncpp.a $(lib_target) $(LDFLAGS) -o $@
+	$(CXX) $(CXXFLAGS) $(OPENCV_CFLAGS) $< $(lib2_target) libjsoncpp.a $(lib_target) -Bstatic $(LDFLAGS) -o $@
 	@echo ----------------------------------------
 	@echo ... Built $@ ...
 	@echo ----------------------------------------

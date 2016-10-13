@@ -10,10 +10,10 @@ public:
     tld::Point* to;
     tld::Point* backwardPoint;
 
-    float fbError;
-    float ncc;
-    float dx;
-    float dy;
+    double fbError;
+    double ncc;
+    double dx;
+    double dy;
 
     FBPoint();
     FBPoint(tld::Point* src, tld::Point* to, tld::Point* bwPoint);

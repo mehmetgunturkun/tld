@@ -11,16 +11,16 @@ using namespace std;
 class NNScore: public Score {
 public:
     Patch* patch;
-    vector<float> relativeScores;
-    vector<float> conservativeScores;
+    vector<double> relativeScores;
+    vector<double> conservativeScores;
 
     NNScore();
     NNScore(Patch* patch);
-    NNScore(Patch* patch, vector<float> relativeScores, vector<float> conservativeScores);
+    NNScore(Patch* patch, vector<double> relativeScores, vector<double> conservativeScores);
 
     Score* sum(Score* other);
     Score* divide(int n);
     Score* clone();
-    float getValue(int modelId);
+    double getValue(int modelId);
 };
 #endif

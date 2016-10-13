@@ -1,121 +1,127 @@
-#include "common/Colors.hpp"
-#include "tracker/Tracker.hpp"
+#include <stdlib.h>
+#include <vector>
 
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/video/tracking.hpp"
 
-class SamplePoint {
-public:
-    double x;
-    double y;
-    SamplePoint(double x, double y) {
-        this->x = x;
-        this->y = y;
-    }
-};
+using namespace std;
+using namespace cv;
+
+#define COLOR_BOLD    "\x1b[1m"
+
+#define COLOR_GREEN   "\x1b[32m"
+#define COLOR_RED     "\x1b[31m"
+#define COLOR_YELLOW  "\x1b[33m"
+#define COLOR_CYAN    "\x1b[36m"
+#define COLOR_WHITE   "\x1b[37m"
+
+#define COLOR_RESET   "\x1b[0m"
+
 
 int main(int argc, char** args) {
 
-    vector<SamplePoint*> points = {
-        new SamplePoint(146, 130),
-        new SamplePoint(154.889, 130),
-        new SamplePoint(163.778, 130),
-        new SamplePoint(172.667, 130),
-        new SamplePoint(181.556, 130),
-        new SamplePoint(190.444, 130),
-        new SamplePoint(199.333, 130),
-        new SamplePoint(208.222, 130),
-        new SamplePoint(217.111, 130),
-        new SamplePoint(226, 130),
-        new SamplePoint(146, 132.222),
-        new SamplePoint(154.889, 132.222),
-        new SamplePoint(163.778, 132.222),
-        new SamplePoint(172.667, 132.222),
-        new SamplePoint(181.556, 132.222),
-        new SamplePoint(190.444, 132.222),
-        new SamplePoint(199.333, 132.222),
-        new SamplePoint(208.222, 132.222),
-        new SamplePoint(217.111, 132.222),
-        new SamplePoint(226, 132.222),
-        new SamplePoint(146, 135.444),
-        new SamplePoint(154.889, 135.444),
-        new SamplePoint(163.778, 135.444),
-        new SamplePoint(172.667, 135.444),
-        new SamplePoint(181.556, 135.444),
-        new SamplePoint(190.444, 135.444),
-        new SamplePoint(199.333, 135.444),
-        new SamplePoint(208.222, 135.444),
-        new SamplePoint(217.111, 135.444),
-        new SamplePoint(226, 135.444),
-        new SamplePoint(146, 138.667),
-        new SamplePoint(154.889, 138.667),
-        new SamplePoint(163.778, 138.667),
-        new SamplePoint(172.667, 138.667),
-        new SamplePoint(181.556, 138.667),
-        new SamplePoint(190.444, 138.667),
-        new SamplePoint(199.333, 138.667),
-        new SamplePoint(208.222, 138.667),
-        new SamplePoint(217.111, 138.667),
-        new SamplePoint(226, 138.667),
-        new SamplePoint(146, 141.889),
-        new SamplePoint(154.889, 141.889),
-        new SamplePoint(163.778, 141.889),
-        new SamplePoint(172.667, 141.889),
-        new SamplePoint(181.556, 141.889),
-        new SamplePoint(190.444, 141.889),
-        new SamplePoint(199.333, 141.889),
-        new SamplePoint(208.222, 141.889),
-        new SamplePoint(217.111, 141.889),
-        new SamplePoint(226, 141.889),
-        new SamplePoint(146, 145.111),
-        new SamplePoint(154.889, 145.111),
-        new SamplePoint(163.778, 145.111),
-        new SamplePoint(172.667, 145.111),
-        new SamplePoint(181.556, 145.111),
-        new SamplePoint(190.444, 145.111),
-        new SamplePoint(199.333, 145.111),
-        new SamplePoint(208.222, 145.111),
-        new SamplePoint(217.111, 145.111),
-        new SamplePoint(226, 145.111),
-        new SamplePoint(146, 148.333),
-        new SamplePoint(154.889, 148.333),
-        new SamplePoint(163.778, 148.333),
-        new SamplePoint(172.667, 148.333),
-        new SamplePoint(181.556, 148.333),
-        new SamplePoint(190.444, 148.333),
-        new SamplePoint(199.333, 148.333),
-        new SamplePoint(208.222, 148.333),
-        new SamplePoint(217.111, 148.333),
-        new SamplePoint(226, 148.333),
-        new SamplePoint(146, 151.556),
-        new SamplePoint(154.889, 151.556),
-        new SamplePoint(163.778, 151.556),
-        new SamplePoint(172.667, 151.556),
-        new SamplePoint(181.556, 151.556),
-        new SamplePoint(190.444, 151.556),
-        new SamplePoint(199.333, 151.556),
-        new SamplePoint(208.222, 151.556),
-        new SamplePoint(217.111, 151.556),
-        new SamplePoint(226, 151.556),
-        new SamplePoint(146, 154.778),
-        new SamplePoint(154.889, 154.778),
-        new SamplePoint(163.778, 154.778),
-        new SamplePoint(172.667, 154.778),
-        new SamplePoint(181.556, 154.778),
-        new SamplePoint(190.444, 154.778),
-        new SamplePoint(199.333, 154.778),
-        new SamplePoint(208.222, 154.778),
-        new SamplePoint(217.111, 154.778),
-        new SamplePoint(226, 154.778),
-        new SamplePoint(146, 158),
-        new SamplePoint(154.889, 158),
-        new SamplePoint(163.778, 158),
-        new SamplePoint(172.667, 158),
-        new SamplePoint(181.556, 158),
-        new SamplePoint(190.444, 158),
-        new SamplePoint(199.333, 158),
-        new SamplePoint(208.222, 158),
-        new SamplePoint(217.111, 158),
-        new SamplePoint(226, 158)
-    };
+    vector<Point2f> points;
+    points.push_back(Point2f(146.000000, 130.000000));
+    points.push_back(Point2f(146.000000, 133.222229));
+    points.push_back(Point2f(146.000000, 136.444443));
+    points.push_back(Point2f(146.000000, 139.666672));
+    points.push_back(Point2f(146.000000, 142.888885));
+    points.push_back(Point2f(146.000000, 146.111115));
+    points.push_back(Point2f(146.000000, 149.333328));
+    points.push_back(Point2f(146.000000, 152.555557));
+    points.push_back(Point2f(146.000000, 155.777771));
+    points.push_back(Point2f(146.000000, 159.000000));
+    points.push_back(Point2f(154.888885, 130.000000));
+    points.push_back(Point2f(154.888885, 133.222229));
+    points.push_back(Point2f(154.888885, 136.444443));
+    points.push_back(Point2f(154.888885, 139.666672));
+    points.push_back(Point2f(154.888885, 142.888885));
+    points.push_back(Point2f(154.888885, 146.111115));
+    points.push_back(Point2f(154.888885, 149.333328));
+    points.push_back(Point2f(154.888885, 152.555557));
+    points.push_back(Point2f(154.888885, 155.777771));
+    points.push_back(Point2f(154.888885, 159.000000));
+    points.push_back(Point2f(163.777771, 130.000000));
+    points.push_back(Point2f(163.777771, 133.222229));
+    points.push_back(Point2f(163.777771, 136.444443));
+    points.push_back(Point2f(163.777771, 139.666672));
+    points.push_back(Point2f(163.777771, 142.888885));
+    points.push_back(Point2f(163.777771, 146.111115));
+    points.push_back(Point2f(163.777771, 149.333328));
+    points.push_back(Point2f(163.777771, 152.555557));
+    points.push_back(Point2f(163.777771, 155.777771));
+    points.push_back(Point2f(163.777771, 159.000000));
+    points.push_back(Point2f(172.666672, 130.000000));
+    points.push_back(Point2f(172.666672, 133.222229));
+    points.push_back(Point2f(172.666672, 136.444443));
+    points.push_back(Point2f(172.666672, 139.666672));
+    points.push_back(Point2f(172.666672, 142.888885));
+    points.push_back(Point2f(172.666672, 146.111115));
+    points.push_back(Point2f(172.666672, 149.333328));
+    points.push_back(Point2f(172.666672, 152.555557));
+    points.push_back(Point2f(172.666672, 155.777771));
+    points.push_back(Point2f(172.666672, 159.000000));
+    points.push_back(Point2f(181.555557, 130.000000));
+    points.push_back(Point2f(181.555557, 133.222229));
+    points.push_back(Point2f(181.555557, 136.444443));
+    points.push_back(Point2f(181.555557, 139.666672));
+    points.push_back(Point2f(181.555557, 142.888885));
+    points.push_back(Point2f(181.555557, 146.111115));
+    points.push_back(Point2f(181.555557, 149.333328));
+    points.push_back(Point2f(181.555557, 152.555557));
+    points.push_back(Point2f(181.555557, 155.777771));
+    points.push_back(Point2f(181.555557, 159.000000));
+    points.push_back(Point2f(190.444443, 130.000000));
+    points.push_back(Point2f(190.444443, 133.222229));
+    points.push_back(Point2f(190.444443, 136.444443));
+    points.push_back(Point2f(190.444443, 139.666672));
+    points.push_back(Point2f(190.444443, 142.888885));
+    points.push_back(Point2f(190.444443, 146.111115));
+    points.push_back(Point2f(190.444443, 149.333328));
+    points.push_back(Point2f(190.444443, 152.555557));
+    points.push_back(Point2f(190.444443, 155.777771));
+    points.push_back(Point2f(190.444443, 159.000000));
+    points.push_back(Point2f(199.333328, 130.000000));
+    points.push_back(Point2f(199.333328, 133.222229));
+    points.push_back(Point2f(199.333328, 136.444443));
+    points.push_back(Point2f(199.333328, 139.666672));
+    points.push_back(Point2f(199.333328, 142.888885));
+    points.push_back(Point2f(199.333328, 146.111115));
+    points.push_back(Point2f(199.333328, 149.333328));
+    points.push_back(Point2f(199.333328, 152.555557));
+    points.push_back(Point2f(199.333328, 155.777771));
+    points.push_back(Point2f(199.333328, 159.000000));
+    points.push_back(Point2f(208.222229, 130.000000));
+    points.push_back(Point2f(208.222229, 133.222229));
+    points.push_back(Point2f(208.222229, 136.444443));
+    points.push_back(Point2f(208.222229, 139.666672));
+    points.push_back(Point2f(208.222229, 142.888885));
+    points.push_back(Point2f(208.222229, 146.111115));
+    points.push_back(Point2f(208.222229, 149.333328));
+    points.push_back(Point2f(208.222229, 152.555557));
+    points.push_back(Point2f(208.222229, 155.777771));
+    points.push_back(Point2f(208.222229, 159.000000));
+    points.push_back(Point2f(217.111115, 130.000000));
+    points.push_back(Point2f(217.111115, 133.222229));
+    points.push_back(Point2f(217.111115, 136.444443));
+    points.push_back(Point2f(217.111115, 139.666672));
+    points.push_back(Point2f(217.111115, 142.888885));
+    points.push_back(Point2f(217.111115, 146.111115));
+    points.push_back(Point2f(217.111115, 149.333328));
+    points.push_back(Point2f(217.111115, 152.555557));
+    points.push_back(Point2f(217.111115, 155.777771));
+    points.push_back(Point2f(217.111115, 159.000000));
+    points.push_back(Point2f(226.000000, 130.000000));
+    points.push_back(Point2f(226.000000, 133.222229));
+    points.push_back(Point2f(226.000000, 136.444443));
+    points.push_back(Point2f(226.000000, 139.666672));
+    points.push_back(Point2f(226.000000, 142.888885));
+    points.push_back(Point2f(226.000000, 146.111115));
+    points.push_back(Point2f(226.000000, 149.333328));
+    points.push_back(Point2f(226.000000, 152.555557));
+    points.push_back(Point2f(226.000000, 155.777771));
+    points.push_back(Point2f(226.000000, 159.000000));
 
     int nPts = (int) points.size();
     int win_size = 4;
@@ -125,9 +131,13 @@ int main(int argc, char** args) {
     CvSize imageSize = cvSize(320, 240);
 
     IplImage* firstFrame = cvLoadImage("/Users/mehmetgunturkun/MasterThesis/resources/tld/car/sequence/00001.jpg", CV_LOAD_IMAGE_COLOR);
+    IplImage* firstFrameGray = cvCreateImage( imageSize, 8, 1 );
+    // cvCvtColor(firstFrameGray, firstFrame, CV_BGR2GRAY);
     IplImage* firstPyramid = cvCreateImage( imageSize, 8, 1 );
 
     IplImage* secondFrame = cvLoadImage("/Users/mehmetgunturkun/MasterThesis/resources/tld/car/sequence/00002.jpg", CV_LOAD_IMAGE_COLOR);
+    IplImage* secondFrameGray = cvCreateImage( imageSize, 8, 1 );
+    // IplImage* secondFrameGray = cvCvtColor(firstFrame, CV_LOAD_IMAGE_GRAYSCALE);
     IplImage* secondPyramid = cvCreateImage( imageSize, 8, 1 );
 
     CvPoint2D32f* fromPoints = (CvPoint2D32f*)cvAlloc(nPts*sizeof(CvPoint2D32f));
@@ -136,17 +146,17 @@ int main(int argc, char** args) {
     int Level = 5;
 
     for (int i = 0; i < nPts; i++) {
-        SamplePoint* p = points[i];
-        fromPoints[i].x = p->x;    
-        fromPoints[i].y = p->y;
+        Point2f p = points[i];
+        fromPoints[i].x = p.x;
+        fromPoints[i].y = p.y;
 
-        toPoints[i].x = p->x;
-        toPoints[i].y = p->y;
+        toPoints[i].x = p.x;
+        toPoints[i].y = p.y;
     }
 
     cvCalcOpticalFlowPyrLK(
-        firstFrame,
-        secondFrame,
+        firstFrameGray,
+        secondFrameGray,
         firstPyramid,
         secondPyramid,
         fromPoints,

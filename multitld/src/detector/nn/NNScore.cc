@@ -1,6 +1,6 @@
 #include "detector/nn/NNScore.hpp"
 
-NNScore::NNScore(Patch* patch, vector<float> relativeScores, vector<float> conservativeScores) {
+NNScore::NNScore(Patch* patch, vector<double> relativeScores, vector<double> conservativeScores) {
     this->patch = patch;
     this->relativeScores = relativeScores;
     this->conservativeScores = conservativeScores;
@@ -48,6 +48,6 @@ Score* NNScore::divide(int n) {
     return this;
 }
 
-float NNScore::getValue(int modelId) {
+double NNScore::getValue(int modelId) {
     return conservativeScores[modelId];
 }

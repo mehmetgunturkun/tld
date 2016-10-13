@@ -3,10 +3,6 @@
 
 #include "opencv2/imgproc/imgproc.hpp"
 
-// #define ANSI_COLOR_GREEN   "\x1b[32m"
-// #define ANSI_COLOR_RED     "\x1b[31m"
-// #define ANSI_COLOR_YELLOW  "\x1b[33m"
-
 #define COLOR_BOLD    "\x1b[1m"
 
 #define COLOR_GREEN   "\x1b[32m"
