@@ -14,8 +14,10 @@ void NearestNeighborClassifier::init(Frame* firstFrame, vector<Box*> boxList) {
 bool NearestNeighborClassifier::classify(Frame* frame, ScoredBox* scoredBox) {
     Box* box = scoredBox->box;
     Patch* patch = new Patch(frame, box);
-    vector<float> relativeScores(nrOfModels);
-    vector<float> conservativeScores(nrOfModels);
+
+    vector<double> relativeScores(nrOfModels);
+    vector<double> conservativeScores(nrOfModels);
+
     for (int i = 0;  i < nrOfModels; i++) {
         ObjectModel* objectModel = models[i];
         ObjectScore* objectScore = objectModel->computeScore(patch);
@@ -27,7 +29,7 @@ bool NearestNeighborClassifier::classify(Frame* frame, ScoredBox* scoredBox) {
     bool anyModelClassified = false;
     vector<int> classifiedModelIds;
     for (int j = 0; j < nrOfModels; j++) {
-        float score = relativeScores[j];
+        double score = relativeScores[j];
         if (score > POSITIVE_SCORE_THRESHOLD) {
             anyModelClassified = true;
             classifiedModelIds.push_back(j);
@@ -45,12 +47,12 @@ bool NearestNeighborClassifier::classify(Frame* frame, ScoredBox* scoredBox) {
 bool NearestNeighborClassifier::validate(Frame* frame, ScoredBox* scoredBox, int modelId) {
     Box* box = scoredBox->box;
     Patch* patch = new Patch(frame, box);
-    vector<float> relativeScores(nrOfModels);
-    vector<float> conservativeScores(nrOfModels);
+    vector<double> relativeScores(nrOfModels);
+    vector<double> conservativeScores(nrOfModels);
 
     ObjectModel* objectModel = models[modelId];
     ObjectScore* objectScore = objectModel->computeScore(patch);
-    float conservativeScore = objectScore->conservativeScore;
+    double conservativeScore = objectScore->conservativeScore;
 
     relativeScores[modelId] = objectScore->relativeScore;
     conservativeScores[modelId] = conservativeScore;
@@ -101,7 +103,7 @@ void NearestNeighborClassifier::train(TrainingSet<ScoredBox> ts, int modelId) {
         Patch* patch = nnScore->patch;
         ObjectScore* objectScore = model->computeScore(patch);
 
-        float relativeScore = objectScore->relativeScore;
+        double relativeScore = objectScore->relativeScore;
         bool isInPositive = objectScore->isInPositive;
 
         // Frame* frame = ts.frame;

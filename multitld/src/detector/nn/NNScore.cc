@@ -1,6 +1,6 @@
 #include "detector/nn/NNScore.hpp"
 
-NNScore::NNScore(Patch* patch, vector<float> relativeScores, vector<float> conservativeScores) {
+NNScore::NNScore(Patch* patch, vector<double> relativeScores, vector<double> conservativeScores) {
     this->patch = patch;
     this->relativeScores = relativeScores;
     this->conservativeScores = conservativeScores;
@@ -27,12 +27,12 @@ Score* NNScore::sum(Score* other) {
     NNScore* newNNScore = (NNScore*) this->clone();
 
     for (int i = 0; i < TLDConfig::nrOfModels; i++) {
-        float thisRelativeScore = relativeScores[i];
-        float otherRelativeScore = otherNNScore->relativeScores[i];
+        double thisRelativeScore = relativeScores[i];
+        double otherRelativeScore = otherNNScore->relativeScores[i];
         newNNScore->relativeScores[i] = thisRelativeScore + otherRelativeScore;
 
-        float thisConervativeScore = conservativeScores[i];
-        float otherConservativeScore = otherNNScore->conservativeScores[i];
+        double thisConervativeScore = conservativeScores[i];
+        double otherConservativeScore = otherNNScore->conservativeScores[i];
         newNNScore->conservativeScores[i] = thisConervativeScore + otherConservativeScore;
     }
 
@@ -49,5 +49,5 @@ Score* NNScore::divide(int n) {
 }
 
 double NNScore::getValue(int modelId) {
-    return (double) conservativeScores[modelId];
+    return conservativeScores[modelId];
 }

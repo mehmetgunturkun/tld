@@ -193,7 +193,7 @@ void Detector::learn(Frame* current, Box* box, vector<ScoredBox*> grids, int mod
         }
 
         EnsembleScore* ensembleScore = (EnsembleScore*) sample->getScore("ensemble");
-        float confidence = ensembleScore->scores[modelId];
+        double confidence = ensembleScore->scores[modelId];
         if (isNegative(sample->box) && confidence >= 1.0) {
             nrOfNegativeEC += 1;
             score(current, sample);

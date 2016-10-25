@@ -20,7 +20,7 @@ class NearestNeighborClassifier {
 private:
     int nrOfModels;
     vector<ObjectModel*> models;
-    float POSITIVE_SCORE_THRESHOLD;
+    double POSITIVE_SCORE_THRESHOLD;
 public:
     NearestNeighborClassifier();
     void init(Frame* firstFrame, vector<Box*> boxList);
