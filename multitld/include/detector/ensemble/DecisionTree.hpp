@@ -9,8 +9,10 @@ private:
     vector<Branch*> tree;
 public:
     DecisionTree(int nrOfModels);
-    vector<float> getProbabilities(int binaryCode);
-    float getProbability(int binaryCode, int modelId);
+
+    double getProbability(int binaryCode, int modelId);
+    vector<double> getProbabilities(int binaryCode);
+
     void update(int binaryCode, int modelId, bool label);
     void dumpDecisionTree();
 };

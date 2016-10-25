@@ -9,8 +9,8 @@ Branch::Branch(int nrOfModels) {
     }
 }
 
-vector<float> Branch::getProbabilities() {
-    vector<float> probabilities(nrOfLeaves);
+vector<double> Branch::getProbabilities() {
+    vector<double> probabilities(nrOfLeaves);
     for (int i = 0; i < nrOfLeaves; i++) {
         Leaf* leaf = branch[i];
         probabilities[i] = leaf->probability;
@@ -18,9 +18,9 @@ vector<float> Branch::getProbabilities() {
     return probabilities;
 }
 
-float Branch::getProbability(int modelId) {
+double Branch::getProbability(int modelId) {
     Leaf* leaf = branch[modelId];
-    float probability = leaf->probability;
+    double probability = leaf->probability;
     return probability;
 }
 

@@ -5,7 +5,7 @@
 
 class EnsembleScore: public Score {
 public:
-    vector<float> scores;
+    vector<double> scores;
     vector<int> binaryCodes;
     bool isMerged;
 
@@ -15,7 +15,7 @@ public:
         binaryCodes.resize(nrOfBaseClassifiers);
     }
 
-    EnsembleScore(vector<float> scores) {
+    EnsembleScore(vector<double> scores) {
         isMerged = true;
         this->scores = scores;
     }
@@ -49,11 +49,11 @@ public:
     }
 
     double getProbability(int modelId) {
-        return (double) scores[modelId];
+        return scores[modelId];
     }
 
     double getValue(int modelId) {
-        return (double) scores[modelId];
+        return scores[modelId];
     }
 };
 

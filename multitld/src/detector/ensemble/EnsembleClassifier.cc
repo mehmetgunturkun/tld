@@ -19,7 +19,6 @@ EnsembleClassifier::EnsembleClassifier() {
 }
 
 void EnsembleClassifier::init(Frame* firstFrame, vector<Box*> boxList) {
-    // do nothing for now
     this->nrOfModels = (int) boxList.size();
     this->baseClassifiers = generateBaseClassifier();
 }
@@ -76,16 +75,6 @@ vector<Point2f*> shiftPoints(vector<Point2f*> points, int size, int direction) {
     }
     return shiftedPoints;
 }
-
-// vector<Point2f*> shiftPoints(vector<Point2f*> points, int size, double x, double y) {
-//     vector<Point2f*> shiftedPoints;
-//     for (int i = 0; i < size; i++) {
-//         Point2f* point = points[i];
-//         Point2f* shiftedPoint = shift(point, x, y);
-//         shiftedPoints.push_back(shiftedPoint);
-//     }
-//     return shiftedPoints;
-// }
 
 vector<PixelComparison*> EnsembleClassifier::produceAllComparisons() {
     vector<Point2f*> fromList;
@@ -186,7 +175,6 @@ vector<PixelComparison*> EnsembleClassifier::produceAllComparisons() {
 }
 
 vector<BaseClassifier*> EnsembleClassifier::shuffleComparisons(vector<PixelComparison*> allComparisons) {
-    int nrOfComparisons = (int) allComparisons.size();
     allComparisons = Random::randomSample(allComparisons);
 
     vector<BaseClassifier*> classifiers;
@@ -203,11 +191,11 @@ vector<BaseClassifier*> EnsembleClassifier::shuffleComparisons(vector<PixelCompa
 }
 
 bool EnsembleClassifier::classify(Frame* frame, ScoredBox* scoredBox) {
-    vector<float> scores(nrOfModels);
+    vector<double> scores(nrOfModels);
     EnsembleScore* score = new EnsembleScore(nrOfModels, nrOfBaseClassifiers);
     for (int i = 0; i < nrOfBaseClassifiers; i++) {
         BaseClassifier* bc = baseClassifiers[i];
-        vector<float> bcScores = bc->score(frame, scoredBox->box, score);
+        vector<double> bcScores = bc->score(frame, scoredBox->box, score);
 
         for (int j = 0; j < nrOfModels; j++) {
             scores[j] += bcScores[j];
@@ -217,7 +205,7 @@ bool EnsembleClassifier::classify(Frame* frame, ScoredBox* scoredBox) {
     bool anyModelClassified = false;
     vector<int> classifiedModelIds;
     for (int j = 0; j < nrOfModels; j++) {
-        float score = scores[j];
+        double score = scores[j];
         if (score > POSITIVE_SCORE_THRESHOLD) {
             anyModelClassified = true;
             classifiedModelIds.push_back(j);
@@ -260,7 +248,7 @@ void EnsembleClassifier::train(TrainingSet<ScoredBox> ts, int modelId) {
             ScoredBox* scoredBox = sample->item;
             int label = sample->label;
 
-            float probability = getProbability(scoredBox, modelId);
+            double probability = getProbability(scoredBox, modelId);
 
             // ImageBuilder* builder = new ImageBuilder(frame);
             // printf("EC >> Prob(%d): %f\n", label, probability);
@@ -276,11 +264,10 @@ void EnsembleClassifier::train(TrainingSet<ScoredBox> ts, int modelId) {
             }
         }
     }
-    // printf("EC >> %lu samples were processed for training\n", samples.size());
 }
 
-float EnsembleClassifier::getProbability(ScoredBox* scoredBox, int modelId) {
-    float probability = 0.0f;
+double EnsembleClassifier::getProbability(ScoredBox* scoredBox, int modelId) {
+    double probability = 0.0f;
     for (int i = 0; i < nrOfBaseClassifiers; i++) {
         BaseClassifier* bc = baseClassifiers[i];
         probability += bc->getProbability(scoredBox, modelId);

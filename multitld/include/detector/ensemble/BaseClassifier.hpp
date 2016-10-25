@@ -17,9 +17,11 @@ public:
     int id;
     BaseClassifier(int i, vector<PixelComparison*> comparisons, int nrOfModels);
     int generateBinaryCode(Frame* frame, Box* box, EnsembleScore* score);
-    vector<float> score(Frame* frame, Box* box, EnsembleScore* score);
-    float score(Frame* frame, Box* box, EnsembleScore* score, int modelId);
-    float getProbability(ScoredBox* box, int modelId);
+
+    double score(Frame* frame, Box* box, EnsembleScore* score, int modelId);
+    vector<double> score(Frame* frame, Box* box, EnsembleScore* score);
+    double getProbability(ScoredBox* box, int modelId);
+
     void train(Frame* frame, Box* box, int modelId, bool label);
     void train(Frame* frame, ScoredBox* box, int modelId, bool label);
     void dumpBaseClassifier();

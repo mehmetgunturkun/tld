@@ -11,8 +11,10 @@ private:
 public:
     bool dirtyBit;
     Branch(int nrOfModels);
-    vector<float> getProbabilities();
-    float getProbability(int modelId);
+
+    double getProbability(int modelId);
+    vector<double> getProbabilities();
+
     void update(int modelId, bool label);
     void dumpLeaves();
 };

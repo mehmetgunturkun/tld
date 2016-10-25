@@ -7,15 +7,15 @@ DecisionTree::DecisionTree(int nrOfModels) {
     }
 }
 
-vector<float> DecisionTree::getProbabilities(int binaryCode) {
+vector<double> DecisionTree::getProbabilities(int binaryCode) {
     Branch* branch = tree[binaryCode];
-    vector<float> probabilities = branch->getProbabilities();
+    vector<double> probabilities = branch->getProbabilities();
     return probabilities;
 }
 
-float DecisionTree::getProbability(int binaryCode, int modelId) {
+double DecisionTree::getProbability(int binaryCode, int modelId) {
     Branch* branch = tree[binaryCode];
-    float probability = branch->getProbability(modelId);
+    double probability = branch->getProbability(modelId);
     return probability;
 }
 

@@ -15,8 +15,8 @@ public:
     int nrOfPixelComparisons;
     int nrOfModels;
 
-    float positiveUpdateThreshold;
-    float negativeUpdateThreshold;
+    double positiveUpdateThreshold;
+    double negativeUpdateThreshold;
 
     vector<BaseClassifier*> baseClassifiers;
 
@@ -24,16 +24,19 @@ public:
     vector<PixelComparison*> produceAllComparisons();
     vector<BaseClassifier*> shuffleComparisons(vector<PixelComparison*> allComparisons);
 
-    float POSITIVE_SCORE_THRESHOLD;
+    double POSITIVE_SCORE_THRESHOLD;
 
     EnsembleClassifier();
     void init(Frame* firstFrame, vector<Box*> boxList);
     bool classify(Frame* frame, ScoredBox* scoredBox);
-    float getProbability(ScoredBox* scoredBox, int modelId);
+
+    double getProbability(ScoredBox* scoredBox, int modelId);
     void score(Frame* frame, ScoredBox* scoredBox);
+
     void train(TrainingSet<Box> ts, int modelId);
     void train(TrainingSet<ScoredBox> ts, int modelId);
     void updateBaseClassifiers(Frame* frame, ScoredBox* scoredBox, int modelId, bool label);
+
     void dumpEnsembleClassifier();
 };
 #endif

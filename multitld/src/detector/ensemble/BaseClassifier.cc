@@ -12,17 +12,17 @@ int BaseClassifier::generateBinaryCode(Frame* frame, Box* box, EnsembleScore* sc
     return binaryCode;
 }
 
-vector<float> BaseClassifier::score(Frame* frame, Box* box, EnsembleScore* score) {
+vector<double> BaseClassifier::score(Frame* frame, Box* box, EnsembleScore* score) {
     int binaryCode = codeGen->generateBinaryCode(frame, box);
     score->binaryCodes[id] = binaryCode;
-    vector<float> probabilities = decTree->getProbabilities(binaryCode);
+    vector<double> probabilities = decTree->getProbabilities(binaryCode);
     return probabilities;
 }
 
-float BaseClassifier::score(Frame* frame, Box* box, EnsembleScore* score, int modelId) {
+double BaseClassifier::score(Frame* frame, Box* box, EnsembleScore* score, int modelId) {
     int binaryCode = codeGen->generateBinaryCode(frame, box);
     score->binaryCodes[id] = binaryCode;
-    float probability = decTree->getProbability(binaryCode, modelId);
+    double probability = decTree->getProbability(binaryCode, modelId);
     return probability;
 }
 
@@ -31,7 +31,7 @@ void BaseClassifier::train(Frame* frame, Box* box, int modelId, bool label) {
     decTree->update(binaryCode, modelId, label);
 }
 
-float BaseClassifier::getProbability(ScoredBox* scoredBox, int modelId) {
+double BaseClassifier::getProbability(ScoredBox* scoredBox, int modelId) {
     EnsembleScore* ensembleScore = (EnsembleScore*) scoredBox->getScore("ensemble");
     if (ensembleScore->isMerged) {
         printf("Yes it is merged!\n");
