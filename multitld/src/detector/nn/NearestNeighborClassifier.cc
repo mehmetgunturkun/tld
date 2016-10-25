@@ -165,11 +165,25 @@ void NearestNeighborClassifier::train(TrainingSet<ScoredBox> ts, int modelId) {
     }
 }
 
-bool NearestNeighborClassifier::evaluate(Frame* frame, Box* box, int modelId) {
+bool NearestNeighborClassifier::evaluate(Frame* frame, Box* box, double minVariance, int modelId) {
     Patch* patch = new Patch(frame, box);
     ObjectModel* model = models[modelId];
     ObjectScore* objectScore = model->computeScore(patch);
-    return objectScore->relativeScore > 0.7;
+
+    printf("EVALUATE >> %s, %3.5f\n", box->toCharArr(), objectScore->relativeScore);
+
+    if (objectScore->relativeScore < 0.5) {
+        printf("NN >> Fast Change\n");
+        return false;
+    }
+
+    double patchVariance = computePatchVariance(patch);
+    if (patchVariance < minVariance) {
+        printf("NN >> Low Variance\n");
+        return false;
+    }
+
+    return true;
 }
 
 void NearestNeighborClassifier::dumpNearestNeighborClassifier() {

@@ -36,6 +36,7 @@ public:
 
     int nrOfPoints;
     int scaleNo;
+    bool isValid;
 
     Box(int id, double x1, double y1, double x2, double y2);
     Box* move(double dx, double dy);

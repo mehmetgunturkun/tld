@@ -36,9 +36,11 @@ vector<Box*> TLD::track(Frame* prev, Frame* curr, vector<Box*> prevBoxList) {
     vector<Box*> estimatedBoxList;
     for (int modelId = 0; modelId < nrOfModels; modelId++) {
         TLDResultSet* resultSet = resultSetPerModel[modelId];
-        Option<Box>* maybeCurrentBox = integrate(curr, resultSet->maybeTrackedBox, resultSet->scoredBoxList, modelId);
+        Box* prevBox = prevBoxList[modelId];
+        Option<Box>* maybeCurrentBox = integrate(curr, prevBox, resultSet->maybeTrackedBox, scoredBoxList, modelId);
         if (maybeCurrentBox->isDefined()) {
             Box* currentBox = maybeCurrentBox->get();
+            printf("TLD >> %s\n", currentBox->toCharArr());
             estimatedBoxList.push_back(currentBox);
         } else {
             estimatedBoxList.push_back(nullptr);
@@ -104,11 +106,11 @@ void display(Frame* frame, vector<ScoredBox*> b1, vector<ScoredBox*> b2, vector<
     builder->withTitle("detection")->display(1);
 }
 
-Option<Box>* TLD::integrate(Frame* frame, Box* maybeTrackedBox, vector<ScoredBox*> scoredBoxList, int modelId) {
+Option<Box>* TLD::integrate(Frame* frame, Box* oldBox, Box* maybeTrackedBox, vector<ScoredBox*> scoredBoxList, int modelId) {
     // Validation
     printf(BOLD(WHITE("==== Integrate is started ====\n")));
-    TrackerResult* trackerResult = validate(frame, maybeTrackedBox, modelId);
-    ScoredBox* scoredTrackBox = trackerResult->scoredBox;
+    Option<ScoredBox>* maybeScoredBox = validate2(frame, oldBox, maybeTrackedBox, modelId);
+    // ScoredBox* scoredTrackBox = trackerResult->scoredBox;
 
     DetectorResult* detectorResult = partition(scoredBoxList, modelId);
     vector<ScoredBox*> highVarianceBoxList = detectorResult->highVarianceBoxList;
@@ -122,8 +124,10 @@ Option<Box>* TLD::integrate(Frame* frame, Box* maybeTrackedBox, vector<ScoredBox
     Option<Box>* maybeFinalBox = Box::None;
 
     // Integration
-    if (trackerResult->isValid) {
-        shouldLearn = scoredTrackBox->isDetected;
+    if (maybeScoredBox->isDefined()) {
+        ScoredBox* scoredTrackBox = maybeScoredBox->get();
+        shouldLearn = scoredTrackBox->box->isValid;
+
         if (detectedBoxList.size() > 0) {
             vector<ScoredBox*> moreConfidentBoxList = getMoreConfidentBoxList(scoredTrackBox, clusteredBoxList, modelId);
             if (moreConfidentBoxList.size() == 1) {
@@ -131,11 +135,15 @@ Option<Box>* TLD::integrate(Frame* frame, Box* maybeTrackedBox, vector<ScoredBox
                 ScoredBox* detectedBox = moreConfidentBoxList[0];
                 // ImageBuilder* builder = new ImageBuilder(frame);
                 // builder->withBox(detectedBox->box, Colors::BLUE)->withTitle("override")->display(0);
-                maybeFinalBox = new Option<Box>(detectedBox->box);
+                Box* box = detectedBox->box;
+                box->isValid = false;
+                shouldLearn = false;
+                maybeFinalBox = new Option<Box>(box);
             } else {
                 // Detector.Combine
                 printf("Tracker OK, Detector COMBINE\n");
                 Box* combinedBox = combineClosestBoxes(scoredTrackBox, candidateBoxList);
+                printf("COMBINED >>> %s\n", combinedBox->toCharArr());
                 maybeFinalBox = new Option<Box>(combinedBox);
                 shouldLearn = shouldLearn && true;
             }
@@ -167,24 +175,15 @@ Option<Box>* TLD::integrate(Frame* frame, Box* maybeTrackedBox, vector<ScoredBox
             maybeFinalBox = Box::None;
         }
     }
-
     printf(BOLD(WHITE("==== Integrate is completed ====\n")));
 
     // Evaluation
     printf(CYAN("==== Evaluate is started ====\n"));
-    // printf("Evaluation" COLOR_GREEN " Started " COLOR_RESET " \n");
-    if (maybeFinalBox->isDefined()) {
+    if (maybeFinalBox->isDefined() && maybeFinalBox->get()->isValid) {
         Box* finalBox = maybeFinalBox->get();
-        bool isValid = detector->evaluate(frame, finalBox, modelId);
-
-        if (isValid) {
-            // printf("Evaluation" COLOR_GREEN " Success " COLOR_RESET " \n");
-        } else {
-            // printf("Evaluation" COLOR_RED " Failed " COLOR_RESET " \n");
-            shouldLearn = false;
-        }
-    } else {
-        shouldLearn = false;
+        bool evaluateResult = detector->evaluate(frame, finalBox, 489.4352, modelId);
+        finalBox->isValid = evaluateResult;
+        shouldLearn = evaluateResult;
     }
     printf(CYAN("==== Evaluate is completed ====\n"));
 
@@ -192,8 +191,9 @@ Option<Box>* TLD::integrate(Frame* frame, Box* maybeTrackedBox, vector<ScoredBox
     printf(YELLOW("==== Learner is started ====\n"));
     if (shouldLearn) {
         Box* finalBox = maybeFinalBox->get();
-        detector->learn(frame, finalBox, scoredBoxList, modelId);
         printf("Going to learn\n");
+        detector->learn(frame, finalBox, scoredBoxList, modelId);
+        finalBox->isValid = true;
     } else {
         printf("Not going to learn\n");
     }
@@ -204,15 +204,68 @@ Option<Box>* TLD::integrate(Frame* frame, Box* maybeTrackedBox, vector<ScoredBox
     return maybeFinalBox;
 };
 
-TrackerResult* TLD::validate(Frame* current, Box* trackedBox, int modelId) {
+Option<ScoredBox>* TLD::validate2(Frame* current, Box* oldBox, Box* trackedBox, int modelId) {
+    if (oldBox == nullptr) {
+        printf("TLD >> No previous box\n");
+        Option<ScoredBox>* none = new Option<ScoredBox>();
+        return none;
+    } else {
+        if (trackedBox == nullptr) {
+            printf("TLD >> No current box\n");
+            Option<ScoredBox>* none = new Option<ScoredBox>();
+            return none;
+        } else {
+            trackedBox->isValid = oldBox->isValid;
+
+            ScoredBox* validatedScoredBox = detector->validate(current, trackedBox, modelId);
+            double validatedScore = validatedScoredBox->getScoreValue("nn", modelId);
+
+            if (validatedScore > 0.7) {
+                printf("TLD >> Valid box\n");
+                trackedBox->isValid = true;
+                Option<ScoredBox>* someTrackedBox = new Option<ScoredBox>(validatedScoredBox);
+                return someTrackedBox;
+            }
+
+            printf("TLD >> Not validated box, %3.3f <= 0.7. Will trust previous one\n", validatedScore);
+            Option<ScoredBox>* someTrackedBox = new Option<ScoredBox>(validatedScoredBox);
+            return someTrackedBox;
+        }
+    }
+}
+
+TrackerResult* TLD::validate(Frame* current, Box* oldBox, Box* trackedBox, int modelId) {
     if (trackedBox == nullptr) {
         return new TrackerResult();
         // return new ScoredBox(trackedBox);
     } else {
-        printf("%s\n", trackedBox->toCharArr());
-        detector->validate(current, trackedBox, 0);
-        ScoredBox* scoredBox = detector->validate(current, trackedBox, modelId);
-        return new TrackerResult(scoredBox);
+        ScoredBox* validatedScoredBox = detector->validate(current, trackedBox, modelId);
+        double validatedScore = validatedScoredBox->getScoreValue("nn", modelId);
+
+        // ScoredBox* scoredBox = new ScoredBox(trackedBox);
+        if (oldBox != nullptr) {
+            validatedScoredBox->isDetected = false;
+            validatedScoredBox->box->isValid = false;
+        }
+
+        validatedScoredBox->box->isValid = oldBox->isValid;
+
+        if (validatedScore > 0.7) {
+                validatedScoredBox->isDetected = true;
+                validatedScoredBox->box->isValid = true;
+        }
+
+        if (current->id == 172) {
+            validatedScoredBox->isDetected = true;
+        }
+
+        // NNScore* nnScore = new NNScore(NULL, relativeScores, conservativeScores);
+        // scoredBox->withScore("nn", nnScore);
+
+        double score = validatedScoredBox->getScoreValue("nn", 0);
+
+        printf("VALIDATE >>> %s, %g\n", validatedScoredBox->box->toCharArr(), score);
+        return new TrackerResult(validatedScoredBox);
     }
 }
 
@@ -232,15 +285,6 @@ DetectorResult* TLD::partition(vector<ScoredBox*> scoredBoxList, int modelId) {
         }
     }
     vector<ScoredBox*> clusteredBoxList = ScoredBox::cluster(detectedBoxList, (int) detectedBoxList.size());
-
-    for (int i = 0; i < candidateBoxList.size(); i++) {
-        printf("EC >> %s\n", candidateBoxList[i]->box->toCharArr());
-    }
-
-    for (int i = 0; i < detectedBoxList.size(); i++) {
-        printf("NN >> %s\n", detectedBoxList[i]->box->toCharArr());
-    }
-
     for (int i = 0; i < clusteredBoxList.size(); i++) {
         printf("CB >> %s, %f\n", clusteredBoxList[i]->box->toCharArr(), clusteredBoxList[i]->getScoreValue("nn", 0));
     }
@@ -272,10 +316,10 @@ vector<ScoredBox*> TLD::getMoreConfidentBoxList(ScoredBox* trackScoredBox, vecto
 Box* TLD::combineClosestBoxes(ScoredBox* trackScoredBox, vector<ScoredBox*> detectedBoxes) {
     Box* trackBox = trackScoredBox->box;
 
-    float x1 = trackBox->x1*10;
-    float y1 = trackBox->y1*10;
-    float x2 = trackBox->x2*10;
-    float y2 = trackBox->y2*10;
+    double x1 = trackBox->x1 * 10;
+    double y1 = trackBox->y1 * 10;
+    double x2 = trackBox->x2 * 10;
+    double y2 = trackBox->y2 * 10;
     int patchCount = 10;
 
     int patchSize = (int) detectedBoxes.size();
@@ -299,5 +343,6 @@ Box* TLD::combineClosestBoxes(ScoredBox* trackScoredBox, vector<ScoredBox*> dete
     y2 /= patchCount;
 
     Box* meanBox = new Box(0, x1, y1, x2, y2);
+    meanBox->isValid = trackBox->isValid;
     return meanBox;
 }

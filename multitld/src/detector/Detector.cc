@@ -320,8 +320,8 @@ ScoredBox* Detector::validate(Frame* frame, Box* box, int modelId) {
     return scoredBox;
 }
 
-bool Detector::evaluate(Frame* frame, Box* box, int modelId) {
-    return nnClassifier->evaluate(frame, box, modelId);
+bool Detector::evaluate(Frame* frame, Box* box, double minVariance, int modelId) {
+    return nnClassifier->evaluate(frame, box, minVariance, modelId);
 }
 
 void Detector::dumpDetector() {

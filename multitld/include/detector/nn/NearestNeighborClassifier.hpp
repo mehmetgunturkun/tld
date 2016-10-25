@@ -25,11 +25,11 @@ public:
     NearestNeighborClassifier();
     void init(Frame* firstFrame, vector<Box*> boxList);
     double getPatchVariance(Frame* frame, Box* box);
-    
+
     bool classify(Frame* frame, ScoredBox* scoredBox);
     void score(Frame* frame, ScoredBox* scoredBox);
 
-    bool evaluate(Frame* frame, Box* box, int modelId);
+    bool evaluate(Frame* frame, Box* box, double minVariance, int modelId);
     bool validate(Frame* frame, ScoredBox* scoredBox, int modelId);
 
     void train(TrainingSet<Box> ts, int modelId);

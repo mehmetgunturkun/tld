@@ -51,7 +51,7 @@ public:
     vector<ScoredBox*> score(Frame* frame, vector<Box*> boxList);
     void score(Frame* frame, ScoredBox* scoredBox);
 
-    bool evaluate(Frame* frame, Box* box, int modelId);
+    bool evaluate(Frame* frame, Box* box, double minVariance, int modelId);
     void dumpDetector();
 };
 #endif
