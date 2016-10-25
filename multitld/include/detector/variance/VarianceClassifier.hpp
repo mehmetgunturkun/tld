@@ -17,6 +17,9 @@ public:
 
     VarianceClassifier();
     VarianceClassifier(double minVariance);
+
+    void setMinimumVariance(int modelId, double minVariance);
+
     void init(Frame* frame, vector<Box*> boxList);
     bool classify(Frame* frame, ScoredBox *scoredBox);
 };

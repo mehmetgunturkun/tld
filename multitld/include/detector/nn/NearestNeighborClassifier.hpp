@@ -24,6 +24,8 @@ private:
 public:
     NearestNeighborClassifier();
     void init(Frame* firstFrame, vector<Box*> boxList);
+    double getPatchVariance(Frame* frame, Box* box);
+    
     bool classify(Frame* frame, ScoredBox* scoredBox);
     void score(Frame* frame, ScoredBox* scoredBox);
 

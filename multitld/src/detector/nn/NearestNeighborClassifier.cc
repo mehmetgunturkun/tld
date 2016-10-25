@@ -11,6 +11,37 @@ void NearestNeighborClassifier::init(Frame* firstFrame, vector<Box*> boxList) {
     }
 }
 
+double computePatchVariance(Patch* p) {
+    Mat* patchData = p->data;
+    double sum = 0.0;
+    for (int i = 0 ; i < Patch::HEIGHT; i++) {
+        for (int j = 0 ; j < Patch::WIDTH; j++) {
+            double p = patchData->at<double>(i, j);
+            sum += p;
+        }
+    }
+
+    double mean = sum / 225;
+
+    double variance = 0.0;
+    for (int i = 0 ; i < Patch::HEIGHT; i++) {
+        for (int j = 0 ; j < Patch::WIDTH; j++) {
+            double p = patchData->at<double>(i, j);
+            p = p - mean;
+            variance += (p * p);
+        }
+    }
+
+    variance = variance / 224;
+    return variance;
+}
+
+double NearestNeighborClassifier::getPatchVariance(Frame* frame, Box* box) {
+    Patch* patch = new Patch(frame, box);
+    double variance = computePatchVariance(patch);
+    return variance / 2.0;
+}
+
 bool NearestNeighborClassifier::classify(Frame* frame, ScoredBox* scoredBox) {
     Box* box = scoredBox->box;
     Patch* patch = new Patch(frame, box);

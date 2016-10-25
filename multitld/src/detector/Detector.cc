@@ -17,7 +17,7 @@ Detector::Detector(Frame* frame, vector<Box*> boxList) {
     nrOfPositiveBoxes4NNAtInitialization = 1;
     nrOfNegativeBoxes4NNAtInitialization = 50;
 
-    varianceThreshold = 1297 * 0.5;
+    varianceThreshold = 0.0;
     positiveBoxOverlapThreshold = 0.6;
     negativeBoxOverlapThreshold = 0.2;
 }
@@ -38,6 +38,21 @@ vector<Box*> Detector::init(Frame* frame, vector<Box*> boxList) {
 
     int nrOfBoxes = (int) boxList.size();
     vector<Box*> correctedBoxList;
+
+    double minimumVariance = FLT_MAX;
+    for (int i = 0; i < nrOfBoxes; i++) {
+        Box* box = boxList[i];
+        Box* correctedBox = getClosestBox(frame, box);
+        double boxVariance = nnClassifier->getPatchVariance(frame, correctedBox);
+
+        vClassifier->setMinimumVariance(i, boxVariance);
+        if (boxVariance < minimumVariance) {
+            minimumVariance = boxVariance;
+        }
+    }
+
+    this->varianceThreshold = minimumVariance / 2.0;
+
     for (int i = 0; i < nrOfBoxes; i++) {
             Box* box = boxList[i];
             Box* correctedBox = this->init(frame, box, i);
@@ -273,19 +288,26 @@ vector<ScoredBox*> Detector::detect(Frame* frame) {
     while (iterator->hasNext()) {
         Box* nextBox = iterator->next();
         ScoredBox* scoredBox = new ScoredBox(nextBox);
+        allBoxList.push_back(scoredBox);
 
         if (!vClassifier->classify(frame, scoredBox)) {
             continue;
         }
-        allBoxList.push_back(scoredBox);
 
         if (!eClassifier->classify(frame, scoredBox)) {
             continue;
         }
 
+        printf("EC >> %s\n", nextBox->toCharArr());
+
         if (!nnClassifier->classify(frame, scoredBox)) {
             continue;
         }
+
+        NNScore* nnScore = (NNScore*) scoredBox->getScore("nn");
+        double relativeScore = nnScore->relativeScores[0];
+        double conservativeValue = nnScore->conservativeScores[0];
+        printf("NN >> %s, %g, %g\n", nextBox->toCharArr(), relativeScore, conservativeValue);
 
         scoredBox->isDetected = true;
     }
@@ -305,4 +327,20 @@ bool Detector::evaluate(Frame* frame, Box* box, int modelId) {
 void Detector::dumpDetector() {
     eClassifier->dumpEnsembleClassifier();
     nnClassifier->dumpNearestNeighborClassifier();
+}
+
+Box* Detector::getClosestBox(Frame* frame, Box* box) {
+    BoxIterator* boxIterator = new BoxIterator(firstFrame, firstBox, maxScaleLimit, minimumPatchSize);
+    double minimumOverlap = 0.0;
+    Box* closestBox = (Box*) nullptr;
+    while (boxIterator->hasNext()) {
+        Box* nextBox = boxIterator->next();
+        double overlap = Box::computeOverlap(nextBox, box);
+
+        if (overlap > minimumOverlap) {
+            minimumOverlap = overlap;
+            closestBox = nextBox;
+        }
+    }
+    return closestBox;
 }
