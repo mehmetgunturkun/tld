@@ -105,31 +105,29 @@ void NearestNeighborClassifier::train(TrainingSet<ScoredBox> ts, int modelId) {
 
         double relativeScore = objectScore->relativeScore;
         bool isInPositive = objectScore->isInPositive;
+        int closestPositivePatchIndex = objectScore->closestPositivePatchIndex;
 
-        // Frame* frame = ts.frame;
-        // ImageBuilder* builder = new ImageBuilder(frame);
         if (label == 1) {
-            // builder->withBox(scoredBox->box, Colors::BLUE)->withTitle("nn-pos")->display(0);
             if (relativeScore <= 0.65) {
                 if (isInPositive == true) {
-                    // int patchIndex = objectScore->getClosestPositivePatchIndex;
-                    // printf("NN.rep(+) >>> %s\n", scoredBox->box->toCharArr());
-                } else {
-                    // printf("NN.add(+) >>> %s\n", scoredBox->box->toCharArr());
+                    printf("NN.add(+) >>> %d, %s\n", closestPositivePatchIndex, scoredBox->box->toCharArr());
                     model->add(patch, true);
+                    continue;
                 }
+                printf("NN.ins(+) >>> %s, %g, %d, %d\n", scoredBox->box->toCharArr(), relativeScore, isInPositive, closestPositivePatchIndex);
+                model->add(patch, closestPositivePatchIndex, true);
             } else {
-                // printf("NN.nop(+) >>> %s\n", scoredBox->box->toCharArr());
+                printf("NN.nop(+) >>> %s, %g, %d\n", scoredBox->box->toCharArr(), relativeScore, isInPositive);
             }
         }
 
         if (label == 0) {
             // builder->withBox(scoredBox->box, Colors::RED)->withTitle("nn-neg")->display(0);
             if (relativeScore > 0.5) {
-                // printf("NN.add(-) >>> %s\n", scoredBox->box->toCharArr());
+                printf("NN.add(-) >>> %s, %g\n", scoredBox->box->toCharArr(), relativeScore);
                 model->add(patch, false);
             } else {
-                // printf("NN.nop(-) >>> %s\n", scoredBox->box->toCharArr());
+                printf("NN.nop(-) >>> %s, %g\n", scoredBox->box->toCharArr(), relativeScore);
             }
         }
     }
