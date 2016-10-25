@@ -243,7 +243,6 @@ void EnsembleClassifier::train(TrainingSet<ScoredBox> ts, int modelId) {
 
     int step = nrOfSamples / 10;
 
-
     for (int trial = 0; trial < nrOfBootstrap; trial++) {
         for (int i = 0; i < step; i++) {
             for (int k = 0; k < 10; k++) {
