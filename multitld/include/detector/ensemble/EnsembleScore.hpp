@@ -48,12 +48,12 @@ public:
         return this;
     }
 
-    float getProbability(int modelId) {
-        return scores[modelId];
+    double getProbability(int modelId) {
+        return (double) scores[modelId];
     }
 
-    float getValue(int modelId) {
-        return scores[modelId];
+    double getValue(int modelId) {
+        return (double) scores[modelId];
     }
 };
 

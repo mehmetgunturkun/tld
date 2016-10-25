@@ -10,13 +10,12 @@ using namespace std;
 class Score {
 public:
     double value;
-    virtual Score* sum(Score* other);
-    virtual Score* divide(int n);
-
-    virtual Score* clone();
-
     bool isAnyModellClassified;
     vector<int> classifiedModelIds;
-    virtual float getValue(int modelId);
+
+    virtual Score* sum(Score* other);
+    virtual Score* divide(int n);
+    virtual Score* clone();
+    virtual double getValue(int modelId);
 };
 #endif

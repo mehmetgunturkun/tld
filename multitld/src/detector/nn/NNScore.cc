@@ -48,6 +48,6 @@ Score* NNScore::divide(int n) {
     return this;
 }
 
-float NNScore::getValue(int modelId) {
-    return conservativeScores[modelId];
+double NNScore::getValue(int modelId) {
+    return (double) conservativeScores[modelId];
 }
