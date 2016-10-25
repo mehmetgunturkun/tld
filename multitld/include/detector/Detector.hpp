@@ -7,6 +7,8 @@
 
 #include "core/BoxIterator.hpp"
 #include "common/BoundedPriorityQueue.hpp"
+#include "common/BoundedSortedVector.hpp"
+
 #include "detector/variance/VarianceClassifier.hpp"
 #include "detector/ensemble/EnsembleClassifier.hpp"
 #include "detector/nn/NearestNeighborClassifier.hpp"

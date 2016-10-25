@@ -102,8 +102,12 @@ public:
 };
 
 struct ScoredBoxOverlapOrdered {
-  bool operator() (ScoredBox* box1, ScoredBox* box2) {
+    bool operator() (ScoredBox* box1, ScoredBox* box2) {
       return box1->box->overlap >= box2->box->overlap;
-  }
+    }
+
+    bool compare(ScoredBox* box1, ScoredBox* box2) {
+        return box1->box->overlap > box2->box->overlap;
+    }
 };
 #endif
