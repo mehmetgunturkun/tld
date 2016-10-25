@@ -22,23 +22,23 @@ class Box {
 public:
     int id;
 
-    float x1;
-    float y1;
-    float x2;
-    float y2;
+    double x1;
+    double y1;
+    double x2;
+    double y2;
 
-    float width;
-    float height;
+    double width;
+    double height;
 
-    float mean;
-    float variance;
-    float overlap;
+    double mean;
+    double variance;
+    double overlap;
 
     int nrOfPoints;
     int scaleNo;
 
-    Box(int id, float x1, float y1, float x2, float y2);
-    Box* move(float dx, float dy);
+    Box(int id, double x1, double y1, double x2, double y2);
+    Box* move(double dx, double dy);
 
     Box* sum(Box* other);
     Box* divide(int n);
@@ -49,10 +49,10 @@ public:
     static Option<Box>* parseFromLine(string line) {
         StringStream* stream = new StringStream(line, ',');
 
-        float x1 = stod(stream->next());
-        float y1 = stod(stream->next());
-        float x2 = stod(stream->next());
-        float y2 = stod(stream->next());
+        double x1 = stod(stream->next());
+        double y1 = stod(stream->next());
+        double x2 = stod(stream->next());
+        double y2 = stod(stream->next());
 
         if (isnan(x1) || isnan(x2) || isnan(y1) || isnan(y2)) {
             Option<Box>* none = new Option<Box>();
@@ -107,15 +107,14 @@ public:
     }
 
     static double computeOverlap(Box* b1, Box* b2) {
-        double x11 = (double) b1->x1;
-        double x12 = (double) b1->x2;
-        double y11 = (double) b1->y1;
-        double y12 = (double) b1->y2;
-
-        double x21 = (double) b2->x1;
-        double x22 = (double) b2->x2;
-        double y21 = (double) b2->y1;
-        double y22 = (double) b2->y2;
+        double x11 = b1->x1;
+        double x12 = b1->x2;
+        double y11 = b1->y1;
+        double y12 = b1->y2;
+        double x21 = b2->x1;
+        double x22 = b2->x2;
+        double y21 = b2->y1;
+        double y22 = b2->y2;
 
         if (x11 > x22 ||
             y11 > y22 ||

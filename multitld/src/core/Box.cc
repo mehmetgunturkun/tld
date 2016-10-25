@@ -2,7 +2,7 @@
 
 Option<Box>* Box::None = new Option<Box>();
 
-Box::Box(int id, float x1, float y1, float x2, float y2) {
+Box::Box(int id, double x1, double y1, double x2, double y2) {
     this->id = id;
 
     this->x1 = x1;
@@ -14,7 +14,7 @@ Box::Box(int id, float x1, float y1, float x2, float y2) {
     this->height = y2 - y1 + 1;
 }
 
-Box* Box::move(float dx, float dy) {
+Box* Box::move(double dx, double dy) {
     Box* box = new Box(id, x1 + dx, y1 + dy, x2 + dx, y2 + dy);
     return box;
 }
