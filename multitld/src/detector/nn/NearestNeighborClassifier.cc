@@ -114,6 +114,7 @@ void NearestNeighborClassifier::train(TrainingSet<ScoredBox> ts, int modelId) {
                     model->add(patch, true);
                     continue;
                 }
+
                 printf("NN.ins(+) >>> %s, %g, %d, %d\n", scoredBox->box->toCharArr(), relativeScore, isInPositive, closestPositivePatchIndex);
                 model->add(patch, closestPositivePatchIndex, true);
             } else {
