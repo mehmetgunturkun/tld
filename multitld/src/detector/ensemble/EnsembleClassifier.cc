@@ -237,30 +237,39 @@ void EnsembleClassifier::score(Frame* frame, ScoredBox* scoredBox) {
 }
 
 void EnsembleClassifier::train(TrainingSet<ScoredBox> ts, int modelId) {
-    vector<Labelled<ScoredBox>*> samples = ts.getShuffledSamples();
+    vector<Labelled<ScoredBox>*> samples = ts.getSamples();
     int nrOfBootstrap = ts.nrOfBootstrap;
-    // printf("EC >> %lu samples are going to be processed for training - online\n", samples.size());
+    int nrOfSamples = (int) samples.size();
+
+    int step = nrOfSamples / 10;
+
+
     for (int trial = 0; trial < nrOfBootstrap; trial++) {
-        for (int i = 0; i < ts.nrOfSamples; i++) {
-            Labelled<ScoredBox>* sample = samples[i];
+        for (int i = 0; i < step; i++) {
+            for (int k = 0; k < 10; k++) {
+                Labelled<ScoredBox>* sample = samples[k * step + i];
 
-            Frame* frame = sample->frame;
-            ScoredBox* scoredBox = sample->item;
-            int label = sample->label;
+                Frame* frame = sample->frame;
+                ScoredBox* scoredBox = sample->item;
+                int label = sample->label;
 
-            double probability = getProbability(scoredBox, modelId);
+                double probability = getProbability(scoredBox, modelId);
 
-            // ImageBuilder* builder = new ImageBuilder(frame);
-            // printf("EC >> Prob(%d): %f\n", label, probability);
+                if (label == 1) {
+                    if (probability <= positiveUpdateThreshold) {
+                        updateBaseClassifiers(frame, scoredBox, modelId, true);
+                    } else {
+                        // update nothing
+                    }
+                }
 
-            if (label == true && probability < positiveUpdateThreshold) {
-                // builder->withBox(scoredBox->box, Colors::BLUE)->withTitle("ensemble-pos")->display(1000);
-                updateBaseClassifiers(frame, scoredBox, modelId, true);
-            }
-
-            if (label == false && probability > negativeUpdateThreshold) {
-                // builder->withBox(scoredBox->box, Colors::RED)->withTitle("ensemble-neg")->display(1000);
-                updateBaseClassifiers(frame, scoredBox, modelId, false);
+                if (label == 0) {
+                    if (probability >= negativeUpdateThreshold) {
+                        updateBaseClassifiers(frame, scoredBox, modelId, false);
+                    } else {
+                        // update nothing
+                    }
+                }
             }
         }
     }
