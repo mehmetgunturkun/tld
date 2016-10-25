@@ -1,10 +1,11 @@
 #include "detector/nn/ObjectModel.hpp"
 
-ObjectScore::ObjectScore(double relativeScore, double conservativeScore, bool isInPositive, bool isInNegative) {
+ObjectScore::ObjectScore(double relativeScore, double conservativeScore, bool isInPositive, bool isInNegative, int closestPositivePatchIndex) {
     this->relativeScore = relativeScore;
     this->conservativeScore = conservativeScore;
     this->isInPositive = isInPositive;
     this->isInNegative = isInNegative;
+    this->closestPositivePatchIndex = closestPositivePatchIndex;
 }
 
 ObjectModel::ObjectModel() {
@@ -12,43 +13,26 @@ ObjectModel::ObjectModel() {
     nrOfNegativePatches = 0;
 }
 
-double ObjectModel::computeRelativeScore(Patch* sample) {
-    double positiveNNSimilarity = computePositiveSimilarity(sample);
-    double negativeNNSimilarity = computeNegativeSimilarity(sample);
-    if ( positiveNNSimilarity == 0 && negativeNNSimilarity == 0) {
-        return 0.0;
-    } else {
-        double sim  = (negativeNNSimilarity / (positiveNNSimilarity + negativeNNSimilarity));
-        return sim;
-    }
-}
-
-double ObjectModel::computeConservativeScore(Patch* sample) {
-    double positiveNNSimilarity = computeInitialPositiveSimilarity(sample);
-    double negativeNNSimilarity = computeNegativeSimilarity(sample);
-
-    if ( positiveNNSimilarity == 0 && negativeNNSimilarity == 0) {
-        return 0.0;
-    } else {
-        double sim  = (negativeNNSimilarity / (positiveNNSimilarity + negativeNNSimilarity));
-        return sim;
-    }
-}
-
 ObjectScore* ObjectModel::computeScore(Patch* sample) {
     if (nrOfPositivePatches == 0) {
-        ObjectScore* objectScore = new ObjectScore(0.0, 0.0, false, false);
+        ObjectScore* objectScore = new ObjectScore(0.0, 0.0, false, false, 0);
         return objectScore;
     }
 
     if (nrOfNegativePatches == 0) {
-        ObjectScore* objectScore = new ObjectScore(1.0, 1.0, false, false);
+        ObjectScore* objectScore = new ObjectScore(1.0, 1.0, false, false, 0);
         return objectScore;
     }
 
-    double positiveNNSimilarity = computePositiveSimilarity(sample);
-    double positiveInititalNNSimilarity = computeInitialPositiveSimilarity(sample);
-    double negativeNNSimilarity = computeNegativeSimilarity(sample);
+    tuple<double, int> positiveNNTuple = computePositiveSimilarity(sample);
+    tuple<double, int> positiveInititalNNTuple = computeInitialPositiveSimilarity(sample);
+    tuple<double, int> negativeNNTuple = computeNegativeSimilarity(sample);
+
+    double positiveNNSimilarity = get<0>(positiveNNTuple);
+    double positiveInititalNNSimilarity = get<0>(positiveInititalNNTuple);
+    double negativeNNSimilarity = get<0>(negativeNNTuple);
+
+    int closestPositivePatchIndex = get<1>(positiveNNTuple);
 
     double relativeScore = 0.0;
     if ( positiveNNSimilarity != 0.0 || negativeNNSimilarity != 0.0) {
@@ -63,32 +47,47 @@ ObjectScore* ObjectModel::computeScore(Patch* sample) {
     bool isInPositive = (1.0 - positiveNNSimilarity) > 0.95;
     bool isInNegative = (1.0 - negativeNNSimilarity) > 0.95;
 
-    ObjectScore* objectScore = new ObjectScore(relativeScore, conservativeScore, isInPositive, isInNegative);
+    ObjectScore* objectScore = new ObjectScore(
+        relativeScore,
+        conservativeScore,
+        isInPositive,
+        isInNegative,
+        closestPositivePatchIndex
+    );
     return objectScore;
 }
 
-double ObjectModel::computeInitialPositiveSimilarity(Patch* sample) {
-    return computeNearestSimilarity(positivePatchList, ceil( (double) nrOfPositivePatches / 2), sample);
+tuple<double, int> ObjectModel::computeInitialPositiveSimilarity(Patch* sample) {
+    int size = (int) ceil( (double) nrOfPositivePatches / 2);
+    return computeNearestSimilarity(positivePatchList, size, sample);
 }
 
-double ObjectModel::computePositiveSimilarity(Patch* sample) {
+tuple<double, int> ObjectModel::computePositiveSimilarity(Patch* sample) {
     return computeNearestSimilarity(positivePatchList, nrOfPositivePatches, sample);
 }
 
-double ObjectModel::computeNegativeSimilarity(Patch* sample) {
+tuple<double, int> ObjectModel::computeNegativeSimilarity(Patch* sample) {
     return computeNearestSimilarity(negativePatchList, nrOfNegativePatches, sample);
 }
 
-double ObjectModel::computeNearestSimilarity(vector<Patch*> templatePatchList, int size, Patch* sample) {
+tuple<double, int> ObjectModel::computeNearestSimilarity(vector<Patch*> templatePatchList, int size, Patch* sample) {
     double similarityValue = 0.0;
+    int index = size;
     for (int i = 0; i < size; i++) {
             Patch* templatePatch = templatePatchList[i];
             double tempSimilarityValue = computeSimilarity(templatePatch, sample);
             if (tempSimilarityValue > similarityValue) {
                     similarityValue = tempSimilarityValue;
+                    index = i + 1;
             }
     }
-    return (1.0 - similarityValue);
+
+    if (index > size) {
+        index = size;
+    }
+
+    similarityValue = 1.0 - similarityValue;
+    return make_tuple(similarityValue, index);
 }
 
 double ObjectModel::computeSimilarity(Patch* templatePatch, Patch* samplePatch) {
@@ -113,7 +112,7 @@ double ObjectModel::computeSimilarity(Patch* templatePatch, Patch* samplePatch) 
     double upper = corr;
     double lower = sqrt(normTemplate * normSample);
     double ncc = (upper / lower);
-    return 0.5 * (ncc + 1.0);
+    return (ncc + 1.0) / 2.0;
 }
 
 void ObjectModel::add(Patch* patch, bool label) {
@@ -122,6 +121,16 @@ void ObjectModel::add(Patch* patch, bool label) {
         nrOfPositivePatches += 1;
     } else {
         negativePatchList.push_back(patch);
+        nrOfNegativePatches += 1;
+    }
+}
+
+void ObjectModel::add(Patch* patch, int index, bool label) {
+    if (label) {
+        positivePatchList.insert(positivePatchList.begin() + index, patch);
+        nrOfPositivePatches += 1;
+    } else {
+        negativePatchList.insert(negativePatchList.begin() + index, patch);
         nrOfNegativePatches += 1;
     }
 }

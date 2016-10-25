@@ -27,7 +27,7 @@ int main() {
     ObjectModel* model = new ObjectModel();
     model->add(p0, true);
 
-    float score = model->computePositiveSimilarity(p1);
-    printf("Positive Score: %f\n", 1 - score);
+    // float score = model->computePositiveSimilarity(p1);
+    // printf("Positive Score: %f\n", 1 - score);
 
 }
