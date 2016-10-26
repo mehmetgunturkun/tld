@@ -275,7 +275,7 @@ void EnsembleClassifier::train(TrainingSet<ScoredBox> ts, int modelId) {
 }
 
 double EnsembleClassifier::getProbability(ScoredBox* scoredBox, int modelId) {
-    double probability = 0.0f;
+    double probability = 0.0;
     for (int i = 0; i < nrOfBaseClassifiers; i++) {
         BaseClassifier* bc = baseClassifiers[i];
         probability += bc->getProbability(scoredBox, modelId);
