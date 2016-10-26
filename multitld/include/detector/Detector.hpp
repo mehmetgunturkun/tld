@@ -1,13 +1,15 @@
 #ifndef DETECTOR_H
 #define DETECTOR_H
+#include <limits.h>
 
 #include "core/Frame.hpp"
 #include "core/Box.hpp"
 #include "core/ScoredBox.hpp"
 
 #include "core/BoxIterator.hpp"
-#include "common/BoundedPriorityQueue.hpp"
 #include "common/BoundedSortedVector.hpp"
+#include "common/BoundedPriorityQueue.hpp"
+#include "core/BoundedSortedScoredBoxVector.hpp"
 
 #include "detector/variance/VarianceClassifier.hpp"
 #include "detector/ensemble/EnsembleClassifier.hpp"

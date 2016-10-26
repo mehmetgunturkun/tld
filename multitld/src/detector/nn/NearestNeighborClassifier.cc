@@ -48,7 +48,6 @@ bool NearestNeighborClassifier::classify(Frame* frame, ScoredBox* scoredBox) {
 
     vector<double> relativeScores(nrOfModels);
     vector<double> conservativeScores(nrOfModels);
-
     for (int i = 0;  i < nrOfModels; i++) {
         ObjectModel* objectModel = models[i];
         ObjectScore* objectScore = objectModel->computeScore(patch);
@@ -146,7 +145,7 @@ void NearestNeighborClassifier::train(TrainingSet<ScoredBox> ts, int modelId) {
                     continue;
                 }
 
-                printf("NN.ins(+) >>> %s, %g, %d, %d\n", scoredBox->box->toCharArr(), relativeScore, isInPositive, closestPositivePatchIndex);
+                printf("NN.rep(+) >>> %s, %g, %d, %d\n", scoredBox->box->toCharArr(), relativeScore, isInPositive, closestPositivePatchIndex);
                 model->add(patch, closestPositivePatchIndex, true);
             } else {
                 printf("NN.nop(+) >>> %s, %g, %d\n", scoredBox->box->toCharArr(), relativeScore, isInPositive);

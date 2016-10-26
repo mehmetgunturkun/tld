@@ -5,8 +5,8 @@
 
 #define COLOR_BOLD    "\x1b[1m"
 
-#define COLOR_RED     "\x1b[91m"
 #define COLOR_GREEN   "\x1b[92m"
+#define COLOR_RED     "\x1b[91m"
 #define COLOR_YELLOW  "\x1b[93m"
 #define COLOR_CYAN    "\x1b[96m"
 #define COLOR_WHITE   "\x1b[37m"

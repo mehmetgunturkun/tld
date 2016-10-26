@@ -266,10 +266,22 @@ void EnsembleClassifier::train(TrainingSet<ScoredBox> ts, int modelId) {
                 }
 
                 if (label == 0) {
-                    if (probability >= negativeUpdateThreshold) {
+                    double a = (double) probability;
+                    double b = (double) negativeUpdateThreshold;
+                    if (a >= b) {
+                        printf(RED("%s is going to be updated as negative, since it has already higher prob: %g > %g\n"), scoredBox->box->toCharArr(), a, b);
                         updateBaseClassifiers(frame, scoredBox, modelId, false);
                     } else {
-                        // update nothing
+                        if (
+                            scoredBox->box->id == 3435 ||
+                            scoredBox->box->id == 3436 ||
+                            scoredBox->box->id == 3526 ||
+                            scoredBox->box->id == 3527 ||
+                            scoredBox->box->id == 7649 ||
+                            scoredBox->box->id == 7650
+                        ) {
+                            printf(YELLOW("%s is going to be ignored as negative, since it has already lower prob: %g < %g\n"), scoredBox->box->toCharArr(), a, b);
+                        }
                     }
                 }
             }

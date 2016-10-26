@@ -15,12 +15,12 @@ ObjectModel::ObjectModel() {
 
 ObjectScore* ObjectModel::computeScore(Patch* sample) {
     if (nrOfPositivePatches == 0) {
-        ObjectScore* objectScore = new ObjectScore(0.0, 0.0, false, false, 0);
+        ObjectScore* objectScore = new ObjectScore(0.0f, 0.0f, false, false, 0);
         return objectScore;
     }
 
     if (nrOfNegativePatches == 0) {
-        ObjectScore* objectScore = new ObjectScore(1.0, 1.0, false, false, 0);
+        ObjectScore* objectScore = new ObjectScore(1.0f, 1.0f, false, false, 0);
         return objectScore;
     }
 
@@ -47,13 +47,7 @@ ObjectScore* ObjectModel::computeScore(Patch* sample) {
     bool isInPositive = (1.0 - positiveNNSimilarity) > 0.95;
     bool isInNegative = (1.0 - negativeNNSimilarity) > 0.95;
 
-    ObjectScore* objectScore = new ObjectScore(
-        relativeScore,
-        conservativeScore,
-        isInPositive,
-        isInNegative,
-        closestPositivePatchIndex
-    );
+    ObjectScore* objectScore = new ObjectScore(relativeScore, conservativeScore, isInPositive, isInNegative, closestPositivePatchIndex);
     return objectScore;
 }
 

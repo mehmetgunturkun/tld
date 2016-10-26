@@ -34,7 +34,7 @@ public:
     double computeSimilarity(Patch* templatePatch, Patch* samplePatch);
 
     ObjectScore* computeScore(Patch* patch);
-
+    
     void add(Patch* patch, bool label);
     void add(Patch* patch, int index, bool label);
     void replace(Patch* patch, int oldIndex);
