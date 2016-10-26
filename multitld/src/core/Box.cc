@@ -12,9 +12,39 @@ Box::Box(int id, double x1, double y1, double x2, double y2) {
     this->y2 = y2;
     this->width = x2 - x1 + 1;
     this->height = y2 - y1 + 1;
+    this->isValid = false;
 }
 
-Box* Box::move(double dx, double dy) {
+Box::Box(int id, double x1, double y1, double x2, double y2, double w, double h) {
+    this->id = id;
+
+    this->x1 = x1;
+    this->y1 = y1;
+
+    this->x2 = x2;
+    this->y2 = y2;
+    this->width = x2 - x1 + 1;
+    this->height = y2 - y1 + 1;
+    this->isValid = false;
+}
+
+bool Box::isStandard() {
+    double sum = 0.0;
+    sum += x1;
+    sum += x2;
+    sum += y1;
+    sum += y2;
+
+    double roundedSum = 0.0;
+    roundedSum += round(x1);
+    roundedSum += round(x2);
+    roundedSum += round(y1);
+    roundedSum += round(y2);
+
+    return sum == roundedSum;
+}
+
+Box* Box::move(float dx, float dy) {
     Box* box = new Box(id, x1 + dx, y1 + dy, x2 + dx, y2 + dy);
     return box;
 }

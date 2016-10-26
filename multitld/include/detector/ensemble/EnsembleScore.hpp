@@ -32,8 +32,8 @@ public:
 
         int n = (int) scores.size();
         for (int i = 0; i < n; i++) {
-            double thisScore = scores[i];
-            double otherScore = otherEnsembleScore->scores[i];
+            float thisScore = scores[i];
+            float otherScore = otherEnsembleScore->scores[i];
             newEnsembleScore->scores[i] = thisScore + otherScore;
         }
 

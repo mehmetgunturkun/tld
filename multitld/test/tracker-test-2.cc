@@ -112,7 +112,8 @@ int main(int argc, char** argv) {
         new tld::Point(134.551, 148.054)
     };
 
-    vector<tld::Point*> newPointList = tracker->lkTrack(frame1, frame2, pointList);
+    vector<tld::Point*> newPointList;
+    //  = tracker->lkTrack(frame1, frame2, pointList);
 
     cout << "------------------\n";
     for (int i = 0; i < pointList.size(); i++) {

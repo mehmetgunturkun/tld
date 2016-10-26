@@ -85,7 +85,7 @@ public:
             return boxList;
         }
         vector<Distance*> distances = computeDistances(boxList, nrOfBoxes);
-        vector<Cluster*> clusters = Cluster::build(distances, distances.size(), 0.5);
+        vector<Cluster*> clusters = Cluster::build(distances, (int) distances.size(), 0.5);
         vector<ScoredBox*> clusteredBoxes = combineClusters(clusters, boxList);
         return clusteredBoxes;
     }
@@ -103,7 +103,7 @@ public:
 
 struct ScoredBoxOverlapOrdered {
     bool operator() (ScoredBox* box1, ScoredBox* box2) {
-      return box1->box->overlap >= box2->box->overlap;
+        return box1->box->overlap >= box2->box->overlap;
     }
 
     bool compare(ScoredBox* box1, ScoredBox* box2) {

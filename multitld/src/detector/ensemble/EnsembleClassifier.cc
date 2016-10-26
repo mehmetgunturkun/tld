@@ -253,12 +253,15 @@ void EnsembleClassifier::train(TrainingSet<ScoredBox> ts, int modelId) {
                 int label = sample->label;
 
                 double probability = getProbability(scoredBox, modelId);
+                // ImageBuilder* builder = new ImageBuilder(frame);
+                // printf("EC >> Prob(%d): %f\n", label, probability);
 
                 if (label == 1) {
                     if (probability <= positiveUpdateThreshold) {
+                        // printf(GREEN("%s is going to be updated as positive, since it has already lower prob: %f\n"), scoredBox->box->toCharArr(), probability);
                         updateBaseClassifiers(frame, scoredBox, modelId, true);
                     } else {
-                        // update nothing
+                        // printf(YELLOW("%s is going to be ignored as positive, since it has already higher prob: %f\n"), scoredBox->box->toCharArr(), probability);
                     }
                 }
 

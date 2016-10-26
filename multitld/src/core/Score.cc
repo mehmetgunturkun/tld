@@ -13,5 +13,5 @@ Score* Score::clone() {
 }
 
 double Score::getValue(int modelId) {
-    return 0.0f;
+    return 0.0;
 }
