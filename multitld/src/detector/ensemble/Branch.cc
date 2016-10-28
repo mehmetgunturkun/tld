@@ -37,6 +37,6 @@ void Branch::update(int modelId, bool label) {
 void Branch::dumpLeaves() {
     for (int i = 0; i < nrOfLeaves; i++) {
         Leaf* leaf = branch[i];
-        printf("\t%d: %s\n", i, leaf->toString().c_str());
+        println("\t%d: %s", i, leaf->toString().c_str());
     }
 }

@@ -1,6 +1,8 @@
 #ifndef BASE_CLASSIFIER_H
 #define BASE_CLASSIFIER_H
 
+#include "common/Logging.hpp"
+
 #include "core/Frame.hpp"
 #include "core/Box.hpp"
 #include "core/ScoredBox.hpp"

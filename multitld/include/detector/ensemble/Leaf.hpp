@@ -4,6 +4,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include "common/Logging.hpp"
 
 using namespace std;
 

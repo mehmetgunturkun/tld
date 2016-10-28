@@ -141,25 +141,25 @@ void NearestNeighborClassifier::train(TrainingSet<ScoredBox> ts, int modelId) {
         if (label == 1) {
             if (relativeScore <= 0.65) {
                 if (isInPositive == true) {
-                    printf("NN.add(+) >>> %d, %s\n", closestPositivePatchIndex, scoredBox->box->toCharArr());
+                    DEBUG("NN.add(+) >>> %d, %s", closestPositivePatchIndex, scoredBox->box->toCharArr());
                     model->add(patch, true);
                     continue;
                 }
 
-                printf("NN.ins(+) >>> %s, %g, %d, %d\n", scoredBox->box->toCharArr(), relativeScore, isInPositive, closestPositivePatchIndex);
+                DEBUG("NN.ins(+) >>> %s, %g, %d, %d", scoredBox->box->toCharArr(), relativeScore, isInPositive, closestPositivePatchIndex);
                 model->add(patch, closestPositivePatchIndex, true);
             } else {
-                printf("NN.nop(+) >>> %s, %g, %d\n", scoredBox->box->toCharArr(), relativeScore, isInPositive);
+                DEBUG("NN.nop(+) >>> %s, %g, %d", scoredBox->box->toCharArr(), relativeScore, isInPositive);
             }
         }
 
         if (label == 0) {
             // builder->withBox(scoredBox->box, Colors::RED)->withTitle("nn-neg")->display(0);
             if (relativeScore > 0.5) {
-                printf("NN.add(-) >>> %s, %g\n", scoredBox->box->toCharArr(), relativeScore);
+                DEBUG("NN.add(-) >>> %s, %g", scoredBox->box->toCharArr(), relativeScore);
                 model->add(patch, false);
             } else {
-                printf("NN.nop(-) >>> %s, %g\n", scoredBox->box->toCharArr(), relativeScore);
+                DEBUG("NN.nop(-) >>> %s, %g", scoredBox->box->toCharArr(), relativeScore);
             }
         }
     }

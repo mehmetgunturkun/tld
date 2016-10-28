@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#include "common/Logging.hpp"
 #include "common/Option.hpp"
 #include "common/StringStream.hpp"
 
@@ -15,8 +16,6 @@
 #define NR_OF_MODELS 2
 #define MIN_DOUBLE(a,b) (a < b ? a : b)
 #define MAX_DOUBLE(a,b) (a > b ? a : b)
-
-#define println(format, ...) printf(format, ##__VA_ARGS__); printf("\n");
 
 using namespace std;
 

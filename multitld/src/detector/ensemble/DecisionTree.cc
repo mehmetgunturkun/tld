@@ -29,7 +29,7 @@ void DecisionTree::dumpDecisionTree() {
     for (int i = 0; i < nrOfBranch; i++) {
          Branch* branch = tree[i];
          if (branch->dirtyBit) {
-             printf("BinaryCode: %d\n", i);
+             println("BinaryCode: %d", i);
              branch->dumpLeaves();
          }
     }

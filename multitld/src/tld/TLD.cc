@@ -198,7 +198,10 @@ Option<Box>* TLD::integrate(Frame* frame, Box* oldBox, Box* maybeTrackedBox, vec
         printf("Not going to learn\n");
     }
 
-    detector->dumpDetector();
+    DEBUGALL(
+        detector->dumpDetector();
+    )
+
     printf(YELLOW("==== Learner is completed ====\n"));
 
     return maybeFinalBox;

@@ -54,6 +54,8 @@ int main(int argc, char** argv) {
         previous = current;
     }
 
+    tld->detector->dumpDetector();
+
     outputFile.close();
     return EXIT_SUCCESS;
 }

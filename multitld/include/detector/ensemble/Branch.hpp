@@ -1,6 +1,7 @@
 #ifndef BRANCH_H
 #define BRANCH_H
 
+#include "common/Logging.hpp"
 #include "detector/ensemble/Leaf.hpp"
 
 class Branch {

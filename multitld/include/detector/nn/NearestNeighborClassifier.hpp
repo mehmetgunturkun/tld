@@ -3,6 +3,7 @@
 
 #include <vector>
 
+#include "common/Logging.hpp"
 #include "core/Frame.hpp"
 #include "core/ScoredBox.hpp"
 

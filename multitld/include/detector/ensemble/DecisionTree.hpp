@@ -2,6 +2,7 @@
 #define DECISION_TREE_H
 
 #include <cmath>
+#include "common/Logging.hpp"
 #include "detector/ensemble/Branch.hpp"
 
 class DecisionTree {

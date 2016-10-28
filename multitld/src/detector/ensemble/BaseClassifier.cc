@@ -47,13 +47,13 @@ void BaseClassifier::train(Frame* frame, ScoredBox* scoredBox, int modelId, bool
 }
 
 void BaseClassifier::dumpBaseClassifier() {
-    printf("===== BaseClassifier(%2d) =====\n", this->id);
+    println("===== BaseClassifier(%2d) =====", this->id);
     decTree->dumpDecisionTree();
-    printf("===============================\n");
+    println("===============================");
 }
 
 void BaseClassifier::printPixelComparison() {
-    printf("===== BaseClassifier(%2d) =====\n", this->id);
+    println("===== BaseClassifier(%2d) =====", this->id);
     codeGen->printPixelComparison();
-    printf("===============================\n");
+    println("===============================");
 }

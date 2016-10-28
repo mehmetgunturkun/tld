@@ -72,8 +72,6 @@ Box* Detector::init(Frame* frame, Box* box, int modelId) {
     while (boxIterator->hasNext()) {
         Box* sampleBox = boxIterator->next();
 
-        printf("%s\n", sampleBox->toCharArr());
-
         //Compute Overlap
         double overlap = Box::computeOverlap(sampleBox, box);
         sampleBox->overlap = overlap;
@@ -110,17 +108,19 @@ Box* Detector::init(Frame* frame, Box* box, int modelId) {
     Random::seed();
     vector<ScoredBox*> negativeScoredBoxList4EnsembleFirstPart = Random::splitData(negativeScoredBoxList4Ensemble, 2);
 
-    printf("====== TRAINING DATA FOR EC ======\n");
-    for (int i = 0; i < (int) positiveScoredBoxList4Ensemble.size(); i++) {
-        ScoredBox* scoredBox = positiveScoredBoxList4Ensemble[i];
-        printf(COLOR_GREEN "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
-    }
+    DEBUGALL(
+        printf("====== TRAINING DATA FOR EC ======\n");
+        for (int i = 0; i < (int) positiveScoredBoxList4Ensemble.size(); i++) {
+            ScoredBox* scoredBox = positiveScoredBoxList4Ensemble[i];
+            DEBUG(COLOR_GREEN "%s" COLOR_RESET, scoredBox->box->toCharArr());
+        }
 
-    for (int i = 0; i < (int) negativeScoredBoxList4Ensemble.size(); i++) {
-        ScoredBox* scoredBox = negativeScoredBoxList4Ensemble[i];
-        printf(COLOR_RED "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
-    }
-    printf("==================================\n");
+        for (int i = 0; i < (int) negativeScoredBoxList4Ensemble.size(); i++) {
+            ScoredBox* scoredBox = negativeScoredBoxList4Ensemble[i];
+            DEBUG(COLOR_RED "%s" COLOR_RESET, scoredBox->box->toCharArr());
+        }
+        printf("==================================\n");
+    )
 
     Box* closestBox = positiveScoredBoxList4Ensemble[0]->box;
     vector<ScoredBox*> positiveScoredBoxList4NN = { positiveScoredBoxList4Ensemble[0] };
@@ -134,17 +134,19 @@ Box* Detector::init(Frame* frame, Box* box, int modelId) {
     Random::seed();
     vector<ScoredBox*> negativeScoredBoxList4NNFirstPart = Random::splitData(negativeScoredBoxList4NN, 2);
 
-    printf("====== TRAINING DATA FOR NN ======\n");
-    for (int i = 0; i < (int) positiveScoredBoxList4NN.size(); i++) {
-        ScoredBox* scoredBox = positiveScoredBoxList4NN[i];
-        printf(COLOR_GREEN "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
-    }
+    DEBUGALL(
+        printf("====== TRAINING DATA FOR NN ======\n");
+        for (int i = 0; i < (int) positiveScoredBoxList4NN.size(); i++) {
+            ScoredBox* scoredBox = positiveScoredBoxList4NN[i];
+            DEBUG(COLOR_GREEN "%s" COLOR_RESET, scoredBox->box->toCharArr());
+        }
 
-    for (int i = 0; i < (int) negativeScoredBoxList4NNFirstPart.size(); i++) {
-        ScoredBox* scoredBox = negativeScoredBoxList4NNFirstPart[i];
-        printf(COLOR_RED "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
-    }
-    printf("==================================\n");
+        for (int i = 0; i < (int) negativeScoredBoxList4NNFirstPart.size(); i++) {
+            ScoredBox* scoredBox = negativeScoredBoxList4NNFirstPart[i];
+            DEBUG(COLOR_RED "%s" COLOR_RESET, scoredBox->box->toCharArr());
+        }
+        printf("==================================\n");
+    )
 
     TrainingSet<ScoredBox> trainingSet4Ensemble = TrainingSet<ScoredBox>(
         frame,
@@ -232,40 +234,42 @@ void Detector::learn(Frame* current, Box* box, vector<ScoredBox*> grids, int mod
 
     vector<ScoredBox*> positiveScoredBoxList4Ensemble = positiveQueue.toVector();
     vector<ScoredBox*> negativeScoredBoxList4Ensemble = negativeQueue;
+    DEBUGALL(
+        printf("====== TRAINING DATA FOR EC ======\n");
+        printf("Positive Boxes: %d / %d\n", (int) positiveScoredBoxList4Ensemble.size(), nrOfPositive);
+        for (int i = 0; i < (int) positiveScoredBoxList4Ensemble.size(); i++) {
+            ScoredBox* scoredBox = positiveScoredBoxList4Ensemble[i];
+            DEBUG(COLOR_GREEN "%s - %f" COLOR_RESET, scoredBox->box->toCharArr(), scoredBox->box->overlap);
+        }
 
-    printf("====== TRAINING DATA FOR EC ======\n");
-    printf("Positive Boxes: %d / %d\n", (int) positiveScoredBoxList4Ensemble.size(), nrOfPositive);
-    for (int i = 0; i < (int) positiveScoredBoxList4Ensemble.size(); i++) {
-        ScoredBox* scoredBox = positiveScoredBoxList4Ensemble[i];
-        printf(COLOR_GREEN "%s - %f\n" COLOR_RESET, scoredBox->box->toCharArr(), scoredBox->box->overlap);
-    }
-
-    printf("Negative Boxes: %d\n", (int) negativeScoredBoxList4Ensemble.size());
-    for (int i = 0; i < (int) negativeScoredBoxList4Ensemble.size(); i++) {
-        ScoredBox* scoredBox = negativeScoredBoxList4Ensemble[i];
-        printf(COLOR_RED "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
-    }
-    printf("==================================\n");
+        printf("Negative Boxes: %d\n", (int) negativeScoredBoxList4Ensemble.size());
+        for (int i = 0; i < (int) negativeScoredBoxList4Ensemble.size(); i++) {
+            ScoredBox* scoredBox = negativeScoredBoxList4Ensemble[i];
+            DEBUG(COLOR_RED "%s" COLOR_RESET, scoredBox->box->toCharArr());
+        }
+        printf("==================================\n");
+    )
 
     vector<ScoredBox*> positiveScoredBoxList4NN;
     if (positiveScoredBoxList4Ensemble.size() > 0) {
         positiveScoredBoxList4NN = { positiveScoredBoxList4Ensemble[0] };
     }
     vector<ScoredBox*> negativeScoredBoxList4NN = negativeQueue4NN;
+    DEBUGALL(
+        printf("====== TRAINING DATA FOR NN ======\n");
+        printf("Positive Boxes: %d\n", (int) positiveScoredBoxList4NN.size());
+        for (int i = 0; i < (int) positiveScoredBoxList4NN.size(); i++) {
+            ScoredBox* scoredBox = positiveScoredBoxList4NN[i];
+            DEBUG(COLOR_GREEN "%s" COLOR_RESET, scoredBox->box->toCharArr());
+        }
 
-    printf("====== TRAINING DATA FOR NN ======\n");
-    printf("Positive Boxes: %d\n", (int) positiveScoredBoxList4NN.size());
-    for (int i = 0; i < (int) positiveScoredBoxList4NN.size(); i++) {
-        ScoredBox* scoredBox = positiveScoredBoxList4NN[i];
-        printf(COLOR_GREEN "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
-    }
-
-    printf("Negative Boxes: %d\n", (int) negativeScoredBoxList4NN.size());
-    for (int i = 0; i < (int) negativeScoredBoxList4NN.size(); i++) {
-        ScoredBox* scoredBox = negativeScoredBoxList4NN[i];
-        printf(COLOR_RED "%s\n" COLOR_RESET, scoredBox->box->toCharArr());
-    }
-    printf("==================================\n");
+        printf("Negative Boxes: %d\n", (int) negativeScoredBoxList4NN.size());
+        for (int i = 0; i < (int) negativeScoredBoxList4NN.size(); i++) {
+            ScoredBox* scoredBox = negativeScoredBoxList4NN[i];
+            DEBUG(COLOR_RED "%s" COLOR_RESET, scoredBox->box->toCharArr());
+        }
+        printf("==================================\n");
+    )
 
     TrainingSet<ScoredBox> trainingSet4Ensemble = TrainingSet<ScoredBox>(
         current,
