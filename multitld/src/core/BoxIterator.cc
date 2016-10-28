@@ -21,14 +21,23 @@ BoxScaleTemplate::BoxScaleTemplate(int scaleNo, double boxWidth, double boxHeigh
     this->width = boxWidth;
     this->height = boxHeight;
 
-    this->stepX = round(this->width) * 0.1;
-    this->stepY = round(this->height) * 0.1;
+    frameWidth = frameWidth - 1;
+    frameHeight = frameHeight - 1;
 
-    this->stepX = min(this->stepX, this->stepY);
-    this->stepY = min(this->stepX, this->stepY);
+    double h = MIN_DOUBLE(this->height, this->height);
+    double w = MIN_DOUBLE(this->height, this->width);
 
-    this->limitX = roundDouble(frameWidth - this->width - 1);
-    this->limitY = roundDouble(frameHeight - this->height - 1);
+    double sx = w * 0.1;
+    double sy = h * 0.1;
+
+    double lx = frameWidth - this->width - 1;
+    double ly = frameHeight - this->height - 1;
+
+    this->stepX = sx;
+    this->stepY = sy;
+
+    this->limitX = lx;
+    this->limitY = ly;
 }
 
 
@@ -38,9 +47,10 @@ bool BoxScaleTemplate::hasNext() {
         return true;
     } else {
         double nextX1 = this->x1 + stepX;
-        if (roundDouble(nextX1) >= limitX) {
+        if (nextX1 >= limitX) {
             double nextY1 = this->y1 + stepY;
-            if (roundDouble(nextY1) >= limitY) {
+
+            if (nextY1 >= limitY) {
                 return false;
             }
             this->x1 = 1.0;
