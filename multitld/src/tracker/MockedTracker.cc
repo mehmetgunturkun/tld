@@ -5,11 +5,7 @@
 #include <iostream>
 #include <fstream>
 
-
-
 //********************************
-
-
 void track(Frame* firstFrame, Frame* secondFrame, Box* box);
 
 class TPoint {
@@ -319,7 +315,8 @@ Option<Box>* parseFromLine(string line) {
 }
 
 Tracker::Tracker() {
-    ifstream initFile("/tmp/mockedBoxList.csv");
+    // ifstream initFile("/tmp/mockedBoxList.csv");
+    ifstream initFile("/tmp/tld/simulations/car/mockedBoxList.csv");
     string line;
     while (getline(initFile, line)) {
         // printf("reading line: %s\n", line.c_str());
@@ -336,10 +333,10 @@ Tracker::Tracker() {
 
 vector<Box*> Tracker::track(Frame* prev, Frame* curr, vector<Box*> boxList) {
     printf("Returning mocked result for %d\n", curr->id);
-    if (boxList.size() > 0 && boxList[0] != nullptr) {
-        Box* fromBox = boxList[0];
-        trackOneFrame(prev, curr, fromBox);
-    }
+    // if (boxList.size() > 0 && boxList[0] != nullptr) {
+    //     Box* fromBox = boxList[0];
+    //     trackOneFrame(prev, curr, fromBox);
+    // }
 
     Box* nextBox = mockedBoxList[curr->id - 1];
     vector<Box*> nextBoxList;

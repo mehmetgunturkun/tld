@@ -1,11 +1,6 @@
 #include "testbase/Sequence.hpp"
 #include "detector/ensemble/EnsembleClassifier.hpp"
 
-
-void createPoints(Box* box) {
-    
-}
-
 int main(int argc, char** argv) {
 
     Sequence* sequence = new Sequence("tld/car");

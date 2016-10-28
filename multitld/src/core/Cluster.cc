@@ -24,5 +24,6 @@ Cluster* Cluster::merge(Cluster* other) {
         c->add(other->pointList[i]);
     }
 
+
     return c;
 }

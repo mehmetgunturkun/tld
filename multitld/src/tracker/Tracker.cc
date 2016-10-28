@@ -26,12 +26,11 @@ vector<Box*> Tracker::track(Frame* prev, Frame* curr, vector<Box*> boxList) {
     int nrOfStableBoxes = (int) stableBoxList.size();
 
     for (int i = 0; i < nrOfStableBoxes; i++) {
-        printf("PRE >> %s\n", stableBoxList[i]->toCharArr());
+        printf("%s\n", stableBoxList[i]->toCharArr());
     }
 
-    vector<Box*> nextBoxList;
     if (nrOfStableBoxes == 0) {
-        nextBoxList = boxList;
+        return boxList;
     } else {
         vector<tld::Point*> points = decomposePoints(stableBoxList, nrOfStableBoxes);
         vector<FBPoint*> trackedPoints = track(prev, curr, points);
@@ -44,21 +43,12 @@ vector<Box*> Tracker::track(Frame* prev, Frame* curr, vector<Box*> boxList) {
             boxList,
             trackedPoints
         );
-        nextBoxList = estimatedBoxList;
+        return estimatedBoxList;
     }
-
-    for (int i = 0; i < nextBoxList.size(); i++) {
-        if (nextBoxList[i] != nullptr) {
-            printf("POST >> %s\n", nextBoxList[i]->toCharArr());
-        }
-    }
-    return nextBoxList;
 }
 
-
-double Tracker::computeStep(double start, double end, int pointCount) {
-    double step = ((end - 5.0) - (start + 5.0)) / (pointCount - 1);
-    return step;
+float Tracker::computeStep(float start, float end, int pointCount) {
+    return ((end - MARGIN) - (start + MARGIN)) / (pointCount - 1);
 }
 
 vector<tld::Point*> Tracker::decomposePoints(vector<Box*> boxList, int nrOfBoxes) {
@@ -67,33 +57,11 @@ vector<tld::Point*> Tracker::decomposePoints(vector<Box*> boxList, int nrOfBoxes
     for (int i = 0; i < nrOfBoxes; i++) {
         Box* box = boxList[i];
         int nrOfPoints = 0;
-
-        double x1 = (double) box->x1;
-        double x2 = (double) box->x2;
-
-        double y1 = (double) box->y1;
-        double y2 = (double) box->y2;
-
-        double horizontalStep = computeStep(x1, x2, 10);
-        double verticalStep = computeStep(y1, y2, 10);
-
-        double height = (double) box->height;
-        double heightWithPadding = height - 5.0;
-
-        double width = (double) box->width;
-        double widthWithPadding = width - 5.0;
-
-        for (double i = 5; i <= widthWithPadding; i = i + horizontalStep) {
-            for (double j = 5; j <= heightWithPadding; j = j + verticalStep) {
-                double x = x1 + i;
-                double y = y1 + j;
-
-                float xf = (float) x;
-                float yf = (float) y;
-
-                // printf("points.push_back(Point2f(%f, %f));\n", xf, yf);
-
-                Point2f point2f = Point2f(xf, yf);
+        float horizontalStep = computeStep(box->x1, box->x2, 10);
+        float verticalStep = computeStep(box->y1, box->y2, 10);
+        for (float j = MARGIN; j <= box->height - MARGIN; j = j + verticalStep) {
+            for (float i = MARGIN; i <= box->width - MARGIN; i = i + horizontalStep) {
+                Point2f point2f = Point2f(box->x1 + i - 2, box->y1 + j);
                 tld::Point* point = new tld::Point(point2f);
 
                 nrOfPoints += 1;
@@ -111,7 +79,7 @@ vector<FBPoint*> Tracker::track(Frame* prev, Frame* curr, vector<tld::Point*> po
     int nrOfPoints = points.size();
 
     vector<tld::Point*> toPoints = lkTrack(prev, curr, points);
-    printf("-------------------------------------------------------\n");
+    printf("------\n");
     vector<tld::Point*> backwardPoints = lkTrack(curr, prev, toPoints);
 
     for (int i = 0; i < nrOfPoints; i++) {
@@ -119,7 +87,7 @@ vector<FBPoint*> Tracker::track(Frame* prev, Frame* curr, vector<tld::Point*> po
         tld::Point* targetPoint = toPoints[i];
         tld::Point* bwPoint = backwardPoints[i];
 
-        if (targetPoint->state) {
+        if (bwPoint->state) {
             FBPoint* fbPoint = new FBPoint(srcPoint, targetPoint, bwPoint);
             fbPoints.push_back(fbPoint);
         } else {
@@ -145,16 +113,18 @@ vector<tld::Point*> Tracker::lkTrack(Frame* prev, Frame* curr, vector<tld::Point
     int nrOfPoints = 0;
     for (int i = 0; i < pointCount; i++) {
         tld::Point* point = srcPoints[i];
-        fromPoints[nrOfPoints].x = point->underlying.x;
-        fromPoints[nrOfPoints].y = point->underlying.y;
+        if (point->state) {
+            fromPoints[nrOfPoints].x = point->underlying.x;
+            fromPoints[nrOfPoints].y = point->underlying.y;
 
-        toPoints[nrOfPoints].x = point->underlying.x;
-        toPoints[nrOfPoints].y = point->underlying.y;
+            toPoints[nrOfPoints].x = point->underlying.x;
+            toPoints[nrOfPoints].y = point->underlying.y;
 
-        nrOfPoints += 1;
+            nrOfPoints += 1;
+        }
     }
 
-    char* status = (char*) cvAlloc(nrOfPoints);
+    char* status = (char*)  cvAlloc(nrOfPoints);
 
     cvCalcOpticalFlowPyrLK(
         fromImage,
@@ -168,7 +138,7 @@ vector<tld::Point*> Tracker::lkTrack(Frame* prev, Frame* curr, vector<tld::Point
         5,
         status,
         0,
-        cvTermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS, 20, 0.03),
+        cvTermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS, 20,0.03),
         CV_LKFLOW_INITIAL_GUESSES);
 
     vector<tld::Point*> targetPoints;
@@ -176,22 +146,19 @@ vector<tld::Point*> Tracker::lkTrack(Frame* prev, Frame* curr, vector<tld::Point
     for (int i = 0; i < pointCount; i++) {
         tld::Point* srcPoint = srcPoints[i];
         tld::Point* targetPoint;
-        // if (srcPoint->state) {
+        if (srcPoint->state) {
             CvPoint2D32f toPoint2f = toPoints[id];
-
             Point2f toPoint = Point2f(toPoint2f.x, toPoint2f.y);
-            int state = (int) status[id];
-            if (state == 1) {
-                printf(GREEN("PO(%f, %f) >> P1(%f, %f)\n"), srcPoint->underlying.x, srcPoint->underlying.y, toPoint2f.x, toPoint2f.y);
+            uchar state = status[id];
+            if (state) {
                 targetPoint = new tld::Point(toPoint);
             } else {
-                printf(RED("PO(%f, %f) >> P1(%f, %f)\n"), srcPoint->underlying.x, srcPoint->underlying.y, toPoint2f.x, toPoint2f.y);
                 targetPoint = tld::Point::failed;
             }
             id += 1;
-        // } else {
-        //     targetPoint = tld::Point::failed;
-        // }
+        } else {
+            targetPoint = tld::Point::failed;
+        }
         targetPoints.push_back(targetPoint);
     }
 
@@ -222,54 +189,12 @@ float computeNCC(Frame* srcFrame, tld::Point* srcPoint, Frame* targetFrame, tld:
 
 float median(vector<float> floatVector) {
     int size = (int) floatVector.size();
-    if (size == 0) {
-        printf(RED("There is no item to get median\n"));
-        return 0.0f;
-    } else if (size == 1) {
-        return floatVector[0];
-    } else {
-        sort(floatVector.begin(), floatVector.end(), [](float a, float b) { return a > b; });
-        int middle = size / 2;
-        float med = floatVector[middle];
-
-        printf(CYAN("MED(%d): %f\n"), middle, med);
-
-        if (size % 2 == 0) {
-            printf(CYAN("MED(%d): %f\n"), middle - 1, floatVector[middle - 1]);
-
-            med = (med + floatVector[middle - 1]) / 2;
-        }
-
-        return med;
-    }
-}
-
-double mediand(vector<double> floatVector) {
-    int size = (int) floatVector.size();
-    if (size == 0) {
-        printf(RED("There is no item to get median\n"));
-        return 0.0f;
-    } else if (size == 1) {
-        return floatVector[0];
-    } else {
-        sort(floatVector.begin(), floatVector.end(), [](float a, float b) { return a > b; });
-        int middle = size / 2;
-        double med = floatVector[middle];
-
-        printf(CYAN("MED(%d): %f\n"), middle, med);
-
-        if (size % 2 == 0) {
-
-            printf(CYAN("MED(%d): %f\n"), middle - 1, floatVector[middle - 1]);
-            med = (med + floatVector[middle - 1]) / 2;
-        }
-
-        return med;
-    }
+    sort(floatVector.begin(), floatVector.end(), [](float a, float b) { return a > b; });
+    return floatVector[size / 2];
 }
 
 Option<Box>* estimate(Frame* prev, Frame* curr, Box* box, vector<FBPoint*> trackedPoints, int start, int end) {
-    vector<double> fbErrors;
+    vector<float> fbErrors;
     vector<float> nccErrors;
     int nrOfStablePoints = 0;
     for (int i = start; i < end; i++) {
@@ -280,27 +205,10 @@ Option<Box>* estimate(Frame* prev, Frame* curr, Box* box, vector<FBPoint*> track
             tld::Point* targetPoint = fbPoint->to;
             tld::Point* bwPoint = fbPoint->backwardPoint;
 
-            double x1 = (double) srcPoint->underlying.x;
-            double y1 = (double) srcPoint->underlying.y;
-            double x3 = (double) bwPoint->underlying.x;
-            double y3 = (double) bwPoint->underlying.y;
-
-            double dx = x3 - x1;
-            double dy = y3 - y1;
-            double error = sqrt(dx*dx + dy*dy);
-
             float fbError = computeFBError(srcPoint, targetPoint, bwPoint);
             float ncc = computeNCC(prev, srcPoint, curr, targetPoint);
 
-            printf(CYAN("P(x = %f, y = %f, fbb = %f, ncc = %f)\n"),
-                targetPoint->underlying.x,
-                targetPoint->underlying.y,
-                fbError,
-                ncc);
-
-
-
-            fbPoint->fbError = error;
+            fbPoint->fbError = fbError;
             fbPoint->ncc = ncc;
 
             fbErrors.push_back(fbError);
@@ -314,11 +222,8 @@ Option<Box>* estimate(Frame* prev, Frame* curr, Box* box, vector<FBPoint*> track
         return failedBox;
     }
 
-    double medFBE = mediand(fbErrors);
+    float medFBE = median(fbErrors);
     float medNCC = median(nccErrors);
-
-    printf("median(fb): %g\n", medFBE);
-    printf("median(ncc): %f\n", medNCC);
 
     if (medFBE > 10) {
         printf("Invalid Box -- high fb error - %f\n", medFBE);
@@ -329,32 +234,28 @@ Option<Box>* estimate(Frame* prev, Frame* curr, Box* box, vector<FBPoint*> track
     vector<FBPoint*> reliablePoints;
     for (int i = start; i < end; i++) {
         FBPoint* fbPoint = trackedPoints[i];
-        if (fbPoint->state && fbPoint->fbError <= 0.0284 && fbPoint->ncc >= 0.98) {
+        if (fbPoint->state && fbPoint->fbError <= medFBE && fbPoint->ncc >= medNCC) {
             reliablePoints.push_back(fbPoint);
         }
     }
 
     int nrOfReliablePoints = reliablePoints.size();
-
-    printf("Nr Of Reliable Points: %d\n", nrOfReliablePoints);
     if (nrOfReliablePoints == 0) {
         printf("No reliable boxes\n");
         Option<Box>* failedBox = new Option<Box>();
         return failedBox;
     }
 
-    vector<double> dxList(nrOfReliablePoints);
-    vector<double> dyList(nrOfReliablePoints);
+    vector<float> dxList(nrOfReliablePoints);
+    vector<float> dyList(nrOfReliablePoints);
     for (int i = 0; i < nrOfReliablePoints; i++) {
         FBPoint* fbPoint = reliablePoints[i];
-        dxList[i] = (double) fbPoint->dx;
-        dyList[i] = (double) fbPoint->dy;
+        dxList[i] = fbPoint->dx;
+        dyList[i] = fbPoint->dy;
     }
 
-    double medX = mediand(dxList);
-    double medY = mediand(dyList);
-
-    printf("dx: %f, dy: %f\n", medX, medY);
+    float medX = median(dxList);
+    float medY = median(dyList);
 
     Box* movedBox = box->move(medX, medY);
     Option<Box>* successBox = new Option<Box>(movedBox);

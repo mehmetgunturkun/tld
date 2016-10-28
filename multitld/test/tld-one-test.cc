@@ -51,7 +51,6 @@ int main(int argc, char** argv) {
             // outputFile << "Box(nan, nan, nan, nan)";
         }
         // builder->display(1);
-        // previous->free();
         previous = current;
     }
 

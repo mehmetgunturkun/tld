@@ -16,6 +16,8 @@
 #define MIN_DOUBLE(a,b) (a < b ? a : b)
 #define MAX_DOUBLE(a,b) (a > b ? a : b)
 
+#define println(format, ...) printf(format, ##__VA_ARGS__); printf("\n");
+
 using namespace std;
 
 class Box {
@@ -30,7 +32,7 @@ public:
     double width;
     double height;
 
-    float mean;
+    double mean;
     double variance;
     double overlap;
 
@@ -42,7 +44,7 @@ public:
 
     Box(int id, double x1, double y1, double x2, double y2);
     Box(int id, double x1, double y1, double x2, double y2, double w, double h);
-    Box* move(float dx, float dy);
+    Box* move(double dx, double dy);
 
     Box* sum(Box* other);
     Box* divide(int n);
@@ -54,10 +56,10 @@ public:
     static Option<Box>* parseFromLine(string line) {
         StringStream* stream = new StringStream(line, ',');
 
-        float x1 = stod(stream->next());
-        float y1 = stod(stream->next());
-        float x2 = stod(stream->next());
-        float y2 = stod(stream->next());
+        double x1 = stod(stream->next());
+        double y1 = stod(stream->next());
+        double x2 = stod(stream->next());
+        double y2 = stod(stream->next());
 
         if (isnan(x1) || isnan(x2) || isnan(y1) || isnan(y2)) {
             Option<Box>* none = new Option<Box>();
@@ -84,8 +86,7 @@ public:
 
     string toTLDString() {
         stringstream ss;
-        ss  << "Box("
-            << id << ", "
+        ss  << id << ", "
             << x1 << ", "
             << y1 << ", "
             << x2 << ", "
@@ -112,15 +113,15 @@ public:
     }
 
     static double computeOverlap(Box* b1, Box* b2) {
-        double x11 = (double) b1->x1;
-        double x12 = (double) b1->x2;
-        double y11 = (double) b1->y1;
-        double y12 = (double) b1->y2;
+        double x11 = b1->x1;
+        double x12 = b1->x2;
+        double y11 = b1->y1;
+        double y12 = b1->y2;
 
-        double x21 = (double) b2->x1;
-        double x22 = (double) b2->x2;
-        double y21 = (double) b2->y1;
-        double y22 = (double) b2->y2;
+        double x21 = b2->x1;
+        double x22 = b2->x2;
+        double y21 = b2->y1;
+        double y22 = b2->y2;
 
         if (x11 > x22 ||
             y11 > y22 ||
@@ -173,6 +174,10 @@ public:
 struct OverlapOrdered {
   bool operator() (Box* box1, Box* box2) {
       return box1->overlap >= box2->overlap;
+  }
+
+  bool compare(Box* box1, Box* box2) {
+      return box1->overlap > box2->overlap;
   }
 };
 

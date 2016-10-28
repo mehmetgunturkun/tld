@@ -10,7 +10,8 @@ double roundDouble(double n) {
     }
 }
 
-BoxScaleTemplate::BoxScaleTemplate(double boxWidth, double boxHeight, double frameWidth, double frameHeight) {
+BoxScaleTemplate::BoxScaleTemplate(int scaleNo, double boxWidth, double boxHeight, double frameWidth, double frameHeight) {
+    this->scaleNo = scaleNo;
     this->x1 = 1.0;
     this->y1 = 1.0;
 
@@ -64,7 +65,7 @@ Box* BoxScaleTemplate::next() {
 
 BoxIterator::BoxIterator(Frame* f, Box* b, int maximumScale, int minimumWindowSize) {
     this->currentScaleNo = 0;
-    this->maxScale = 10;
+    this->maxScale = maximumScale;
     this->nrOfTotalScales = 0;
     this->nrOfBoxes = 0;
 
@@ -81,8 +82,8 @@ void BoxIterator::initBoxScaleTemplates(Frame* frame, Box* box) {
         double scaledWidth = roundDouble(((double) width) * scale);
         double scaledHeight = roundDouble(((double) height) * scale);
         if (scaledWidth > 24.0 && scaledHeight > 24.0  && scaledWidth < frame->width && scaledHeight < frame->height) {
+            BoxScaleTemplate* boxTemplate = new BoxScaleTemplate(this->nrOfTotalScales, scaledWidth, scaledHeight, frame->width, frame->height);
             this->nrOfTotalScales += 1;
-            BoxScaleTemplate* boxTemplate = new BoxScaleTemplate(scaledWidth, scaledHeight, frame->width, frame->height);
             boxPerScale.push_back(boxTemplate);
         }
     }

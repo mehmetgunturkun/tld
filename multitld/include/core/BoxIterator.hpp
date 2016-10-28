@@ -8,6 +8,7 @@ class BoxScaleTemplate {
 private:
     // double roundDouble(double n);
 public:
+    int scaleNo;
     double x1;
     double y1;
 
@@ -23,7 +24,7 @@ public:
     bool preStart;
     int nrOfBoxes;
 
-    BoxScaleTemplate(double boxWidth, double boxHeight, double frameWidth, double frameHeight);
+    BoxScaleTemplate(int scaleNo, double boxWidth, double boxHeight, double frameWidth, double frameHeight);
     bool hasNext();
     Box* next();
 };

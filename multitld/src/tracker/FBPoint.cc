@@ -12,23 +12,8 @@ FBPoint::FBPoint(tld::Point* src, tld::Point* to, tld::Point* bwPoint) {
     this->to = to;
     this->backwardPoint = bwPoint;
 
-
-    double x1 = (double) src->underlying.x;
-    double y1 = (double) src->underlying.y;
-
-    double x2 = (double) to->underlying.x;
-    double y2 = (double) to->underlying.y;
-
-    double x3 = (double) backwardPoint->underlying.x;
-    double y3 = (double) backwardPoint->underlying.y;
-
-    this->dx = x2 - x1;
-    this->dy = y2 - y1;
-
-    //
-    // double ddx = x3 - x1;
-    // double ddy = y3 - y1;
-    // this->fbError = sqrt(dx*dx + dy*dy);
+    dx = to->underlying.x - src->underlying.x;
+    dy = to->underlying.y - src->underlying.y;
 }
 
 string FBPoint::toString() {

@@ -51,7 +51,10 @@ vector<Box*> Detector::init(Frame* frame, vector<Box*> boxList) {
         }
     }
 
-    this->varianceThreshold = minimumVariance / 2.0;
+    // this->varianceThreshold = minimumVariance / 2.0;
+    this->varianceThreshold = 489.4352 / 2.0;
+
+    printf("MINVAR >>> %3.4f\n", this->varianceThreshold);
 
     for (int i = 0; i < nrOfBoxes; i++) {
             Box* box = boxList[i];
@@ -62,13 +65,14 @@ vector<Box*> Detector::init(Frame* frame, vector<Box*> boxList) {
 }
 
 Box* Detector::init(Frame* frame, Box* box, int modelId) {
-    BoundedPriorityQueue<Box, OverlapOrdered> positiveQueue =
-        BoundedPriorityQueue<Box, OverlapOrdered>(nrOfPositiveBoxes4EnsembleAtInitialization);
+    BoundedSortedVector<Box, OverlapOrdered> positiveQueue = BoundedSortedVector<Box, OverlapOrdered>(10);
     vector<Box*> negativeQueue;
 
     BoxIterator* boxIterator = new BoxIterator(firstFrame, firstBox, maxScaleLimit, minimumPatchSize);
     while (boxIterator->hasNext()) {
         Box* sampleBox = boxIterator->next();
+
+        printf("%s\n", sampleBox->toCharArr());
 
         //Compute Overlap
         double overlap = Box::computeOverlap(sampleBox, box);

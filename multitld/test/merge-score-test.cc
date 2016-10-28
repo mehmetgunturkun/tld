@@ -16,7 +16,7 @@ int main(int argc, char** args) {
         double score2 = ensembleScore2->scores[i];
         double score3 = ensembleScore3->scores[i];
 
-        printf("%d, %g, %g, %g\n",i, score1, score2, score3);
+        printf("%d, %f, %f, %f\n",i, score1, score2, score3);
     }
     printf("Test is completed!\n");
 }
