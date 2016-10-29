@@ -1,7 +1,7 @@
 #ifndef FB_POINT_H
 #define FB_POINT_H
 
-#include "core/Point.hpp"
+#include "tracker/Point.hpp"
 
 class FBPoint {
 public:
@@ -16,7 +16,7 @@ public:
     float dy;
 
     FBPoint();
-    FBPoint(tld::Point* src, tld::Point* to, tld::Point* bwPoint);
+    FBPoint(tld::Point* src, tld::Point* to, tld::Point* bwPoint, float fbErr, float nccSim);
     string toString();
     const char* toCharArray();
     static FBPoint* failed;

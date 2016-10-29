@@ -3,10 +3,11 @@
 
 #include "opencv2/video/tracking.hpp"
 #include "common/Option.hpp"
-#include "core/Point.hpp"
 
 #include "core/Frame.hpp"
 #include "core/Box.hpp"
+
+#include "tracker/Point.hpp"
 #include "tracker/FBPoint.hpp"
 
 using namespace std;
@@ -21,9 +22,8 @@ private:
 public:
     Tracker();
     vector<tld::Point*> decomposePoints(vector<Box*> boxList, int nrOfBoxes);
-    vector<FBPoint*> track(Frame* prev, Frame* curr, vector<tld::Point*> points);
+    vector<FBPoint*> track(Frame* prev, Frame* curr, int nrOfPoints, vector<tld::Point*> points);
     vector<tld::Point*> lkTrack(Frame* prev, Frame* curr, vector<tld::Point*> points);
-    // vector<Box*> fragmentAndEstimateBoxList(Frame* prev, Frame* curr, vector<Box*> boxList, vector<FBPoint*> trackedPoints);
     vector<Box*> fragmentAndEstimateBoxList(Frame* prev,
                                             Frame* curr,
                                             int nrOfStableBoxes,
@@ -32,5 +32,6 @@ public:
                                             vector<Box*> boxList,
                                             vector<FBPoint*> trackedPoints);
     vector<Box*> track(Frame* prev, Frame* curr, std::vector<Box*> boxList);
+    vector<Box*> trackSilently(Frame* prev, Frame* curr, vector<Box*> boxList);
 };
 #endif

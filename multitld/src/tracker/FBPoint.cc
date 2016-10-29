@@ -6,14 +6,17 @@ FBPoint::FBPoint() {
     this->state = false;
 }
 
-FBPoint::FBPoint(tld::Point* src, tld::Point* to, tld::Point* bwPoint) {
+FBPoint::FBPoint(tld::Point* src, tld::Point* to, tld::Point* bwPoint, float fbErr, float nccSim) {
     this->state = true;
     this->src = src;
     this->to = to;
     this->backwardPoint = bwPoint;
 
-    dx = to->underlying.x - src->underlying.x;
-    dy = to->underlying.y - src->underlying.y;
+    dx = to->underlying->x - src->underlying->x;
+    dy = to->underlying->y - src->underlying->y;
+
+    fbError = fbErr;
+    ncc = nccSim;
 }
 
 string FBPoint::toString() {

@@ -306,7 +306,7 @@ vector<ScoredBox*> Detector::detect(Frame* frame) {
             continue;
         }
 
-        printf("EC >> %s\n", nextBox->toCharArr());
+        DEBUG("EC >> %s\n", nextBox->toCharArr());
 
         if (!nnClassifier->classify(frame, scoredBox)) {
             continue;
@@ -315,7 +315,7 @@ vector<ScoredBox*> Detector::detect(Frame* frame) {
         NNScore* nnScore = (NNScore*) scoredBox->getScore("nn");
         double relativeScore = nnScore->relativeScores[0];
         double conservativeValue = nnScore->conservativeScores[0];
-        printf("NN >> %s, %g, %g\n", nextBox->toCharArr(), relativeScore, conservativeValue);
+        DEBUG("NN >> %s, %g, %g\n", nextBox->toCharArr(), relativeScore, conservativeValue);
 
         scoredBox->isDetected = true;
     }

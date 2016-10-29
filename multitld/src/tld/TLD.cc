@@ -191,7 +191,7 @@ Option<Box>* TLD::integrate(Frame* frame, Box* oldBox, Box* maybeTrackedBox, vec
     printf(YELLOW("==== Learner is started ====\n"));
     if (shouldLearn) {
         Box* finalBox = maybeFinalBox->get();
-        printf("Going to learn\n");
+        printf("Going to learn %s\n", finalBox->toCharArr());
         detector->learn(frame, finalBox, scoredBoxList, modelId);
         finalBox->isValid = true;
     } else {

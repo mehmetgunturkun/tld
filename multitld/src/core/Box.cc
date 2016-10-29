@@ -44,8 +44,8 @@ bool Box::isStandard() {
     return sum == roundedSum;
 }
 
-Box* Box::move(double dx, double dy) {
-    Box* box = new Box(id, x1 + dx, y1 + dy, x2 + dx, y2 + dy);
+Box* Box::move(double dx, double sx, double dy, double sy) {
+    Box* box = new Box(id, x1 - sx + dx, y1 - sy + dy, x2 + sx + dx, y2 + sy + dy);
     return box;
 }
 
@@ -72,9 +72,11 @@ Box* Box::sum(Box* other) {
 }
 
 Box* Box::divide(int n) {
-    this->x1 = this->x1 / n;
-    this->x2 = this->x2 / n;
-    this->y1 = this->y1 / n;
-    this->y2 = this->y2 / n;
-    return this;
+    double new_x1 = this->x1 / n;
+    double new_x2 = this->x2 / n;
+    double new_y1 = this->y1 / n;
+    double new_y2 = this->y2 / n;
+
+    Box* newBox = new Box(this->id, new_x1, new_y1, new_x2, new_y2);
+    return newBox;
 }

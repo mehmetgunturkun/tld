@@ -5,6 +5,8 @@
 #include <iostream>
 #include <fstream>
 
+#include "common/Logging.hpp"
+
 //********************************
 void track(Frame* firstFrame, Frame* secondFrame, Box* box);
 
@@ -18,6 +20,10 @@ public:
         this->y = y;
     }
 };
+
+bool isOut(Frame* frame, Box* b) {
+    return b->x1 > frame->width || b->y1 > frame->height || b->x2 < 0 || b->y2 < 0;
+}
 
 double computeStep(double start, double end, int pointCount) {
     double step = ((end - 5.0) - (start + 5.0)) / (pointCount - 1);
@@ -66,12 +72,16 @@ vector<TPoint*> createPoints(Box* box) {
         for (double j = 5; j <= heightWithPadding; j = j + verticalStep) {
             double x = x1 + i;
             double y = y1 + j;
-            printf("P(%3.4f, %3.4f)\n", x, y);
+            ERROR("Point(%3.4f, %3.4f)", x, y);
 
             TPoint* point = new TPoint(x, y);
             pointList.push_back(point);
         }
     }
+
+    ERROR("%s", box->toCharArr());
+    ERROR("There are %4d points to track", (int) pointList.size());
+
     return pointList;
 }
 
@@ -333,10 +343,14 @@ Tracker::Tracker() {
 
 vector<Box*> Tracker::track(Frame* prev, Frame* curr, vector<Box*> boxList) {
     printf("Returning mocked result for %d\n", curr->id);
-    // if (boxList.size() > 0 && boxList[0] != nullptr) {
-    //     Box* fromBox = boxList[0];
-    //     trackOneFrame(prev, curr, fromBox);
-    // }
+    if (boxList.size() > 0 && boxList[0] != nullptr) {
+        Box* fromBox = boxList[0];
+        if (isOut(prev, fromBox)) {
+            // do nothing
+        } else {
+            trackOneFrame(prev, curr, fromBox);
+        }
+    }
 
     Box* nextBox = mockedBoxList[curr->id - 1];
     vector<Box*> nextBoxList;

@@ -9,11 +9,11 @@ int main(int argc, char** argv) {
 
     Box* initBox = sequence->initBox;
 
-    Box* b0 = initBox->move(0.0f, 0.0f);
-    Box* b1 = initBox->move(50.0f, 50.0f);
-    Box* b2 = initBox->move(-50.0f, 50.0f);
-    Box* b3 = initBox->move(50.0f, -50.0f);
-    Box* b4 = initBox->move(-50.0f, -50.0f);
+    Box* b0 = initBox->move(0.0f, 0.0f, 0.0f, 0.0f);
+    Box* b1 = initBox->move(50.0f, 0.0f, 50.0f, 0.0f);
+    Box* b2 = initBox->move(-50.0f, 0.0f, 50.0f, 0.0f);
+    Box* b3 = initBox->move(50.0f, 0.0f, -50.0f, 0.0f);
+    Box* b4 = initBox->move(-50.0f, 0.0f, -50.0f, 0.0f);
 
 
     vector<Box*> boxList = { b0, b1, b2, b3, b4 };

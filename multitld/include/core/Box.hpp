@@ -43,7 +43,7 @@ public:
 
     Box(int id, double x1, double y1, double x2, double y2);
     Box(int id, double x1, double y1, double x2, double y2, double w, double h);
-    Box* move(double dx, double dy);
+    Box* move(double dx, double sx, double dy, double sy);
 
     Box* sum(Box* other);
     Box* divide(int n);

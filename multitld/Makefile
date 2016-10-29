@@ -25,9 +25,9 @@ lib2_sources := \
 	src/core/Cluster.cc \
 	src/core/Frame.cc \
 	src/core/Box.cc \
-	src/core/Point.cc \
+	src/tracker/Point.cc \
 	src/tracker/FBPoint.cc \
-	src/tracker/MockedTracker.cc \
+	src/tracker/Tracker.cc \
 	src/testbase/Sequence.cc \
 	src/core/Score.cc \
 	src/core/ScoredBox.cc \
