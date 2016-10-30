@@ -2,20 +2,17 @@
 #include "testbase/Sequence.hpp"
 
 int main(int argc, char** args) {
-    Sequence* sequence = new Sequence("car");
+    string key(args[2]);
 
-    float t1 = 120.231;
-    double t2 = 120.231;
-
-    printf("%f, %g\n", t1, t2);
+    printf("Going to run for %s\n", key.c_str());
+    Sequence* sequence = new Sequence(key);
 
     if (!sequence->hasNext()) {
         fprintf(stderr, "There is no frames for %s sequence\n", "car");
         return EXIT_FAILURE;
-    }
-
-    while (sequence->hasNext()) {
-        Frame* current = sequence->next();
+    } else {
+        fprintf(stdout, "There are %4d frames for %s sequence\n", sequence->nrOfFrames, key.c_str());
+        return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
 }

@@ -118,7 +118,7 @@ Option<Box>* TLD::integrate(Frame* frame, Box* oldBox, Box* maybeTrackedBox, vec
     vector<ScoredBox*> detectedBoxList = detectorResult->detectedBoxList;
     vector<ScoredBox*> clusteredBoxList = detectorResult->clusteredBoxList;
 
-    display(frame, candidateBoxList, detectedBoxList, clusteredBoxList);
+    // display(frame, candidateBoxList, detectedBoxList, clusteredBoxList);
 
     bool shouldLearn = false;
     Option<Box>* maybeFinalBox = Box::None;

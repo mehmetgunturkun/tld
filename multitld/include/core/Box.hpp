@@ -85,11 +85,10 @@ public:
 
     string toTLDString() {
         stringstream ss;
-        ss  << id << ", "
-            << x1 << ", "
-            << y1 << ", "
-            << x2 << ", "
-            << y2 << ", "
+        ss  << (x1 + 1.0) << ", "
+            << (y1 + 1.0) << ", "
+            << (x2 + 1.0) << ", "
+            << (y2 + 1.0) << ", "
             << width << ", "
             << height<< ")";
         return ss.str();

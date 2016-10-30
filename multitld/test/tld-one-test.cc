@@ -32,6 +32,7 @@ int main(int argc, char** argv) {
 
     int frameNo = 0;
     Frame* previous = firstFrame;
+    outputFile << initBox->toTLDString() << "\n";
     printf("Started to run for %s\n", key.c_str());
 
     while (sequence->hasNext()) {
@@ -43,14 +44,11 @@ int main(int argc, char** argv) {
         Box* box = boxList[0];
         ImageBuilder* builder = new ImageBuilder(current);
         if (box != nullptr) {
-            // printf("FINAL >>> %s\n", box->toCharArr());
-            builder->withBox(box);
-            builder->display(1);
-            // outputFile << box->toString() << "\n";
+            string boxString = box->toTLDString();
+            outputFile << boxString << "\n";
         } else {
-            // outputFile << "Box(nan, nan, nan, nan)";
+            outputFile << "nan, nan, nan, nan\n";
         }
-        // builder->display(1);
         previous = current;
     }
 
