@@ -9,7 +9,7 @@
 #include "common/BoundedPriorityQueue.hpp"
 #include "common/BoundedSortedVector.hpp"
 
-#include "detector/variance/VarianceClassifier.hpp"
+#include "detector/variance/VarianceScore.hpp"
 #include "detector/ensemble/EnsembleClassifier.hpp"
 #include "detector/nn/NearestNeighborClassifier.hpp"
 
@@ -19,7 +19,10 @@ public:
     Box* firstBox;
     int nrOfModels;
 
-    VarianceClassifier* vClassifier;
+    double minimumVariance;
+    vector<double> varianceList;
+
+    // VarianceClassifier* vClassifier;
     EnsembleClassifier* eClassifier;
     NearestNeighborClassifier* nnClassifier;
 
@@ -38,15 +41,20 @@ public:
     Detector();
     Detector(Frame* frame, vector<Box*> boxList);
 
+
+    void initVarianceThresholds(Frame* frame, vector<Box*> boxList);
+    bool checkVariance(Frame* frame, ScoredBox* scoredBox);
+
     bool isPositive(Box* box);
     bool isNegative(Box* box);
+
     vector<Box*> init(Frame* frame, vector<Box*> boxList);
     Box* init(Frame* frame, Box* box, int modelId);
+    Box* getClosestBox(Frame* frame, Box* box);
+
     vector<ScoredBox*> detect(Frame* frame);
     void learn(Frame* current, Box* box, vector<ScoredBox*> grids, int modelId);
     ScoredBox* validate(Frame* frame, Box* box, int modelId);
-
-    Box* getClosestBox(Frame* frame, Box* box);
 
     vector<ScoredBox*> score(Frame* frame, vector<Box*> boxList);
     void score(Frame* frame, ScoredBox* scoredBox);

@@ -356,6 +356,10 @@ vector<float> pdist(vector<CvPoint2D32f*> points, int nrOfPoints) {
     return dist;
 }
 
+bool isOut(Frame* frame, Box* b) {
+    return b->x1 > frame->width || b->y1 > frame->height || b->x2 < 0 || b->y2 < 0;
+}
+
 Option<Box>* estimate(Frame* prev, Frame* curr, Box* box, vector<FBPoint*> trackedPoints, int start, int end) {
     vector<float> fbErrors;
     vector<float> nccErrors;
@@ -434,9 +438,16 @@ Option<Box>* estimate(Frame* prev, Frame* curr, Box* box, vector<FBPoint*> track
     float medY = median(dyList);
 
     Box* movedBox = box->move(medX, sx, medY, sy);
-    println("REAL-TRACKER >> %s", movedBox->toCharArr());
-    Option<Box>* successBox = new Option<Box>(movedBox);
-    return successBox;
+    if (isOut(curr, movedBox)) {
+        println("REAL-TRACKER(OUT) >> %s", movedBox->toCharArr());
+        Option<Box>* failedBox = new Option<Box>();
+        return failedBox;
+    } else {
+        println("REAL-TRACKER(IN) >> %s", movedBox->toCharArr());
+        Option<Box>* successBox = new Option<Box>(movedBox);
+        return successBox;
+    }
+
 }
 
 vector<Box*> Tracker::fragmentAndEstimateBoxList(Frame* prev,

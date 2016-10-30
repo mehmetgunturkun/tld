@@ -34,7 +34,6 @@ lib2_sources := \
 	src/core/BoxIterator.cc \
 	src/core/IntegralImage.cc \
 	src/util/ImageBuilder.cc \
-	src/detector/variance/VarianceClassifier.cc \
 	src/detector/ensemble/PixelComparison.cc \
 	src/detector/ensemble/CodeGenerator.cc \
 	src/detector/ensemble/DecisionTree.cc \

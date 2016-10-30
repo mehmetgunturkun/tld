@@ -45,10 +45,12 @@ int main(int argc, char** argv) {
         ImageBuilder* builder = new ImageBuilder(current);
         if (box != nullptr) {
             string boxString = box->toTLDString();
+            builder->withBox(box);
             outputFile << boxString << "\n";
         } else {
             outputFile << "nan, nan, nan, nan\n";
         }
+        builder->display(1);
         previous = current;
     }
 
