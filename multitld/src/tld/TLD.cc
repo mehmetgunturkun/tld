@@ -11,15 +11,15 @@ TLD::TLD(Frame* frame, vector<Box*> boxList) {
     printf("TLD is created\n");
 }
 
-vector<Box*> TLD::init() {
-    vector<Box*> correctedBox = this->detector->init(this->firstFrame, this->firstBoxList);
-    return correctedBox;
-}
-
 TLD::TLD(Tracker* tracker, Detector* detector) {
     this->tracker = tracker;
     this->detector = detector;
     this->nrOfModels = 0;
+}
+
+vector<Box*> TLD::init() {
+    vector<Box*> correctedBox = detector->init(firstFrame, firstBoxList);
+    return correctedBox;
 }
 
 vector<Box*> TLD::track(Frame* prev, Frame* curr, vector<Box*> prevBoxList) {

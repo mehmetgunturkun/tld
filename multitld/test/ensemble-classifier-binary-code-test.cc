@@ -17,7 +17,7 @@ struct OverlapOrderedV2 {
 };
 
 int main(int argc, char** argv) {
-    Sequence* sequence = new Sequence("tld/car");
+    Sequence* sequence = new Sequence("06_car");
     Frame* firstFrame = sequence->next();
     Box* firstBox = sequence->initBox;
     vector<Box*> boxList = { firstBox };

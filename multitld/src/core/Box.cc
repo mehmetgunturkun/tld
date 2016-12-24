@@ -2,6 +2,19 @@
 
 Option<Box>* Box::None = new Option<Box>();
 
+Box::Box(double x1, double y1, double x2, double y2) {
+    this->id = 0;
+
+    this->x1 = x1;
+    this->y1 = y1;
+
+    this->x2 = x2;
+    this->y2 = y2;
+    this->width = x2 - x1 + 1;
+    this->height = y2 - y1 + 1;
+    this->isValid = false;
+}
+
 Box::Box(int id, double x1, double y1, double x2, double y2) {
     this->id = id;
 

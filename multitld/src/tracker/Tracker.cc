@@ -46,6 +46,7 @@ Tracker::Tracker() {
     this->MARGIN = 5;
     this->TERM_CRITERIA = new TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, 20, 0.03);
     this->WIN_SIZE = new Size(4, 4);
+    this->fbErrorThreshold = 10.0f;
 
     loadMockedBoxList();
     printf("Tracker is created\n");
@@ -360,7 +361,7 @@ bool isOut(Frame* frame, Box* b) {
     return b->x1 > frame->width || b->y1 > frame->height || b->x2 < 0 || b->y2 < 0;
 }
 
-Option<Box>* estimate(Frame* prev, Frame* curr, Box* box, vector<FBPoint*> trackedPoints, int start, int end) {
+Option<Box>* Tracker::estimate(Frame* prev, Frame* curr, Box* box, vector<FBPoint*> trackedPoints, int start, int end) {
     vector<float> fbErrors;
     vector<float> nccErrors;
 
@@ -384,7 +385,7 @@ Option<Box>* estimate(Frame* prev, Frame* curr, Box* box, vector<FBPoint*> track
     float medFBE = median(fbErrors);
     float medNCC = median(nccErrors);
 
-    if (medFBE > 10) {
+    if (medFBE > fbErrorThreshold) {
         printf("Invalid Box -- high fb error - %f\n", medFBE);
         Option<Box>* failedBox = new Option<Box>();
         return failedBox;

@@ -9,7 +9,7 @@ int main(int argc, char** argv) {
 
     for (int i = 0; i < 10; i++) {
         float random = Random::randomFloat();
-        printf("Random = %f\n", random);
+        printf("Random = %5.4f\n", random);
     }
     return 0;
 }

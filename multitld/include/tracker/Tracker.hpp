@@ -18,6 +18,8 @@ private:
     int MARGIN;
     TermCriteria* TERM_CRITERIA = new TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, 20, 0.03);
     Size* WIN_SIZE = new Size(4, 4);
+    float fbErrorThreshold;
+
     float computeStep(float start, float end, int pointCount);
 public:
     Tracker();
@@ -33,5 +35,6 @@ public:
                                             vector<FBPoint*> trackedPoints);
     vector<Box*> track(Frame* prev, Frame* curr, std::vector<Box*> boxList);
     vector<Box*> trackSilently(Frame* prev, Frame* curr, vector<Box*> boxList);
+    Option<Box>* estimate(Frame* prev, Frame* curr, Box* box, vector<FBPoint*> trackedPoints, int start, int end);
 };
 #endif

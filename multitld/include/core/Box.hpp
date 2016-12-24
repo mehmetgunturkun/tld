@@ -41,6 +41,7 @@ public:
     int scaleNo;
     bool isValid;
 
+    Box(double x1, double y1, double x2, double y2);
     Box(int id, double x1, double y1, double x2, double y2);
     Box(int id, double x1, double y1, double x2, double y2, double w, double h);
     Box* move(double dx, double sx, double dy, double sy);

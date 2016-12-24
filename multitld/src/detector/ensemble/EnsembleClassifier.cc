@@ -7,7 +7,6 @@
 #define NEG_Y_DIR 4
 
 EnsembleClassifier::EnsembleClassifier() {
-    Random::seed();
     this->classifierName = "ensemble";
 
     this->nrOfBaseClassifiers = 10;

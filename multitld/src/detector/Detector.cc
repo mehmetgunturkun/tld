@@ -31,7 +31,7 @@ bool Detector::isNegative(Box* box) {
 }
 
 vector<Box*> Detector::init(Frame* frame, vector<Box*> boxList) {
-
+    Random::seed();
     initVarianceThresholds(frame, boxList);
 
     // vClassifier->init(frame, boxList);
