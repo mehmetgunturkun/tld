@@ -30,5 +30,5 @@ int main(int argc, char** argv) {
     float initialVarianceLimit = 490.45 * 0.5;
     printf("Initial Variance Limit: %f\n", initialVarianceLimit);
 
-    BoxIterator* boxIterator = new BoxIterator(firstFrame, firstBox, 10, 24);
+    BoxIterator* boxIterator = new BoxIterator(firstFrame, firstBox);
 }

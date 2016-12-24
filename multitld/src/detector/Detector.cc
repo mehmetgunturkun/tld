@@ -68,7 +68,7 @@ Box* Detector::init(Frame* frame, Box* box, int modelId) {
     BoundedSortedVector<Box, OverlapOrdered> positiveQueue = BoundedSortedVector<Box, OverlapOrdered>(10);
     vector<Box*> negativeQueue;
 
-    BoxIterator* boxIterator = new BoxIterator(firstFrame, firstBox, maxScaleLimit, minimumPatchSize);
+    BoxIterator* boxIterator = new BoxIterator(firstFrame, firstBox);
     while (boxIterator->hasNext()) {
         Box* sampleBox = boxIterator->next();
 
@@ -318,7 +318,7 @@ bool Detector::checkVariance(Frame* frame, ScoredBox* scoredBox) {
 
 vector<ScoredBox*> Detector::detect(Frame* frame) {
     vector<ScoredBox*> allBoxList;
-    BoxIterator* iterator = new BoxIterator(frame, firstBox, maxScaleLimit, minimumPatchSize);
+    BoxIterator* iterator = new BoxIterator(frame, firstBox);
 
     while (iterator->hasNext()) {
         Box* nextBox = iterator->next();
@@ -367,7 +367,7 @@ void Detector::dumpDetector() {
 }
 
 Box* Detector::getClosestBox(Frame* frame, Box* box) {
-    BoxIterator* boxIterator = new BoxIterator(firstFrame, firstBox, maxScaleLimit, minimumPatchSize);
+    BoxIterator* boxIterator = new BoxIterator(firstFrame, firstBox);
     double minimumOverlap = 0.0;
     Box* closestBox = (Box*) nullptr;
     while (boxIterator->hasNext()) {
