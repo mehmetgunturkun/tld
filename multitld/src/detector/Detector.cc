@@ -34,27 +34,11 @@ vector<Box*> Detector::init(Frame* frame, vector<Box*> boxList) {
     Random::seed();
     initVarianceThresholds(frame, boxList);
 
-    // vClassifier->init(frame, boxList);
     eClassifier->init(frame, boxList);
     nnClassifier->init(frame, boxList);
 
     int nrOfBoxes = (int) boxList.size();
     vector<Box*> correctedBoxList;
-
-    // double minimumVariance = FLT_MAX;
-    // for (int i = 0; i < nrOfBoxes; i++) {
-    //     Box* box = boxList[i];
-    //     Box* correctedBox = getClosestBox(frame, box);
-    //     double boxVariance = nnClassifier->getPatchVariance(frame, correctedBox);
-    //
-    //     vClassifier->setMinimumVariance(i, boxVariance);
-    //     if (boxVariance < minimumVariance) {
-    //         minimumVariance = boxVariance;
-    //     }
-    // }
-
-    // this->varianceThreshold = minimumVariance / 2.0;
-    // this->varianceThreshold = 489.4352 / 2.0;
 
     for (int i = 0; i < nrOfBoxes; i++) {
             Box* box = boxList[i];
@@ -62,6 +46,27 @@ vector<Box*> Detector::init(Frame* frame, vector<Box*> boxList) {
             correctedBoxList.push_back(correctedBox);
     }
     return correctedBoxList;
+}
+
+void Detector::initVarianceThresholds(Frame* frame, vector<Box*> boxList) {
+    int nrOfBoxes = (int) boxList.size();
+    this->varianceList.resize(nrOfBoxes);
+
+    double minimumVariance = FLT_MAX;
+    for (int i = 0; i < nrOfBoxes; i++) {
+        int modelId = i;
+        Box* box = boxList[i];
+        Box* correctedBox = getClosestBox(frame, box);
+        double boxVariance = nnClassifier->getPatchVariance(frame, correctedBox);
+
+        this->varianceList[modelId] = boxVariance;
+        if (boxVariance < minimumVariance) {
+            minimumVariance = boxVariance;
+        }
+    }
+    this->minimumVariance = minimumVariance;
+    this->varianceThreshold = 489.4352 / 2.0;
+    printf("MINVAR >>> %3.4f\n", minimumVariance);
 }
 
 Box* Detector::init(Frame* frame, Box* box, int modelId) {
@@ -380,25 +385,4 @@ Box* Detector::getClosestBox(Frame* frame, Box* box) {
         }
     }
     return closestBox;
-}
-
-void Detector::initVarianceThresholds(Frame* frame, vector<Box*> boxList) {
-    int nrOfBoxes = (int) boxList.size();
-    this->varianceList.resize(nrOfBoxes);
-
-    double minimumVariance = FLT_MAX;
-    for (int i = 0; i < nrOfBoxes; i++) {
-        int modelId = i;
-        Box* box = boxList[i];
-        Box* correctedBox = getClosestBox(frame, box);
-        double boxVariance = nnClassifier->getPatchVariance(frame, correctedBox);
-
-        this->varianceList[modelId] = boxVariance;
-        if (boxVariance < minimumVariance) {
-            minimumVariance = boxVariance;
-        }
-    }
-    this->minimumVariance = minimumVariance;
-    this->varianceThreshold = 489.4352 / 2.0;
-    printf("MINVAR >>> %3.4f\n", minimumVariance);
 }
