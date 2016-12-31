@@ -50,6 +50,11 @@ Sequence::Sequence(string key, int skip, int limit) {
 
     files = listImageFiles(sequenceDirectory);
     nrOfFrames =  (int) files.size();
+
+    if (limit <= 0) {
+        limit = nrOfFrames;
+    }
+
     processedFrames = skip;
 
     string initDir = sampleDirectory + "/evaluations/init.txt";
@@ -68,7 +73,16 @@ Sequence::Sequence(string key, int skip, int limit) {
 }
 
 bool Sequence::hasNext() {
-    return processedFrames < nrOfFrames && processedFrames < limit;
+    bool hasMoreFrames = processedFrames < nrOfFrames;
+    if (!hasMoreFrames) {
+        println("There are no frames");
+    }
+
+    bool belowTheLimit = processedFrames >= limit;
+    if (!belowTheLimit) {
+        println("Exceeded The Limit: %d >= %d", processedFrames, limit);
+    }
+    return hasMoreFrames && belowTheLimit;
 }
 
 Frame* Sequence::next() {

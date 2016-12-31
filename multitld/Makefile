@@ -19,6 +19,7 @@ LDFLAGS  += $(OPENCV_LIBS)
 ARFLAGS = ruv
 
 lib2_sources := \
+	src/common/Arguments.cc \
 	src/common/Colors.cc \
 	src/core/TLDConfig.cc \
 	src/core/Random.cc \

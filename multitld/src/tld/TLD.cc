@@ -108,20 +108,13 @@ void display(Frame* frame, vector<ScoredBox*> b1, vector<ScoredBox*> b2, vector<
 
 Option<Box>* TLD::integrate(Frame* frame, Box* oldBox, Box* maybeTrackedBox, vector<ScoredBox*> scoredBoxList, int modelId) {
     // Validation
-    printf(BOLD(WHITE("==== Integrate is started ====\n")));
-
-    println("mc1000");
+    DEBUG(BOLD(WHITE("==== Integrate is started ====\n")));
     Option<ScoredBox>* maybeScoredBox = validate2(frame, oldBox, maybeTrackedBox, modelId);
-    println("mc2000");
-
-    println("mc3000");
     DetectorResult* detectorResult = partition(scoredBoxList, modelId);
     vector<ScoredBox*> highVarianceBoxList = detectorResult->highVarianceBoxList;
     vector<ScoredBox*> candidateBoxList = detectorResult->candidateBoxList;
     vector<ScoredBox*> detectedBoxList = detectorResult->detectedBoxList;
     vector<ScoredBox*> clusteredBoxList = detectorResult->clusteredBoxList;
-
-    println("mc4000");
 
     // display(frame, candidateBoxList, detectedBoxList, clusteredBoxList);
 
@@ -180,7 +173,7 @@ Option<Box>* TLD::integrate(Frame* frame, Box* oldBox, Box* maybeTrackedBox, vec
             maybeFinalBox = Box::None;
         }
     }
-    printf(BOLD(WHITE("==== Integrate is completed ====\n")));
+    DEBUG(BOLD(WHITE("==== Integrate is completed ====\n")));
 
     // Evaluation
     printf(CYAN("==== Evaluate is started ====\n"));

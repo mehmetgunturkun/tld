@@ -1,19 +1,15 @@
 #include <iostream>
 #include <fstream>
 
+#include "common/Arguments.hpp"
 #include "testbase/Sequence.hpp"
 #include "tld/TLD.hpp"
 
-int main(int argc, char** argv) {
-    if (argc < 2) {
-        printf("You should declare key for dataset (e.g. --key car)\n");
-        return 1;
-    }
+int main(int argc, char** args) {
+    Arguments* arguments = new Arguments(argc, args);
 
-    string key(argv[2]);
-
-    string limitString(argv[4]);
-    int limit = std::stoi(limitString);
+    string key = arguments->getString("--sequence");
+    int limit = arguments->getIntOrDefault("--limit", 0);
 
     printf("Going to run for %s\n", key.c_str());
     Sequence* sequence = new Sequence(key, 0, limit);
