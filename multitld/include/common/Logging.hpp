@@ -36,6 +36,12 @@
     #define ERROR(fmt, ...)
 #endif
 
+#if LOG_LEVEL <= ERROR_LEVEL
+    #define ERRORALL(body) body
+#else
+    #define ERRORALL(body)
+#endif
+
 #define println(format, ...) printf(format, ##__VA_ARGS__); printf("\n");
 
 #endif

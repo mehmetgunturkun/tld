@@ -1,8 +1,11 @@
 #include "testbase/Sequence.hpp"
+#include "common/Arguments.hpp"
 #include "detector/Detector.hpp"
 
 int main(int argc, char** args) {
-    Sequence* sequence = new Sequence("06_car");
+    Arguments* arguments = new Arguments(argc, args);
+    string sequenceKey = arguments->getString("--sequence");
+    Sequence* sequence = new Sequence(sequenceKey);
 
     Frame* firstFrame = sequence->next();
     Box* initBox = sequence->initBox;
