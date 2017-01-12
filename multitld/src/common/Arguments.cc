@@ -6,6 +6,7 @@ Arguments::Arguments(int argc, char** args) {
     } else {
         for (int i = 1; i < argc; i = i + 2) {
             string key(args[i]);
+            key = key.substr(2, key.size());
             string value(args[i + 1]);
             argumentMap[key] = value;
         }

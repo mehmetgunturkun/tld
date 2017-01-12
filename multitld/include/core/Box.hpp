@@ -91,7 +91,7 @@ public:
             << (x2 + 1.0) << ", "
             << (y2 + 1.0) << ", "
             << width << ", "
-            << height<< ")";
+            << height;
         return ss.str();
     }
 

@@ -8,8 +8,8 @@
 int main(int argc, char** args) {
     Arguments* arguments = new Arguments(argc, args);
 
-    string key = arguments->getString("--sequence");
-    int limit = arguments->getIntOrDefault("--limit", 0);
+    string key = arguments->getString("sequence");
+    int limit = arguments->getIntOrDefault("limit", 0);
 
     printf("Going to run for %s\n", key.c_str());
     Sequence* sequence = new Sequence(key, 0, limit);

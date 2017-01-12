@@ -1,4 +1,4 @@
-
+#include "common/Arguments.hpp"
 #include "testbase/Sequence.hpp"
 #include "detector/nn/Patch.hpp"
 #include "detector/nn/ObjectModel.hpp"
@@ -13,21 +13,14 @@ void printDoubleImage(Mat* m) {
     }
 }
 
-int main() {
-    Sequence* sequence = new Sequence("tld/car");
-    Frame* f0 = sequence->next();
-    Frame* f1 = sequence->next();
+void buildHMatrix() {
+    
+}
 
-    Box* b0 = new Box(0, 141, 125, 231, 164);
-    Box* b1 = new Box(1, 137.23, 124, 227, 163);
+int main(int argc, char** argv) {
+    Arguments* args = new Arguments(argc, argv);
+    string sequenceKey = args->getString("sequence");
+    Sequence* sequence = new Sequence(sequenceKey);
 
-    Patch* p0 = new Patch(f0, b0);
-    Patch* p1 = new Patch(f1, b1);
-
-    ObjectModel* model = new ObjectModel();
-    model->add(p0, true);
-
-    // float score = model->computePositiveSimilarity(p1);
-    // printf("Positive Score: %f\n", 1 - score);
-
+    println("There are %d frames for %s", sequence->nrOfFrames, sequenceKey.c_str());
 }

@@ -338,8 +338,6 @@ vector<ScoredBox*> Detector::detect(Frame* frame) {
             continue;
         }
 
-        DEBUG("EC >> %s\n", nextBox->toCharArr());
-
         if (!nnClassifier->classify(frame, scoredBox)) {
             continue;
         }

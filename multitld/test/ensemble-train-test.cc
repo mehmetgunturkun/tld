@@ -33,7 +33,7 @@ int main(int argc, char** argv) {
             printf("%s\n", scoredBox->box->toCharArr());
 
             NNScore* nnScore = (NNScore*) scoredBox->getScore("nn");
-            
+
 
             printf("Score >> %3.3f\n", score);
             // builder->display(0);

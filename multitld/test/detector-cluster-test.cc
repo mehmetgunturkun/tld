@@ -3,7 +3,6 @@
 #include "detector/Detector.hpp"
 #include "testbase/Sequence.hpp"
 
-
 void printScoreReport(vector<ScoredBox*> scoredBoxList) {
     int nrOfBoxes = (int) scoredBoxList.size();
     for (int i = 0 ; i < nrOfBoxes; i++) {

@@ -26,7 +26,7 @@ public:
     int nrOfFrames;
     int limit;
 
-    Sequence(string key, int skip = 0, int limit = INT_MAX);
+    Sequence(string key, int skip = 0, int limit = 0);
     bool hasNext();
     Frame* next();
     Frame* get(int frameNo);
