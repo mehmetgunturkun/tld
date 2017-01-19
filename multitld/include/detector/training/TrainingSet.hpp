@@ -10,13 +10,11 @@ using namespace std;
 template <typename Type>
 class Labelled {
 public:
-    Frame* frame;
     Type* item;
     int label;
-    Labelled(Frame* frame, Type* item, int l) {
-        this->frame = frame;
+    Labelled(Type* item, int label) {
         this->item = item;
-        this->label = l;
+        this->label = label;
     }
 };
 
@@ -64,36 +62,38 @@ public:
     vector<Labelled<Type>*> getAllSamples() {
         vector<Labelled<Type>*> labelledSamples;
 
-        for (int i = 0; i < nrOfPositiveSamples; i++) {
-            Type* sample = positiveSamples[i];
-            Labelled<Type>* positiveSample = new Labelled<Type>(frame, sample, 1);
-            labelledSamples.push_back(positiveSample);
-        }
+        // for (int i = 0; i < nrOfPositiveSamples; i++) {
+        //     Type* sample = positiveSamples[i];
+        //     Labelled<Type>* positiveSample = new Labelled<Type>(frame, sample, 1);
+        //     labelledSamples.push_back(positiveSample);
+        // }
+        //
+        // for (int i = 0; i < nrOfNegativeSamples; i++) {
+        //     Type* sample = negativeSamples[i];
+        //     Labelled<Type>* negativeSample = new Labelled<Type>(frame, sample, 0);
+        //     labelledSamples.push_back(negativeSample);
+        // }
 
-        for (int i = 0; i < nrOfNegativeSamples; i++) {
-            Type* sample = negativeSamples[i];
-            Labelled<Type>* negativeSample = new Labelled<Type>(frame, sample, 0);
-            labelledSamples.push_back(negativeSample);
-        }
         return labelledSamples;
     }
 
     vector<Labelled<Type>*> getShuffledSamples() {
         vector<Labelled<Type>*> labelledSamples;
 
-        for (int i = 0; i < nrOfPositiveSamples; i++) {
-            Type* sample = positiveSamples[i];
-            Labelled<Type>* positiveSample = new Labelled<Type>(frame, sample, 1);
-            labelledSamples.push_back(positiveSample);
-        }
+        // for (int i = 0; i < nrOfPositiveSamples; i++) {
+        //     Type* sample = positiveSamples[i];
+        //     Labelled<Type>* positiveSample = new Labelled<Type>(frame, sample, 1);
+        //     labelledSamples.push_back(positiveSample);
+        // }
+        //
+        // for (int i = 0; i < nrOfNegativeSamples; i++) {
+        //     Type* sample = negativeSamples[i];
+        //     Labelled<Type>* negativeSample = new Labelled<Type>(frame, sample, 0);
+        //     labelledSamples.push_back(negativeSample);
+        // }
+        // Random::seed();
+        // labelledSamples = Random::randomSample(labelledSamples);
 
-        for (int i = 0; i < nrOfNegativeSamples; i++) {
-            Type* sample = negativeSamples[i];
-            Labelled<Type>* negativeSample = new Labelled<Type>(frame, sample, 0);
-            labelledSamples.push_back(negativeSample);
-        }
-        Random::seed();
-        labelledSamples = Random::randomSample(labelledSamples);
         return labelledSamples;
     };
 
@@ -101,25 +101,25 @@ public:
     vector<Labelled<Type>*> getPositiveFirstSamples() {
         vector<Labelled<Type>*> labelledSamples;
 
-        for (int i = 0; i < nrOfPositiveSamples; i++) {
-            Type* sample = positiveSamples[i];
-            Labelled<Type>* positiveSample = new Labelled<Type>(frame, sample, 1);
-            labelledSamples.push_back(positiveSample);
-        }
-
-        for (int i = 0; i < nrOfNegativeSamples; i++) {
-            Type* sample = negativeSamples[i];
-            Labelled<Type>* negativeSample = new Labelled<Type>(frame, sample, 0);
-            labelledSamples.push_back(negativeSample);
-        }
-        Random::seed();
-        labelledSamples = Random::randomSample(labelledSamples);
-
-        if (nrOfPositiveSamples > 0) {
-            Type* sample = positiveSamples[0];
-            Labelled<Type>* positiveSample = new Labelled<Type>(frame, sample, 1);
-            labelledSamples.insert(labelledSamples.begin(), positiveSample);
-        }
+        // for (int i = 0; i < nrOfPositiveSamples; i++) {
+        //     Type* sample = positiveSamples[i];
+        //     Labelled<Type>* positiveSample = new Labelled<Type>(frame, sample, 1);
+        //     labelledSamples.push_back(positiveSample);
+        // }
+        //
+        // for (int i = 0; i < nrOfNegativeSamples; i++) {
+        //     Type* sample = negativeSamples[i];
+        //     Labelled<Type>* negativeSample = new Labelled<Type>(frame, sample, 0);
+        //     labelledSamples.push_back(negativeSample);
+        // }
+        // Random::seed();
+        // labelledSamples = Random::randomSample(labelledSamples);
+        //
+        // if (nrOfPositiveSamples > 0) {
+        //     Type* sample = positiveSamples[0];
+        //     Labelled<Type>* positiveSample = new Labelled<Type>(frame, sample, 1);
+        //     labelledSamples.insert(labelledSamples.begin(), positiveSample);
+        // }
 
         return labelledSamples;
     };
@@ -129,53 +129,53 @@ public:
         bool positiveFirst = false,
         bool splitData = false) {
             vector<Labelled<Type>*> labelledSamples;
-            Mat* gaussian;
-            if (useGaussian) {
-                gaussian = frame->gaussian;
-            } else {
-                gaussian = frame->grayscale;
-            }
-
-            Mat* img = gaussian;
-            Frame* f = frame;
-
-            if (splitData) {
-                negativeSamples = Random::randomSample(negativeSamples, nrOfNegativeSamples / 2);
-                nrOfNegativeSamples = (int) negativeSamples.size();
-            }
-
-            for (int i = 0; i < nrOfNegativeSamples; i++) {
-                Type* sample = negativeSamples[i];
-                Labelled<Type>* negativeSample = new Labelled<Type>(f, sample, 0);
-                labelledSamples.push_back(negativeSample);
-            }
-
-            int warpNo = 0;
-            int warpLimit = 1;
-            if (shouldWarp) {
-                warpLimit = 10;
-            }
-
-            do {
-                for (int i = 0; i < nrOfPositiveSamples; i++) {
-                    Type* sample = positiveSamples[i];
-                    Labelled<Type>* positiveSample = new Labelled<Type>(f, sample, 1);
-                    labelledSamples.push_back(positiveSample);
-                }
-
-                img = Image::warp(gaussian);
-                f = new Frame(img, f->grayscale);
-                warpNo += 1;
-            } while (warpNo < warpLimit);
-
-            std::random_shuffle(labelledSamples.begin(), labelledSamples.end());
-            if (positiveFirst) {
-                for (int i = 0; i < nrOfPositiveSamples; i++) {
-                    Type* sample = positiveSamples[i];
-                    Labelled<Type>* positiveSample = new Labelled<Type>(f, sample, 1);
-                    labelledSamples.insert(labelledSamples.begin(), positiveSample);
-                }
-            }
+            // Mat* gaussian;
+            // if (useGaussian) {
+            //     gaussian = frame->gaussian;
+            // } else {
+            //     gaussian = frame->grayscale;
+            // }
+            //
+            // Mat* img = gaussian;
+            // Frame* f = frame;
+            //
+            // if (splitData) {
+            //     negativeSamples = Random::randomSample(negativeSamples, nrOfNegativeSamples / 2);
+            //     nrOfNegativeSamples = (int) negativeSamples.size();
+            // }
+            //
+            // for (int i = 0; i < nrOfNegativeSamples; i++) {
+            //     Type* sample = negativeSamples[i];
+            //     Labelled<Type>* negativeSample = new Labelled<Type>(f, sample, 0);
+            //     labelledSamples.push_back(negativeSample);
+            // }
+            //
+            // int warpNo = 0;
+            // int warpLimit = 1;
+            // if (shouldWarp) {
+            //     warpLimit = 10;
+            // }
+            //
+            // do {
+            //     for (int i = 0; i < nrOfPositiveSamples; i++) {
+            //         Type* sample = positiveSamples[i];
+            //         Labelled<Type>* positiveSample = new Labelled<Type>(f, sample, 1);
+            //         labelledSamples.push_back(positiveSample);
+            //     }
+            //
+            //     img = Image::warp(gaussian);
+            //     f = new Frame(img, f->grayscale);
+            //     warpNo += 1;
+            // } while (warpNo < warpLimit);
+            //
+            // std::random_shuffle(labelledSamples.begin(), labelledSamples.end());
+            // if (positiveFirst) {
+            //     for (int i = 0; i < nrOfPositiveSamples; i++) {
+            //         Type* sample = positiveSamples[i];
+            //         Labelled<Type>* positiveSample = new Labelled<Type>(f, sample, 1);
+            //         labelledSamples.insert(labelledSamples.begin(), positiveSample);
+            //     }
+            // }
             return labelledSamples;
     }
 };

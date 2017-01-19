@@ -25,6 +25,8 @@ public:
 
     int get(Point2f* point, int imageType = CV_LOAD_IMAGE_GAUSSIAN);
     int get(int x, int y, int imageType = CV_LOAD_IMAGE_GAUSSIAN);
+    static Frame* warp(Frame* frame);
+
 
     string toString() {
         stringstream ss;

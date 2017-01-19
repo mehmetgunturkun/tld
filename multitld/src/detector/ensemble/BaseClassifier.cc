@@ -7,7 +7,7 @@ BaseClassifier::BaseClassifier(int id, vector<PixelComparison*> comparisons, int
 }
 
 int BaseClassifier::generateBinaryCode(Frame* frame, Box* box, EnsembleScore* score) {
-    int binaryCode = codeGen->generateBinaryCode(frame, box);
+    int binaryCode = this->generateBinaryCode(frame, box);
     score->binaryCodes[id] = binaryCode;
     return binaryCode;
 }
@@ -56,4 +56,18 @@ void BaseClassifier::printPixelComparison() {
     println("===== BaseClassifier(%2d) =====", this->id);
     codeGen->printPixelComparison();
     println("===============================");
+}
+
+//v2
+int BaseClassifier::generateBinaryCode(Frame* frame, Box* box) {
+    int binaryCode = codeGen->generateBinaryCode(frame, box);
+    return binaryCode;
+}
+
+double BaseClassifier::getProbability(int binaryCode, int modelId) {
+    return decTree->getProbability(binaryCode, modelId);
+}
+
+void BaseClassifier::train(int binaryCode, int modelId, bool label) {
+    decTree->update(binaryCode, modelId, label);
 }

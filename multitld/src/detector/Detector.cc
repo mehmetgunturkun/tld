@@ -70,12 +70,15 @@ void Detector::initVarianceThresholds(Frame* frame, vector<Box*> boxList) {
 }
 
 Box* Detector::init(Frame* frame, Box* box, int modelId) {
+    println("%s", box->toCharArr());
     BoundedSortedVector<Box, OverlapOrdered> positiveQueue = BoundedSortedVector<Box, OverlapOrdered>(10);
     vector<Box*> negativeQueue;
 
     BoxIterator* boxIterator = new BoxIterator(firstFrame, firstBox);
+    int id = 0;
     while (boxIterator->hasNext()) {
         Box* sampleBox = boxIterator->next();
+        id += 1;
 
         //Compute Overlap
         double overlap = Box::computeOverlap(sampleBox, box);
@@ -107,68 +110,41 @@ Box* Detector::init(Frame* frame, Box* box, int modelId) {
     }
 
     vector<Box*> positiveBoxList4Ensemble = positiveQueue.toVector();
-    vector<ScoredBox*> positiveScoredBoxList4Ensemble = score(frame, positiveBoxList4Ensemble);
-    vector<ScoredBox*> negativeScoredBoxList4Ensemble = score(frame, negativeQueue);
-
-    Random::seed();
-    vector<ScoredBox*> negativeScoredBoxList4EnsembleFirstPart = Random::splitData(negativeScoredBoxList4Ensemble, 2);
-
-    DEBUGALL(
-        printf("====== TRAINING DATA FOR EC ======\n");
-        for (int i = 0; i < (int) positiveScoredBoxList4Ensemble.size(); i++) {
-            ScoredBox* scoredBox = positiveScoredBoxList4Ensemble[i];
-            DEBUG(COLOR_GREEN "%s" COLOR_RESET, scoredBox->box->toCharArr());
+    ERRORALL(
+        println("There are %d boxes", id);
+        int nrOfPositiveBoxes = (int) positiveBoxList4Ensemble.size();
+        for (int i = 0; i < nrOfPositiveBoxes; i++) {
+            Box* b = positiveBoxList4Ensemble[i];
+            println("%s", b->toCharArr());
         }
-
-        for (int i = 0; i < (int) negativeScoredBoxList4Ensemble.size(); i++) {
-            ScoredBox* scoredBox = negativeScoredBoxList4Ensemble[i];
-            DEBUG(COLOR_RED "%s" COLOR_RESET, scoredBox->box->toCharArr());
-        }
-        printf("==================================\n");
     )
 
-    Box* closestBox = positiveScoredBoxList4Ensemble[0]->box;
-    vector<ScoredBox*> positiveScoredBoxList4NN = { positiveScoredBoxList4Ensemble[0] };
 
-    Random::seed();
-    vector<ScoredBox*> negativeScoredBoxList4NN = Random::randomSample(
-        negativeScoredBoxList4Ensemble,
-        100
-    );
+    vector<Box*> negativeBoxList4Ensemble;
+    // vector<ScoredBox*> positiveScoredBoxList4Ensemble = score(frame, positiveBoxList4Ensemble);
+    // vector<ScoredBox*> negativeScoredBoxList4Ensemble = score(frame, negativeQueue);
 
-    Random::seed();
-    vector<ScoredBox*> negativeScoredBoxList4NNFirstPart = Random::splitData(negativeScoredBoxList4NN, 2);
+    // Random::seed();
+    // vector<ScoredBox*> negativeScoredBoxList4EnsembleFirstPart = Random::splitData(negativeScoredBoxList4Ensemble, 2);
 
-    DEBUGALL(
-        printf("====== TRAINING DATA FOR NN ======\n");
-        for (int i = 0; i < (int) positiveScoredBoxList4NN.size(); i++) {
-            ScoredBox* scoredBox = positiveScoredBoxList4NN[i];
-            DEBUG(COLOR_GREEN "%s" COLOR_RESET, scoredBox->box->toCharArr());
-        }
+    Box* closestBox = positiveBoxList4Ensemble[0];
 
-        for (int i = 0; i < (int) negativeScoredBoxList4NNFirstPart.size(); i++) {
-            ScoredBox* scoredBox = negativeScoredBoxList4NNFirstPart[i];
-            DEBUG(COLOR_RED "%s" COLOR_RESET, scoredBox->box->toCharArr());
-        }
-        printf("==================================\n");
-    )
-
-    TrainingSet<ScoredBox> trainingSet4Ensemble = TrainingSet<ScoredBox>(
+    TrainingSet<Box> trainingSet4Ensemble = TrainingSet<Box>(
         frame,
-        positiveScoredBoxList4Ensemble,
-        negativeScoredBoxList4EnsembleFirstPart,
+        positiveBoxList4Ensemble,
+        negativeBoxList4Ensemble,
         2
     );
 
-    TrainingSet<ScoredBox> trainingSet4NN = TrainingSet<ScoredBox>(
-        frame,
-        positiveScoredBoxList4NN,
-        negativeScoredBoxList4NNFirstPart,
-        1
-    );
+    // TrainingSet<ScoredBox> trainingSet4NN = TrainingSet<ScoredBox>(
+    //     frame,
+    //     positiveScoredBoxList4NN,
+    //     negativeScoredBoxList4NNFirstPart,
+    //     1
+    // );
 
     eClassifier->train(trainingSet4Ensemble, modelId);
-    nnClassifier->train(trainingSet4NN, modelId);
+    // nnClassifier->train(trainingSet4NN, modelId);
 
     return closestBox;
 }

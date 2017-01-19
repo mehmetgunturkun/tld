@@ -28,5 +28,10 @@ public:
     void train(Frame* frame, ScoredBox* box, int modelId, bool label);
     void dumpBaseClassifier();
     void printPixelComparison();
+
+    //v2
+    int generateBinaryCode(Frame* frame, Box* box);
+    double getProbability(int binaryCode, int modelId);
+    void train(int binaryCode, int modelId, bool label);
 };
 #endif

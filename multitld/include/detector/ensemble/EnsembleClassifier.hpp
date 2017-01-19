@@ -8,6 +8,23 @@
 #include "detector/ensemble/BaseClassifier.hpp"
 #include "detector/training/TrainingSet.hpp"
 
+class CodeVector {
+private:
+    vector<int> codes;
+public:
+    CodeVector(int nrOfBaseClassifiers) {
+        codes.resize(nrOfBaseClassifiers);
+    }
+
+    void set(int index, int binaryCode) {
+        codes[index] = binaryCode;
+    }
+
+    int get(int index) {
+        return codes[index];
+    }
+};
+
 class EnsembleClassifier {
 public:
     string classifierName;
@@ -36,6 +53,13 @@ public:
     void train(TrainingSet<Box> ts, int modelId);
     void train(TrainingSet<ScoredBox> ts, int modelId);
     void updateBaseClassifiers(Frame* frame, ScoredBox* scoredBox, int modelId, bool label);
+
+    CodeVector* generateBinaryCode(Frame* frame, Box* box);
+    double getProbability(CodeVector* codeVector, int modelId);
+    vector<Labelled<CodeVector>*> generateSamples(Frame* frame, vector<Box*> positiveBoxList, vector<Box*> negativeBoxList);
+    vector<Labelled<CodeVector>*> generateSamples(Frame* frame, vector<ScoredBox*> positiveBoxList, vector<ScoredBox*> negativeBoxList);
+    void updateBaseClassifiers(CodeVector* codeVector, int modelId, bool label);
+    void doTrain(vector<Labelled<CodeVector>*> samples, int modelId);
 
     void dumpEnsembleClassifier();
 };

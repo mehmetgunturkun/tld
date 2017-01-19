@@ -47,3 +47,23 @@ int Frame::get(int x, int y, int imageType) {
     int pixel = (int) gaussian->at<uchar>(y, x);
     return pixel;
 }
+
+Frame* Frame::warp(Frame* frame) {
+    double x1 = 129.0;
+    double y1 = 121.0;
+
+    double x2 = 239.0;
+    double y2 = 168.0;
+    Mat* gaussian = frame->gaussian;
+
+    Random::seed();
+    Mat* warpedImage = Image::warp(gaussian, x1, y1, x2, y2);
+    for (int i = 0; i < warpedImage->rows; i++) {
+        for (int j = 0; j < warpedImage->cols; j++) {
+            double p = warpedImage->at<double>(i, j);
+            int pint = (int) round(p);
+            gaussian->at<uchar>(i + y1, j + x1) = (uchar) pint;
+        }
+    }
+    return frame;
+}
