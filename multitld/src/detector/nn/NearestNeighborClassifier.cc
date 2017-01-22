@@ -120,51 +120,6 @@ void NearestNeighborClassifier::score(Frame* frame, ScoredBox* scoredBox) {
     }
 }
 
-void NearestNeighborClassifier::train(TrainingSet<ScoredBox> ts, int modelId) {
-    vector<Labelled<ScoredBox>*> samples = ts.getPositiveFirstSamples();
-    ObjectModel* model = models[modelId];
-    int nrOfSamples = (int) samples.size();
-    for (int i = 0; i < nrOfSamples; i++) {
-        Labelled<ScoredBox>* sample = samples[i];
-
-        ScoredBox* scoredBox = sample->item;
-        int label = sample->label;
-
-        NNScore* nnScore = (NNScore*) scoredBox->getScore("nn");
-        Patch* patch = nnScore->patch;
-        ObjectScore* objectScore = model->computeScore(patch);
-
-        double relativeScore = objectScore->relativeScore;
-        bool isInPositive = objectScore->isInPositive;
-        int closestPositivePatchIndex = objectScore->closestPositivePatchIndex;
-
-        if (label == 1) {
-            if (relativeScore <= 0.65) {
-                if (isInPositive == true) {
-                    DEBUG("NN.add(+) >>> %d, %s", closestPositivePatchIndex, scoredBox->box->toCharArr());
-                    model->add(patch, true);
-                    continue;
-                }
-
-                DEBUG("NN.ins(+) >>> %s, %g, %d, %d", scoredBox->box->toCharArr(), relativeScore, isInPositive, closestPositivePatchIndex);
-                model->add(patch, closestPositivePatchIndex, true);
-            } else {
-                DEBUG("NN.nop(+) >>> %s, %g, %d", scoredBox->box->toCharArr(), relativeScore, isInPositive);
-            }
-        }
-
-        if (label == 0) {
-            // builder->withBox(scoredBox->box, Colors::RED)->withTitle("nn-neg")->display(0);
-            if (relativeScore > 0.5) {
-                DEBUG("NN.add(-) >>> %s, %g", scoredBox->box->toCharArr(), relativeScore);
-                model->add(patch, false);
-            } else {
-                DEBUG("NN.nop(-) >>> %s, %g", scoredBox->box->toCharArr(), relativeScore);
-            }
-        }
-    }
-}
-
 bool NearestNeighborClassifier::evaluate(Frame* frame, Box* box, double minVariance, int modelId) {
     Patch* patch = new Patch(frame, box);
     ObjectModel* model = models[modelId];
@@ -189,4 +144,119 @@ bool NearestNeighborClassifier::evaluate(Frame* frame, Box* box, double minVaria
 void NearestNeighborClassifier::dumpNearestNeighborClassifier() {
     ObjectModel* model = models[0];
     printf("#P = %d, #N = %d\n", model->nrOfPositivePatches, model->nrOfNegativePatches);
+}
+
+vector<Labelled<Patch>*> NearestNeighborClassifier::generateSamples(
+    Frame* frame,
+    vector<Box*> positiveBoxList,
+    vector<Box*> negativeBoxList) {
+        vector<Labelled<Patch>*> patchList;
+
+        int nrOfPositiveSamples = (int) positiveBoxList.size();
+        for (int i = 0; i < nrOfPositiveSamples; i++) {
+            Box* box = positiveBoxList[i];
+            Patch* patch = new Patch(frame, box);
+            patchList.push_back(new Labelled<Patch>(patch, 1));
+        }
+
+        int nrOfNegativeSamples = (int) negativeBoxList.size();
+        for (int i = 0; i < nrOfNegativeSamples; i++) {
+            Box* box = negativeBoxList[i];
+            Patch* patch = new Patch(frame, box);
+            patchList.push_back(new Labelled<Patch>(patch, 0));
+        }
+        return patchList;
+}
+
+vector<Labelled<Patch>*> NearestNeighborClassifier::generateSamples(
+    Frame* frame,
+    vector<ScoredBox*> positiveBoxList,
+    vector<ScoredBox*> negativeBoxList) {
+        vector<Labelled<Patch>*> samples;
+
+        int nrOfPositiveSamples = (int) positiveBoxList.size();
+        for (int i = 0; i < nrOfPositiveSamples; i++) {
+            ScoredBox* scoredBox = positiveBoxList[i];
+            Box* box = scoredBox->box;
+            NNScore* nnScore = (NNScore*) scoredBox->getScore("nn");
+            Patch* patch;
+            if (nnScore == NULL) {
+                patch = nnScore->patch;
+            } else {
+                patch = new Patch(frame, box);
+            }
+
+            samples.push_back(new Labelled<Patch>(patch, 1));
+        }
+
+        int nrOfNegativeSamples = (int) negativeBoxList.size();
+        for (int i = 0; i < nrOfNegativeSamples; i++) {
+            ScoredBox* scoredBox = negativeBoxList[i];
+            Box* box = scoredBox->box;
+
+            NNScore* nnScore = (NNScore*) scoredBox->getScore("nn");
+            Patch* patch;
+            if (nnScore == NULL) {
+                patch = nnScore->patch;
+            } else {
+                patch = new Patch(frame, box);
+            }
+            samples.push_back(new Labelled<Patch>(patch, 0));
+        }
+
+        return samples;
+}
+
+void NearestNeighborClassifier::train(TrainingSet<Box> ts, int modelId) {
+    Frame* frame = ts.frame;
+    vector<Box*> positiveBoxList = ts.positiveSamples;
+    vector<Box*> negativeBoxList = ts.negativeSamples;
+
+    vector<Labelled<Patch>*> samples = generateSamples(
+        frame,
+        positiveBoxList,
+        negativeBoxList
+    );
+    doTrain(samples, modelId);
+}
+
+void NearestNeighborClassifier::train(TrainingSet<ScoredBox> ts, int modelId) {
+    Frame* frame = ts.frame;
+    vector<ScoredBox*> positiveBoxList = ts.positiveSamples;
+    vector<ScoredBox*> negativeBoxList = ts.negativeSamples;
+
+    vector<Labelled<Patch>*> samples = generateSamples(
+        frame,
+        positiveBoxList,
+        negativeBoxList
+    );
+    doTrain(samples, modelId);
+}
+
+void NearestNeighborClassifier::doTrain(vector<Labelled<Patch>*> samples, int modelId) {
+    ObjectModel* model = models[modelId];
+
+    int nrOfSamples = (int) samples.size();
+    for (int i = 0; i < nrOfSamples; i++) {
+        Labelled<Patch>* labelledPatch = samples[i];
+        Patch* patch = labelledPatch->item;
+        int label = labelledPatch->label;
+
+        ObjectScore* objectScore = model->computeScore(patch);
+        double relativeScore = objectScore->relativeScore;
+        bool isInPositive = objectScore->isInPositive;
+        int closestPositivePatchIndex = objectScore->closestPositivePatchIndex;
+
+        if (label == 1 && relativeScore <= 0.65) {
+            if (isInPositive == true) {
+                model->add(patch, true);
+                continue;
+            }
+            model->add(patch, closestPositivePatchIndex, true);
+        }
+
+        if (label == 0 && relativeScore > 0.5) {
+            model->add(patch, false);
+        }
+    }
 }

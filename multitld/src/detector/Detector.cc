@@ -120,31 +120,34 @@ Box* Detector::init(Frame* frame, Box* box, int modelId) {
     )
 
 
-    vector<Box*> negativeBoxList4Ensemble;
-    // vector<ScoredBox*> positiveScoredBoxList4Ensemble = score(frame, positiveBoxList4Ensemble);
-    // vector<ScoredBox*> negativeScoredBoxList4Ensemble = score(frame, negativeQueue);
-
-    // Random::seed();
-    // vector<ScoredBox*> negativeScoredBoxList4EnsembleFirstPart = Random::splitData(negativeScoredBoxList4Ensemble, 2);
-
-    Box* closestBox = positiveBoxList4Ensemble[0];
+    Random::seed();
+    vector<Box*> negativeBoxList4EnsembleFirstPart = Random::splitData(negativeQueue, 2);
 
     TrainingSet<Box> trainingSet4Ensemble = TrainingSet<Box>(
         frame,
         positiveBoxList4Ensemble,
-        negativeBoxList4Ensemble,
+        negativeBoxList4EnsembleFirstPart,
         2
     );
 
-    // TrainingSet<ScoredBox> trainingSet4NN = TrainingSet<ScoredBox>(
-    //     frame,
-    //     positiveScoredBoxList4NN,
-    //     negativeScoredBoxList4NNFirstPart,
-    //     1
-    // );
+    Box* closestBox = positiveBoxList4Ensemble[0];
+    vector<Box*> positiveScoredBoxList4NN = { closestBox };
+
+    vector<Box*> negativeBoxList4NN = Random::randomSample(
+        negativeQueue,
+        100
+    );
+    vector<Box*> negativeBoxList4NNFirstPart = Random::splitData(negativeBoxList4NN, 2);
+
+    TrainingSet<Box> trainingSet4NN = TrainingSet<Box>(
+        frame,
+        positiveScoredBoxList4NN,
+        negativeBoxList4NNFirstPart,
+        1
+    );
 
     eClassifier->train(trainingSet4Ensemble, modelId);
-    // nnClassifier->train(trainingSet4NN, modelId);
+    nnClassifier->train(trainingSet4NN, modelId);
 
     return closestBox;
 }

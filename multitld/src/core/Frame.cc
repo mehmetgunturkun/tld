@@ -48,13 +48,25 @@ int Frame::get(int x, int y, int imageType) {
     return pixel;
 }
 
-Frame* Frame::warp(Frame* frame) {
-    double x1 = 129.0;
-    double y1 = 121.0;
+Frame* Frame::clone() {
+    Mat* otherGrayscale = new Mat();
+    this->grayscale->copyTo(*otherGrayscale);
 
-    double x2 = 239.0;
-    double y2 = 168.0;
-    Mat* gaussian = frame->gaussian;
+    Mat* otherGaussian = new Mat();
+    this->gaussian->copyTo(*otherGaussian);
+
+    Frame* other = new Frame(otherGrayscale, otherGaussian);
+    return other;
+}
+
+Frame* Frame::warp(Frame* frame, Box* box) {
+    Frame* copied = frame->clone();
+    double x1 = box->x1;
+    double y1 = box->y1;
+
+    double x2 = box->x2;
+    double y2 = box->y2;
+    Mat* gaussian = copied->gaussian;
 
     Random::seed();
     Mat* warpedImage = Image::warp(gaussian, x1, y1, x2, y2);
@@ -65,5 +77,5 @@ Frame* Frame::warp(Frame* frame) {
             gaussian->at<uchar>(i + y1, j + x1) = (uchar) pint;
         }
     }
-    return frame;
+    return copied;
 }

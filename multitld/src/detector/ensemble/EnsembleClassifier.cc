@@ -265,44 +265,98 @@ CodeVector* EnsembleClassifier::generateBinaryCode(Frame* frame, Box* box) {
     for (int i = 0; i < nrOfBaseClassifiers; i++) {
         BaseClassifier* bc = baseClassifiers[i];
         int binaryCode = bc->generateBinaryCode(frame, box);
-        println("%d", binaryCode);
         codeVector->set(i, binaryCode);
     }
-    println("");
     return codeVector;
 }
 
-vector<Labelled<CodeVector>*> EnsembleClassifier::generateSamples(Frame* frame, vector<Box*> positiveBoxList, vector<Box*> negativeBoxList) {
-    int nrOfWarps = 2;
-    int warpNo = 1;
+vector<Labelled<CodeVector>*> EnsembleClassifier::generateSamples(
+    Frame* frame,
+    vector<Box*> positiveBoxList,
+    vector<Box*> negativeBoxList) {
+        vector<Labelled<CodeVector>*> binaryCodes;
 
-    vector<Labelled<CodeVector>*> binaryCodes;
-    int nrOfPositiveSamples = (int) positiveBoxList.size();
-    do {
-        println("Running for %d", warpNo);
+        // Create binary codes for positive samples
+        int nrOfPositiveSamples = (int) positiveBoxList.size();
+
+        int nrOfWarps = 3;
+        int warpNo = 1;
+        Frame* currentFrame = frame->clone();
+
+        BoxHull* bbHull = new BoxHull();
         for (int i = 0; i < nrOfPositiveSamples; i++) {
             Box* box = positiveBoxList[i];
-            CodeVector* codeVector = generateBinaryCode(frame, box);
-            binaryCodes.push_back(new Labelled<CodeVector>(codeVector, 1));
+            bbHull->add(box);
         }
+        Box* boxHull = bbHull->getBox();
 
-        frame = Frame::warp(frame);
-        warpNo++;
-    } while (warpNo <= nrOfWarps);
+        do {
+            for (int i = 0; i < nrOfPositiveSamples; i++) {
+                Box* box = positiveBoxList[i];
+                CodeVector* codeVector = generateBinaryCode(currentFrame, box);
+                binaryCodes.push_back(new Labelled<CodeVector>(codeVector, 1));
+            }
 
-    int nrOfNegativeSamples = (int) negativeBoxList.size();
-    for (int i = 0; i < nrOfNegativeSamples; i++) {
-        Box* box = negativeBoxList[i];
-        CodeVector* codeVector = generateBinaryCode(frame, box);
-        binaryCodes.push_back(new Labelled<CodeVector>(codeVector, 0));
-    }
+            currentFrame = Frame::warp(frame, boxHull);
+            warpNo++;
+        } while (warpNo <= nrOfWarps);
 
-    return binaryCodes;
+        free(bbHull);
+        free(boxHull);
+
+        // Create binary codes for negative samples
+        // int nrOfNegativeSamples = (int) negativeBoxList.size();
+        // for (int i = 0; i < nrOfNegativeSamples; i++) {
+        //     Box* box = negativeBoxList[i];
+        //     CodeVector* codeVector = generateBinaryCode(frame, box);
+        //     binaryCodes.push_back(new Labelled<CodeVector>(codeVector, 0));
+        // }
+
+        return binaryCodes;
 }
 
-vector<Labelled<CodeVector>*> EnsembleClassifier::generateSamples(Frame* frame, vector<ScoredBox*> positiveBoxList, vector<ScoredBox*> negativeBoxList) {
-    vector<Labelled<CodeVector>*> binaryCodes;
-    return binaryCodes;
+vector<Labelled<CodeVector>*> EnsembleClassifier::generateSamples(
+    Frame* frame,
+    vector<ScoredBox*> positiveBoxList,
+    vector<ScoredBox*> negativeBoxList) {
+        vector<Labelled<CodeVector>*> binaryCodes;
+
+        int nrOfPositiveSamples = (int) positiveBoxList.size();
+
+        BoxHull* bbHull = new BoxHull();
+        for (int i = 0; i < nrOfPositiveSamples; i++) {
+            Box* box = positiveBoxList[i]->box;
+            bbHull->add(box);
+        }
+        Box* boxHull = bbHull->getBox();
+
+        int nrOfWarps = 1;
+        int warpNo = 1;
+        Frame* currentFrame = frame->clone();
+        do {
+            for (int i = 0; i < nrOfPositiveSamples; i++) {
+                Box* box = positiveBoxList[i]->box;
+                CodeVector* codeVector = generateBinaryCode(currentFrame, box);
+                binaryCodes.push_back(new Labelled<CodeVector>(codeVector, 1));
+            }
+
+            currentFrame = Frame::warp(frame, boxHull);
+            warpNo++;
+        } while (warpNo <= nrOfWarps);
+
+        free(bbHull);
+        free(boxHull);
+
+        // Create binary codes for negative samples
+        // int nrOfNegativeSamples = (int) negativeBoxList.size();
+        // for (int i = 0; i < nrOfNegativeSamples; i++) {
+        //     EnsembleScore* score = (EnsembleScore*) negativeBoxList[i]->getScore("ensemble");
+        //     // TODO EnsembleScore should contain CodeVector instead of binaryCodes
+        //     CodeVector* codeVector = new CodeVector(13);
+        //     binaryCodes.push_back(new Labelled<CodeVector>(codeVector, 0));
+        // }
+
+        return binaryCodes;
 }
 
 double EnsembleClassifier::getProbability(CodeVector* codeVector, int modelId) {

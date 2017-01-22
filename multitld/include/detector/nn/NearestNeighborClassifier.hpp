@@ -33,8 +33,13 @@ public:
     bool evaluate(Frame* frame, Box* box, double minVariance, int modelId);
     bool validate(Frame* frame, ScoredBox* scoredBox, int modelId);
 
-    void train(TrainingSet<Box> ts, int modelId);
     void train(TrainingSet<ScoredBox> ts, int modelId);
     void dumpNearestNeighborClassifier();
+
+    // v2
+    void train(TrainingSet<Box> ts, int modelId);
+    void doTrain(vector<Labelled<Patch>*> samples, int modelId);
+    vector<Labelled<Patch>*> generateSamples(Frame* frame, vector<Box*> positiveBoxList, vector<Box*> negativeBoxList);
+    vector<Labelled<Patch>*> generateSamples(Frame* frame, vector<ScoredBox*> positiveBoxList, vector<ScoredBox*> negativeBoxList);
 };
 #endif
