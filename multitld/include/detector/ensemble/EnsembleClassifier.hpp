@@ -5,25 +5,11 @@
 #include "core/Frame.hpp"
 #include "core/ScoredBox.hpp"
 
+#include "detector/ensemble/CodeVector.hpp"
 #include "detector/ensemble/BaseClassifier.hpp"
 #include "detector/training/TrainingSet.hpp"
 
-class CodeVector {
-private:
-    vector<int> codes;
-public:
-    CodeVector(int nrOfBaseClassifiers) {
-        codes.resize(nrOfBaseClassifiers);
-    }
 
-    void set(int index, int binaryCode) {
-        codes[index] = binaryCode;
-    }
-
-    int get(int index) {
-        return codes[index];
-    }
-};
 
 class EnsembleClassifier {
 public:

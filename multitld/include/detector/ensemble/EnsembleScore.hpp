@@ -3,21 +3,32 @@
 
 #include "core/Score.hpp"
 
+#include "detector/ensemble/CodeVector.hpp"
+
 class EnsembleScore: public Score {
+private:
+    CodeVector* binaryCodes;
 public:
     vector<double> scores;
-    vector<int> binaryCodes;
     bool isMerged;
 
     EnsembleScore(int nrOfModels, int nrOfBaseClassifiers) {
         isMerged = false;
         scores.resize(nrOfModels);
-        binaryCodes.resize(nrOfBaseClassifiers);
+        binaryCodes = new CodeVector(nrOfBaseClassifiers);
     }
 
     EnsembleScore(vector<double> scores) {
         isMerged = true;
         this->scores = scores;
+    }
+
+    void setBinaryCode(int index, int code) {
+        binaryCodes->set(index, code);
+    }
+
+    int getBinaryCode(int index) {
+        return binaryCodes->get(index);
     }
 
     Score* clone() {
