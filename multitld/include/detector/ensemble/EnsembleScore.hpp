@@ -31,6 +31,10 @@ public:
         return binaryCodes->get(index);
     }
 
+    CodeVector* getCodeVector() {
+        return binaryCodes;
+    }
+
     Score* clone() {
         EnsembleScore* clone = new EnsembleScore(this->scores);
         clone->binaryCodes = this->binaryCodes;

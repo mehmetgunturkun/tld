@@ -305,12 +305,12 @@ vector<Labelled<CodeVector>*> EnsembleClassifier::generateSamples(
         free(boxHull);
 
         // Create binary codes for negative samples
-        // int nrOfNegativeSamples = (int) negativeBoxList.size();
-        // for (int i = 0; i < nrOfNegativeSamples; i++) {
-        //     Box* box = negativeBoxList[i];
-        //     CodeVector* codeVector = generateBinaryCode(frame, box);
-        //     binaryCodes.push_back(new Labelled<CodeVector>(codeVector, 0));
-        // }
+        int nrOfNegativeSamples = (int) negativeBoxList.size();
+        for (int i = 0; i < nrOfNegativeSamples; i++) {
+            Box* box = negativeBoxList[i];
+            CodeVector* codeVector = generateBinaryCode(frame, box);
+            binaryCodes.push_back(new Labelled<CodeVector>(codeVector, 0));
+        }
 
         return binaryCodes;
 }
@@ -348,13 +348,12 @@ vector<Labelled<CodeVector>*> EnsembleClassifier::generateSamples(
         free(boxHull);
 
         // Create binary codes for negative samples
-        // int nrOfNegativeSamples = (int) negativeBoxList.size();
-        // for (int i = 0; i < nrOfNegativeSamples; i++) {
-        //     EnsembleScore* score = (EnsembleScore*) negativeBoxList[i]->getScore("ensemble");
-        //     // TODO EnsembleScore should contain CodeVector instead of binaryCodes
-        //     CodeVector* codeVector = new CodeVector(13);
-        //     binaryCodes.push_back(new Labelled<CodeVector>(codeVector, 0));
-        // }
+        int nrOfNegativeSamples = (int) negativeBoxList.size();
+        for (int i = 0; i < nrOfNegativeSamples; i++) {
+            EnsembleScore* score = (EnsembleScore*) negativeBoxList[i]->getScore("ensemble");
+            CodeVector* codeVector = score->getCodeVector();
+            binaryCodes.push_back(new Labelled<CodeVector>(codeVector, 0));
+        }
 
         return binaryCodes;
 }
@@ -381,8 +380,6 @@ void EnsembleClassifier::updateBaseClassifiers(CodeVector* codeVector, int model
 
 void EnsembleClassifier::doTrain(vector<Labelled<CodeVector>*> samples, int modelId) {
     int nrOfBootstrap = 2;
-    double positiveUpdateThreshold = 0.0;
-    double negativeUpdateThreshold = 0.0;
 
     int nrOfSamples = (int) samples.size();
     int step = nrOfSamples / 10;
