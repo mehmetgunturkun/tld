@@ -2,6 +2,18 @@
 
 vector<string> Sequence::extensions = {".jpg", ".png", ".pgm"};
 
+vector<string> Sequence::tldSequences = {
+    "01_david",
+    "02_jumping",
+    "03_pedestrian1",
+    "04_pedestrian2",
+    "05_pedestrian3",
+    "06_car",
+    "07_motocross",
+    "08_volkswagen",
+    "09_carchase"
+ };
+
 bool endsWith (std::string const &fullString, std::string const &ending) {
     if (fullString.length() >= ending.length()) {
         return (fullString.compare (fullString.length() - ending.length(), ending.length(), ending) == 0);
@@ -86,6 +98,7 @@ bool Sequence::hasNext() {
 }
 
 Frame* Sequence::next() {
+    
     string imageFile = files[processedFrames];
 
     Frame* frame = new Frame(imageFile);
@@ -99,4 +112,24 @@ Frame* Sequence::get(int frameNo) {
     string imageFile = files[frameNo];
     Frame* frame = new Frame(imageFile);
     return frame;
+}
+
+vector<Box*> Sequence::loadGroundTruth() {
+    vector<Box*> gt;
+
+    string groundTruthFile = this->dir + "/evaluations/gt.txt";
+    ifstream gtFile(groundTruthFile);
+    if (gtFile.is_open()) {
+        string line = "";
+        while (getline(gtFile, line)) {
+            Option<Box>* maybeBox = Box::parseFromLine(line);
+            if (maybeBox->isEmpty()) {
+                throw "Failed to parse box from line" + line;
+            } else {
+                gt.push_back(maybeBox->get());
+            }
+        }
+    }
+
+    return gt;
 }

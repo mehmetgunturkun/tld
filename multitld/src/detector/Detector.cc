@@ -1,5 +1,6 @@
 #include "detector/Detector.hpp"
 
+//TODO Remove frame and boxlist from constructor we already giving them in init function
 Detector::Detector(Frame* frame, vector<Box*> boxList) {
     firstFrame = frame;
     firstBox = boxList[0];
@@ -57,7 +58,9 @@ void Detector::initVarianceThresholds(Frame* frame, vector<Box*> boxList) {
         int modelId = i;
         Box* box = boxList[i];
         Box* correctedBox = getClosestBox(frame, box);
+
         double boxVariance = nnClassifier->getPatchVariance(frame, correctedBox);
+        boxVariance = boxVariance / 2.0;
 
         this->varianceList[modelId] = boxVariance;
         if (boxVariance < minimumVariance) {
@@ -65,12 +68,10 @@ void Detector::initVarianceThresholds(Frame* frame, vector<Box*> boxList) {
         }
     }
     this->minimumVariance = minimumVariance;
-    this->varianceThreshold = 489.4352 / 2.0;
-    printf("MINVAR >>> %3.4f\n", minimumVariance);
+    this->varianceThreshold = this->minimumVariance / 2.0;
 }
 
 Box* Detector::init(Frame* frame, Box* box, int modelId) {
-    println("%s", box->toCharArr());
     BoundedSortedVector<Box, OverlapOrdered> positiveQueue = BoundedSortedVector<Box, OverlapOrdered>(10);
     vector<Box*> negativeQueue;
 
@@ -110,16 +111,6 @@ Box* Detector::init(Frame* frame, Box* box, int modelId) {
     }
 
     vector<Box*> positiveBoxList4Ensemble = positiveQueue.toVector();
-    ERRORALL(
-        println("There are %d boxes", id);
-        int nrOfPositiveBoxes = (int) positiveBoxList4Ensemble.size();
-        for (int i = 0; i < nrOfPositiveBoxes; i++) {
-            Box* b = positiveBoxList4Ensemble[i];
-            println("%s", b->toCharArr());
-        }
-    )
-
-
     Random::seed();
     vector<Box*> negativeBoxList4EnsembleFirstPart = Random::splitData(negativeQueue, 2);
 

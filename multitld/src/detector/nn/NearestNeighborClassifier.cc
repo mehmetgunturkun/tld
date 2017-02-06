@@ -39,7 +39,7 @@ double computePatchVariance(Patch* p) {
 double NearestNeighborClassifier::getPatchVariance(Frame* frame, Box* box) {
     Patch* patch = new Patch(frame, box);
     double variance = computePatchVariance(patch);
-    return variance / 2.0;
+    return variance;
 }
 
 bool NearestNeighborClassifier::classify(Frame* frame, ScoredBox* scoredBox) {

@@ -31,6 +31,9 @@ public:
     Frame* next();
     Frame* get(int frameNo);
 
+    vector<Box*> loadGroundTruth();
+
     static vector<string> extensions;
+    static vector<string> tldSequences;
 };
 #endif
