@@ -259,21 +259,20 @@ void EnsembleClassifier::dumpEnsembleClassifier() {
 }
 
 //v2
+void EnsembleClassifier::train(TrainingSet<Box> ts, int modelId, double varianceThreshold) {
+    Frame* frame = ts.frame;
+    vector<Box*> positiveBoxList = ts.positiveSamples;
+    vector<Box*> negativeBoxList = ts.negativeSamples;
 
-CodeVector* EnsembleClassifier::generateBinaryCode(Frame* frame, Box* box) {
-    CodeVector* codeVector = new CodeVector(nrOfBaseClassifiers);
-    for (int i = 0; i < nrOfBaseClassifiers; i++) {
-        BaseClassifier* bc = baseClassifiers[i];
-        int binaryCode = bc->generateBinaryCode(frame, box);
-        codeVector->set(i, binaryCode);
-    }
-    return codeVector;
+    vector<Labelled<CodeVector>*> samples = generateSamples(frame, positiveBoxList, negativeBoxList, varianceThreshold);
+    doTrain(samples, modelId);
 }
 
 vector<Labelled<CodeVector>*> EnsembleClassifier::generateSamples(
     Frame* frame,
     vector<Box*> positiveBoxList,
-    vector<Box*> negativeBoxList) {
+    vector<Box*> negativeBoxList,
+    double varianceThreshold) {
         vector<Labelled<CodeVector>*> binaryCodes;
 
         // Create binary codes for positive samples
@@ -293,8 +292,10 @@ vector<Labelled<CodeVector>*> EnsembleClassifier::generateSamples(
         do {
             for (int i = 0; i < nrOfPositiveSamples; i++) {
                 Box* box = positiveBoxList[i];
-                CodeVector* codeVector = generateBinaryCode(currentFrame, box);
-                binaryCodes.push_back(new Labelled<CodeVector>(codeVector, 1));
+                if (box->variance > 0.0) {
+                    CodeVector* codeVector = generateBinaryCode(currentFrame, box);
+                    binaryCodes.push_back(new Labelled<CodeVector>(codeVector, 1));
+                }
             }
 
             currentFrame = Frame::warp(frame, boxHull);
@@ -315,10 +316,21 @@ vector<Labelled<CodeVector>*> EnsembleClassifier::generateSamples(
         return binaryCodes;
 }
 
+
+void EnsembleClassifier::train(TrainingSet<ScoredBox> ts, int modelId, double varianceThreshold) {
+    Frame* frame = ts.frame;
+    vector<ScoredBox*> positiveBoxList = ts.positiveSamples;
+    vector<ScoredBox*> negativeBoxList = ts.negativeSamples;
+
+    vector<Labelled<CodeVector>*> samples = generateSamples(frame, positiveBoxList, negativeBoxList, varianceThreshold);
+    doTrain(samples, modelId);
+}
+
 vector<Labelled<CodeVector>*> EnsembleClassifier::generateSamples(
     Frame* frame,
     vector<ScoredBox*> positiveBoxList,
-    vector<ScoredBox*> negativeBoxList) {
+    vector<ScoredBox*> negativeBoxList,
+    double varianceThreshold) {
         vector<Labelled<CodeVector>*> binaryCodes;
 
         int nrOfPositiveSamples = (int) positiveBoxList.size();
@@ -358,26 +370,6 @@ vector<Labelled<CodeVector>*> EnsembleClassifier::generateSamples(
         return binaryCodes;
 }
 
-double EnsembleClassifier::getProbability(CodeVector* codeVector, int modelId) {
-    double probability = 0.0;
-    for (int i = 0; i < nrOfBaseClassifiers; i++) {
-        BaseClassifier* bc = baseClassifiers[i];
-        int binaryCode = codeVector->get(i);
-
-        probability += bc->getProbability(binaryCode, modelId);
-    }
-    return probability;
-}
-
-void EnsembleClassifier::updateBaseClassifiers(CodeVector* codeVector, int modelId, bool label) {
-    for (int i = 0; i < nrOfBaseClassifiers; i++) {
-        BaseClassifier* bc = baseClassifiers[i];
-        int binaryCode = codeVector->get(i);
-
-        bc->train(binaryCode, modelId, label);
-    }
-}
-
 void EnsembleClassifier::doTrain(vector<Labelled<CodeVector>*> samples, int modelId) {
     int nrOfBootstrap = 2;
 
@@ -405,20 +397,32 @@ void EnsembleClassifier::doTrain(vector<Labelled<CodeVector>*> samples, int mode
     }
 }
 
-void EnsembleClassifier::train(TrainingSet<Box> ts, int modelId) {
-    Frame* frame = ts.frame;
-    vector<Box*> positiveBoxList = ts.positiveSamples;
-    vector<Box*> negativeBoxList = ts.negativeSamples;
+void EnsembleClassifier::updateBaseClassifiers(CodeVector* codeVector, int modelId, bool label) {
+    for (int i = 0; i < nrOfBaseClassifiers; i++) {
+        BaseClassifier* bc = baseClassifiers[i];
+        int binaryCode = codeVector->get(i);
 
-    vector<Labelled<CodeVector>*> samples = generateSamples(frame, positiveBoxList, negativeBoxList);
-    doTrain(samples, modelId);
+        bc->train(binaryCode, modelId, label);
+    }
 }
 
-void EnsembleClassifier::train(TrainingSet<ScoredBox> ts, int modelId) {
-    Frame* frame = ts.frame;
-    vector<ScoredBox*> positiveBoxList = ts.positiveSamples;
-    vector<ScoredBox*> negativeBoxList = ts.negativeSamples;
+double EnsembleClassifier::getProbability(CodeVector* codeVector, int modelId) {
+    double probability = 0.0;
+    for (int i = 0; i < nrOfBaseClassifiers; i++) {
+        BaseClassifier* bc = baseClassifiers[i];
+        int binaryCode = codeVector->get(i);
 
-    vector<Labelled<CodeVector>*> samples = generateSamples(frame, positiveBoxList, negativeBoxList);
-    doTrain(samples, modelId);
+        probability += bc->getProbability(binaryCode, modelId);
+    }
+    return probability;
+}
+
+CodeVector* EnsembleClassifier::generateBinaryCode(Frame* frame, Box* box) {
+    CodeVector* codeVector = new CodeVector(nrOfBaseClassifiers);
+    for (int i = 0; i < nrOfBaseClassifiers; i++) {
+        BaseClassifier* bc = baseClassifiers[i];
+        int binaryCode = bc->generateBinaryCode(frame, box);
+        codeVector->set(i, binaryCode);
+    }
+    return codeVector;
 }

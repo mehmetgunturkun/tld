@@ -19,8 +19,6 @@ int main(int argc, char** args) {
     initBox->isValid = true;
     vector<Box*> boxList = { initBox };
 
-    ofstream outputFile;
-    outputFile.open (sequence->outputFile);
 
     TLD* tld = new TLD(firstFrame, boxList);
     boxList = tld->init();
@@ -28,10 +26,9 @@ int main(int argc, char** args) {
 
     int frameNo = 0;
     Frame* previous = firstFrame;
-    outputFile << initBox->toTLDString() << "\n";
     printf("Started to run for %s\n", key.c_str());
 
-    while (sequence->hasNext()) {
+    while (sequence->hasNext() && frameNo < 5) {
         printf("Frame(%d) >> Frame(%d)\n", frameNo, frameNo + 1);
         Frame* current = sequence->next();
         frameNo += 1;
@@ -40,18 +37,17 @@ int main(int argc, char** args) {
         Box* box = boxList[0];
         ImageBuilder* builder = new ImageBuilder(current);
         if (box != nullptr) {
-            string boxString = box->toTLDString();
+            // string boxString = box->toTLDString();
             builder->withBox(box);
-            outputFile << boxString << "\n";
-        } else {
-            outputFile << "nan, nan, nan, nan\n";
         }
         builder->display(1);
+
+        Frame::dealloc(previous);
+
         previous = current;
     }
 
     tld->detector->dumpDetector();
 
-    outputFile.close();
     return EXIT_SUCCESS;
 }

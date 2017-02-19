@@ -1,6 +1,8 @@
 #ifndef INTEGRAL_IMAGE_HPP
 #define INTEGRAL_IMAGE_HPP
 
+#include <stdio.h>
+
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
 
@@ -31,5 +33,7 @@ public:
     MeanVariance* computeMeanVariance(Box* box);
     MeanVariance* computeMeanVariance(int x, int y, int width, int height);
     int computeSubWindow(int row, int col, int pWidth, int pHeight, bool isSquared);
+
+    static void dealloc(IntegralImage* frame);
 };
 #endif

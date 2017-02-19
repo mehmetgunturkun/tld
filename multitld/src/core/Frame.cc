@@ -79,3 +79,12 @@ Frame* Frame::warp(Frame* frame, Box* box) {
     }
     return copied;
 }
+
+void Frame::dealloc(Frame* frame) {
+    free(frame->displayImg);
+    free(frame->grayscale);
+    free(frame->gaussian);
+
+    IntegralImage::dealloc(frame->integral);
+    free(frame);
+}

@@ -19,5 +19,9 @@ bool PixelComparison::compare(Frame* frame, Box* box) {
 
     int fromPixel = frame->get(normFrom, CV_LOAD_IMAGE_GAUSSIAN);
     int toPixel = frame->get(normTo, CV_LOAD_IMAGE_GAUSSIAN);
+
+    free(normFrom);
+    free(normTo);
+
     return fromPixel > toPixel;
 }

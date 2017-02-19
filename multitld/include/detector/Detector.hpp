@@ -46,7 +46,7 @@ public:
     bool checkVariance(Frame* frame, ScoredBox* scoredBox);
 
     bool isPositive(Box* box);
-    bool isNegative(Box* box);
+    bool isNegative(Box* box, double varianceThresholdPerModel);
 
     vector<Box*> init(Frame* frame, vector<Box*> boxList);
     Box* init(Frame* frame, Box* box, int modelId);

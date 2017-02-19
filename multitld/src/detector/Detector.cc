@@ -6,7 +6,6 @@ Detector::Detector(Frame* frame, vector<Box*> boxList) {
     firstBox = boxList[0];
     nrOfModels = (int) boxList.size();
 
-    // vClassifier = new VarianceClassifier();
     eClassifier = new EnsembleClassifier();
     nnClassifier = new NearestNeighborClassifier();
 
@@ -27,8 +26,8 @@ bool Detector::isPositive(Box* box) {
     return (box->overlap > positiveBoxOverlapThreshold);
 }
 
-bool Detector::isNegative(Box* box) {
-    return (box->overlap < negativeBoxOverlapThreshold) && (box->variance > varianceThreshold);
+bool Detector::isNegative(Box* box, double varianceThresholdPerModel) {
+    return (box->overlap < negativeBoxOverlapThreshold) && (box->variance > varianceThresholdPerModel);
 }
 
 vector<Box*> Detector::init(Frame* frame, vector<Box*> boxList) {
@@ -50,11 +49,10 @@ vector<Box*> Detector::init(Frame* frame, vector<Box*> boxList) {
 }
 
 void Detector::initVarianceThresholds(Frame* frame, vector<Box*> boxList) {
-    int nrOfBoxes = (int) boxList.size();
-    this->varianceList.resize(nrOfBoxes);
+    this->varianceList.resize(nrOfModels);
 
     double minimumVariance = FLT_MAX;
-    for (int i = 0; i < nrOfBoxes; i++) {
+    for (int i = 0; i < nrOfModels; i++) {
         int modelId = i;
         Box* box = boxList[i];
         Box* correctedBox = getClosestBox(frame, box);
@@ -77,6 +75,9 @@ Box* Detector::init(Frame* frame, Box* box, int modelId) {
 
     BoxIterator* boxIterator = new BoxIterator(firstFrame, firstBox);
     int id = 0;
+
+    double varianceThresholdForModel = varianceList[modelId] / 2.0;
+
     while (boxIterator->hasNext()) {
         Box* sampleBox = boxIterator->next();
         id += 1;
@@ -103,32 +104,39 @@ Box* Detector::init(Frame* frame, Box* box, int modelId) {
         sampleBox->variance = meanVariance->variance;
 
         //Check if negative
-        if (isNegative(sampleBox)) {
+        if (isNegative(sampleBox, varianceThresholdForModel)) {
             // Add to TrainingSetBuilder as positive
             negativeQueue.push_back(sampleBox);
             continue;
         }
+
+        free(sampleBox);
     }
 
     vector<Box*> positiveBoxList4Ensemble = positiveQueue.toVector();
+
+    Box* closestBox = positiveBoxList4Ensemble[0];
+    vector<Box*> positiveScoredBoxList4NN = { closestBox };
+
+    Random::seed();
+    vector<Box*> negativeBoxList4NN = Random::randomSample(
+        negativeQueue,
+        100
+    );
+
     Random::seed();
     vector<Box*> negativeBoxList4EnsembleFirstPart = Random::splitData(negativeQueue, 2);
 
+    Random::seed();
+    vector<Box*> negativeBoxList4NNFirstPart = Random::splitData(negativeBoxList4NN, 2);
+
+    // TODO filter
     TrainingSet<Box> trainingSet4Ensemble = TrainingSet<Box>(
         frame,
         positiveBoxList4Ensemble,
         negativeBoxList4EnsembleFirstPart,
         2
     );
-
-    Box* closestBox = positiveBoxList4Ensemble[0];
-    vector<Box*> positiveScoredBoxList4NN = { closestBox };
-
-    vector<Box*> negativeBoxList4NN = Random::randomSample(
-        negativeQueue,
-        100
-    );
-    vector<Box*> negativeBoxList4NNFirstPart = Random::splitData(negativeBoxList4NN, 2);
 
     TrainingSet<Box> trainingSet4NN = TrainingSet<Box>(
         frame,
@@ -137,7 +145,7 @@ Box* Detector::init(Frame* frame, Box* box, int modelId) {
         1
     );
 
-    eClassifier->train(trainingSet4Ensemble, modelId);
+    eClassifier->train(trainingSet4Ensemble, modelId, 0.0);
     nnClassifier->train(trainingSet4NN, modelId);
 
     return closestBox;
@@ -172,6 +180,8 @@ void Detector::learn(Frame* current, Box* box, vector<ScoredBox*> grids, int mod
     int nrOfPositive = 0;
     int nrOfNegativeEC = 0;
 
+    double varianceThresholdForModel = varianceList[modelId];
+
     for (int i = 0; i < gridSize; i++) {
         ScoredBox* sample = grids[i];
 
@@ -193,7 +203,7 @@ void Detector::learn(Frame* current, Box* box, vector<ScoredBox*> grids, int mod
             confidence = ensembleScore->scores[modelId];
         }
 
-        if (isNegative(sample->box) && confidence >= 1.0) {
+        if (isNegative(sample->box, varianceThresholdForModel) && confidence >= 1.0) {
             nrOfNegativeEC += 1;
             score(current, sample);
             negativeQueue.push_back(sample);
@@ -260,7 +270,7 @@ void Detector::learn(Frame* current, Box* box, vector<ScoredBox*> grids, int mod
         negativeScoredBoxList4NN
     );
 
-    eClassifier->train(trainingSet4Ensemble, modelId);
+    eClassifier->train(trainingSet4Ensemble, modelId, 0.0);
     nnClassifier->train(trainingSet4NN, modelId);
 }
 

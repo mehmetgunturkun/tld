@@ -36,14 +36,25 @@ public:
     double getProbability(ScoredBox* scoredBox, int modelId);
     void score(Frame* frame, ScoredBox* scoredBox);
 
-    void train(TrainingSet<Box> ts, int modelId);
-    void train(TrainingSet<ScoredBox> ts, int modelId);
     void updateBaseClassifiers(Frame* frame, ScoredBox* scoredBox, int modelId, bool label);
 
     CodeVector* generateBinaryCode(Frame* frame, Box* box);
     double getProbability(CodeVector* codeVector, int modelId);
-    vector<Labelled<CodeVector>*> generateSamples(Frame* frame, vector<Box*> positiveBoxList, vector<Box*> negativeBoxList);
-    vector<Labelled<CodeVector>*> generateSamples(Frame* frame, vector<ScoredBox*> positiveBoxList, vector<ScoredBox*> negativeBoxList);
+
+    void train(TrainingSet<Box> ts, int modelId, double varianceThreshold);
+    vector<Labelled<CodeVector>*> generateSamples(
+        Frame* frame,
+        vector<Box*> positiveBoxList,
+        vector<Box*> negativeBoxList,
+        double varianceThreshold);
+
+    void train(TrainingSet<ScoredBox> ts, int modelId, double varianceThreshold);
+    vector<Labelled<CodeVector>*> generateSamples(
+        Frame* frame,
+        vector<ScoredBox*> positiveBoxList,
+        vector<ScoredBox*> negativeBoxList,
+        double varianceThreshold);
+
     void updateBaseClassifiers(CodeVector* codeVector, int modelId, bool label);
     void doTrain(vector<Labelled<CodeVector>*> samples, int modelId);
 
