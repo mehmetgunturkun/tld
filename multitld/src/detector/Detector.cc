@@ -109,6 +109,8 @@ Box* Detector::init(Frame* frame, Box* box, int modelId) {
             negativeQueue.push_back(sampleBox);
             continue;
         }
+
+        free(sampleBox);
     }
 
     vector<Box*> positiveBoxList4Ensemble = positiveQueue.toVector();

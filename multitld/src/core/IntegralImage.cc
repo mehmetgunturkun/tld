@@ -125,3 +125,10 @@ int IntegralImage::computeSubWindow(int row, int col, int pWidth, int pHeight, b
         int sum = bottomRight + topLeft - (topRight + bottomLeft);
         return sum;
 }
+
+void IntegralImage::dealloc(IntegralImage* integralImage) {
+    free(integralImage->integralImage);
+    free(integralImage->integralSquaredImage);
+
+    free(integralImage);
+}

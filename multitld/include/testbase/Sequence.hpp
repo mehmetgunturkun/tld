@@ -10,7 +10,7 @@
 #include "core/Frame.hpp"
 
 // #define RESOURCE_DIR "/Users/mehmetgunturkun/MasterThesis/resources"
-#define RESOURCE_DIR "/Users/mehmetgunturkun/MasterThesis/ceng500-mscthesis/resources/tld"
+#define RESOURCE_DIR "/Users/mehmetgunturkun/MasterThesis/ceng500-mscthesis/resources"
 
 using namespace std;
 
