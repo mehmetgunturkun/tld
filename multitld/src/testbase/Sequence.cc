@@ -98,7 +98,7 @@ bool Sequence::hasNext() {
 }
 
 Frame* Sequence::next() {
-    
+
     string imageFile = files[processedFrames];
 
     Frame* frame = new Frame(imageFile);
@@ -124,7 +124,8 @@ vector<Box*> Sequence::loadGroundTruth() {
         while (getline(gtFile, line)) {
             Option<Box>* maybeBox = Box::parseFromLine(line);
             if (maybeBox->isEmpty()) {
-                throw "Failed to parse box from line" + line;
+                println(RED("There is an invalid box"));
+                gt.push_back(nullptr);
             } else {
                 gt.push_back(maybeBox->get());
             }
