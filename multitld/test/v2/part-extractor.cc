@@ -13,6 +13,7 @@
 #include <opencv2/highgui/highgui.hpp>
 
 #define PI 3.14159265358979323846
+#define SIGMA 50
 
 class Part {
 public:
@@ -322,9 +323,21 @@ void contributeToHeatmap(Mat* img, Mat* heatMap, Part* part, Box* box) {
 
     println("%s, P = %4.3f, Theta = %4.3f", part->locationKey.c_str(), part->p, part->theta);
 
+    double constantContribution = 1.0 / (2 * PI * SIGMA * SIGMA);
+
     for (int i = y - 50; i < y + 50; i++) {
         for (int j = x - 50; j < x + 50; j++) {
-            heatMap->at<double>(i, j) = heatMap->at<double>(i, j) + 1.0;
+            int dy = abs(i - y);
+            int dx = abs(j - x);
+            double distance = sqrt(dx * dx + dy * dy);
+            double contribution = 10 / (distance + 1.0);
+
+            if (i == y && j == x) {
+                println("%4.3f", contribution);
+            }
+
+
+            heatMap->at<double>(i, j) = heatMap->at<double>(i, j) + contribution;
         }
     }
 
