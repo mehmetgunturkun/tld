@@ -13,8 +13,11 @@ public:
     static int WIDTH;
     static int HEIGHT;
 
-    Patch(Mat* data);
-    Patch(Frame* frame, Box* box);
+    int id;
     Mat* data;
+
+    Patch(int id, Mat* data);
+    Patch(Frame* frame, Box* box);
+
 };
 #endif
