@@ -80,6 +80,20 @@ public:
     bool isClassified(string classifierKey, int modelId);
     bool isScored(string classifierKey);
 
+    string toString() {
+        stringstream ss;
+        ss  << "ScoredBox("
+            << box->id << ", "
+            << box->x1 << ", "
+            << box->y1 << ", "
+            << box->x2 << ", "
+            << box->y2 << ", "
+            << box->overlap << ", "
+            << box->width << ", "
+            << box->height<< ")";
+        return ss.str();
+    }
+
     static vector<ScoredBox*> cluster(vector<ScoredBox*> boxList, int nrOfBoxes) {
         if (nrOfBoxes == 1) {
             return boxList;
