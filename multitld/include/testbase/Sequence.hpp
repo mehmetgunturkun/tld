@@ -12,6 +12,7 @@
 // #define RESOURCE_DIR "/Users/mehmetgunturkun/MasterThesis/resources"
 #define RESOURCE_DIR "/Users/mehmetgunturkun/MasterThesis/ceng500-mscthesis/resources"
 
+#define NO_LIMIT 0
 using namespace std;
 
 class Sequence {
@@ -26,7 +27,7 @@ public:
     int nrOfFrames;
     int limit;
 
-    Sequence(string key, int skip = 0, int limit = 0);
+    Sequence(string key, int skip = 0, int limit = NO_LIMIT);
     bool hasNext();
     Frame* next();
     Frame* get(int frameNo);
