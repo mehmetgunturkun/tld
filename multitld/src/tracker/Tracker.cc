@@ -365,6 +365,8 @@ Option<Box>* Tracker::estimate(Frame* prev, Frame* curr, Box* box, vector<FBPoin
     vector<float> fbErrors;
     vector<float> nccErrors;
 
+    println(YELLOW("REAL-TRACKER(IN) >> %s"), box->toCharArr());
+    
     int nrOfStablePoints = 0;
     for (int i = start; i < end; i++) {
         FBPoint* fbPoint = trackedPoints[i];
@@ -440,11 +442,11 @@ Option<Box>* Tracker::estimate(Frame* prev, Frame* curr, Box* box, vector<FBPoin
 
     Box* movedBox = box->move(medX, sx, medY, sy);
     if (isOut(curr, movedBox)) {
-        println("REAL-TRACKER(OUT) >> %s", movedBox->toCharArr());
+        println(RED("REAL-TRACKER(OUT) >> %s"), movedBox->toCharArr());
         Option<Box>* failedBox = new Option<Box>();
         return failedBox;
     } else {
-        println("REAL-TRACKER(IN) >> %s", movedBox->toCharArr());
+        println(GREEN("REAL-TRACKER(OUT) >> %s"), movedBox->toCharArr());
         Option<Box>* successBox = new Option<Box>(movedBox);
         return successBox;
     }
