@@ -36,7 +36,7 @@ int run(Arguments* arguments) {
         Box* initBox = sequence->initBox;
 
         vector<Box*> boxList = { initBox };
-        Detector* detector = new Detector(firstFrame, boxList);
+        Detector* detector = new Detector();
         detector->init(firstFrame, boxList);
     }
 

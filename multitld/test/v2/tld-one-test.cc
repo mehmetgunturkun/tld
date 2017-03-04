@@ -20,18 +20,20 @@ int main(int argc, char** args) {
     vector<Box*> boxList = { initBox };
 
 
-    TLD* tld = new TLD(firstFrame, boxList);
-    boxList = tld->init();
+    TLD* tld = new TLD();
+    boxList = tld->init(firstFrame, boxList);
+
     tld->detector->dumpDetector();
 
     int frameNo = 0;
     Frame* previous = firstFrame;
     printf("Started to run for %s\n", key.c_str());
 
-    while (sequence->hasNext() && frameNo < 5) {
+    while (sequence->hasNext()) {
         printf("Frame(%d) >> Frame(%d)\n", frameNo, frameNo + 1);
         Frame* current = sequence->next();
         frameNo += 1;
+        printf("Frame(%s) >> Frame(%s)\n", previous->name.c_str(), current->name.c_str());
 
         boxList = tld->track(previous, current, boxList);
         Box* box = boxList[0];
@@ -39,15 +41,15 @@ int main(int argc, char** args) {
         if (box != nullptr) {
             // string boxString = box->toTLDString();
             builder->withBox(box);
+            builder->display(100);
+        } else {
+            builder->display(0);
         }
-        builder->display(1);
+
+        tld->detector->dumpDetector();
 
         Frame::dealloc(previous);
-
         previous = current;
     }
-
-    tld->detector->dumpDetector();
-
     return EXIT_SUCCESS;
 }
