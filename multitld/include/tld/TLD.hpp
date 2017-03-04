@@ -30,9 +30,10 @@ public:
     Detector* detector;
     int nrOfModels;
 
+    TLD();
     TLD(Tracker* tracker, Detector* detector);
-    TLD(Frame* frame, vector<Box*> boxList);
-    vector<Box*> init();
+
+    vector<Box*> init(Frame* frame, vector<Box*> boxList);
 
     vector<Box*> track(Frame* prev, Frame* curr, vector<Box*> prevBoxList);
     vector<TLDResultSet*> groupResults(vector<Box*> boxList, vector<ScoredBox*> scoredBoxList);
