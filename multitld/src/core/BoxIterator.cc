@@ -124,5 +124,7 @@ bool BoxIterator::hasNext() {
 Box* BoxIterator::next() {
     BoxIteratorScale* scale = scales[currentScale];
     nrOfBoxes += 1;
-    return scale->next();
+    Box* box = scale->next();
+    box->id = nrOfBoxes;
+    return box;
 }
