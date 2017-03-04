@@ -1,14 +1,8 @@
 #include "tld/TLD.hpp"
 
-TLD::TLD(Frame* frame, vector<Box*> boxList) {
-    this->firstFrame = frame;
-    this->firstBoxList = boxList;
-
-    this->nrOfModels = (int) boxList.size();
-
+TLD::TLD() {
     this->tracker = new Tracker();
-    this->detector = new Detector(frame, boxList);
-    printf("TLD is created\n");
+    this->detector = new Detector();
 }
 
 TLD::TLD(Tracker* tracker, Detector* detector) {
@@ -17,7 +11,12 @@ TLD::TLD(Tracker* tracker, Detector* detector) {
     this->nrOfModels = 0;
 }
 
-vector<Box*> TLD::init() {
+vector<Box*> TLD::init(Frame* frame, vector<Box*> boxList) {
+    this->firstFrame = frame;
+    this->firstBoxList = boxList;
+
+    this->nrOfModels = (int) boxList.size();
+
     vector<Box*> correctedBox = detector->init(firstFrame, firstBoxList);
     return correctedBox;
 }

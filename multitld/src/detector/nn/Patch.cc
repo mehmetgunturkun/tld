@@ -14,7 +14,8 @@
 int Patch::WIDTH = 15;
 int Patch::HEIGHT = 15;
 
-Patch::Patch(Mat* d) {
+Patch::Patch(int id, Mat* d) {
+    this->id = id;
     data = d;
 }
 
@@ -215,6 +216,7 @@ Mat* constructSubPixelPatch(Frame* frame, Box* box) {
 }
 
 Patch::Patch(Frame* frame, Box* box) {
+    this->id = box->id;
     if (box->isStandard()) {
         data = constructStandardPatch(frame, box);
     } else {

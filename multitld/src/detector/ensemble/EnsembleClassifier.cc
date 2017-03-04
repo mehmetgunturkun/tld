@@ -274,6 +274,7 @@ vector<Labelled<CodeVector>*> EnsembleClassifier::generateSamples(
     vector<Box*> negativeBoxList,
     double varianceThreshold) {
         vector<Labelled<CodeVector>*> binaryCodes;
+        Random::seed();
 
         // Create binary codes for positive samples
         int nrOfPositiveSamples = (int) positiveBoxList.size();
@@ -331,6 +332,7 @@ vector<Labelled<CodeVector>*> EnsembleClassifier::generateSamples(
     vector<ScoredBox*> positiveBoxList,
     vector<ScoredBox*> negativeBoxList,
     double varianceThreshold) {
+        Random::seed();
         vector<Labelled<CodeVector>*> binaryCodes;
 
         int nrOfPositiveSamples = (int) positiveBoxList.size();
@@ -375,6 +377,8 @@ void EnsembleClassifier::doTrain(vector<Labelled<CodeVector>*> samples, int mode
 
     int nrOfSamples = (int) samples.size();
     int step = nrOfSamples / 10;
+
+    // vector<Labelled<CodeVector>*> shuffledSamples = Random::randomSample(samples);
 
     for (int trial = 0; trial < nrOfBootstrap; trial++) {
         for (int i = 0; i < step; i++) {

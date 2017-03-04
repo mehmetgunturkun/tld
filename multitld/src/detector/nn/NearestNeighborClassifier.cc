@@ -143,7 +143,19 @@ bool NearestNeighborClassifier::evaluate(Frame* frame, Box* box, double minVaria
 
 void NearestNeighborClassifier::dumpNearestNeighborClassifier() {
     ObjectModel* model = models[0];
-    printf("#P = %d, #N = %d\n", model->nrOfPositivePatches, model->nrOfNegativePatches);
+    int nrOfPositivePatches = model->nrOfPositivePatches;
+    printf("#P = %d\n", nrOfPositivePatches);
+    for (int i = 0; i < nrOfPositivePatches; i++) {
+        printf("%d, ", model->positivePatchList[i]->id);
+    }
+    printf("\n");
+
+    int nrOfNegativePatches = model->nrOfNegativePatches;
+    printf("#N = %d\n", nrOfNegativePatches);
+    for (int i = 0; i < nrOfNegativePatches; i++) {
+        printf("%d, ", model->negativePatchList[i]->id);
+    }
+    printf("\n");
 }
 
 vector<Labelled<Patch>*> NearestNeighborClassifier::generateSamples(
@@ -247,16 +259,20 @@ void NearestNeighborClassifier::doTrain(vector<Labelled<Patch>*> samples, int mo
         bool isInPositive = objectScore->isInPositive;
         int closestPositivePatchIndex = objectScore->closestPositivePatchIndex;
 
-        if (label == 1 && relativeScore <= 0.65) {
-            if (isInPositive == true) {
-                model->add(patch, true);
-                continue;
+        if (label == 1) {
+            if (relativeScore <= 0.65) {
+                if (isInPositive == true) {
+                    model->add(patch, true);
+                    continue;
+                }
+                model->add(patch, closestPositivePatchIndex, true);
             }
-            model->add(patch, closestPositivePatchIndex, true);
         }
 
-        if (label == 0 && relativeScore > 0.5) {
-            model->add(patch, false);
+        if (label == 0) {
+            if (relativeScore > 0.5) {
+                model->add(patch, false);
+            }
         }
     }
 }
