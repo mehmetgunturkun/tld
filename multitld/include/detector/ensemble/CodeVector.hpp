@@ -5,8 +5,11 @@ class CodeVector {
 private:
     vector<int> codes;
 public:
+    int size;
+
     CodeVector(int nrOfBaseClassifiers) {
         codes.resize(nrOfBaseClassifiers);
+        size = nrOfBaseClassifiers;
     }
 
     void set(int index, int binaryCode) {
