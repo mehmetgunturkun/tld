@@ -10,7 +10,7 @@
 #define nextcol(tmp, width, height) ((tmp)+1)
 #define nextr_c(tmp, width, height) ((tmp)+width+1)
 
-#define M(r, c) H[r*3+c]
+#define MGET(r, c) H[r*3+c]
 
 using namespace cv;
 
@@ -28,9 +28,9 @@ private:
        double *output=result, i, j, xx, yy;
        /* precalulate necessary constant with respect to i,j offset
           translation, H is column oriented (transposed) */
-       ox = M(0,2);
-       oy = M(1,2);
-       oz = M(2,2);
+       ox = MGET(0,2);
+       oy = MGET(1,2);
+       oz = MGET(2,2);
 
        // printf("ox: %g, oy: %g, oz: %g\n", ox, oy, oz);
 
@@ -38,16 +38,16 @@ private:
        for (j = 0; j < (int)(ymax-ymin+1); j++)
        {
           /* calculate x, y for current row */
-          curx = M(0,1)*yy + ox;
-          cury = M(1,1)*yy + oy;
-          curz = M(2,1)*yy + oz;
+          curx = MGET(0,1)*yy + ox;
+          cury = MGET(1,1)*yy + oy;
+          curz = MGET(2,1)*yy + oz;
           xx = xmin;
           yy = yy + 1;
           for (i = 0; i < (int)(xmax-xmin+1); i++) {
              /* calculate x, y in current column */
-             wx = M(0,0)*xx + curx;
-             wy = M(1,0)*xx + cury;
-             wz = M(2,0)*xx + curz;
+             wx = MGET(0,0)*xx + curx;
+             wy = MGET(1,0)*xx + cury;
+             wz = MGET(2,0)*xx + curz;
     //       printf("%g %g, %g %g %g\n", xx, yy, wx, wy, wz);
              wx /= wz;
              wy /= wz;

@@ -22,13 +22,13 @@ vector<Box*> TLD::init(Frame* frame, vector<Box*> boxList) {
 }
 
 vector<Box*> TLD::track(Frame* prev, Frame* curr, vector<Box*> prevBoxList) {
-    printf(GREEN("==== Tracker is started ====\n"));
+    DEBUG(GREEN("==== Tracker is started ===="));
     vector<Box*> currentBoxList = tracker->track(prev, curr, prevBoxList);
-    printf(GREEN("==== Tracker is completed ====\n"));
+    DEBUG(GREEN("==== Tracker is completed ===="));
 
-    printf(RED("==== Detector is started ====\n"));
+    DEBUG(RED("==== Detector is started ===="));
     vector<ScoredBox*> scoredBoxList = detector->detect(curr);
-    printf(RED("==== Detector is completed ====\n"));
+    DEBUG(RED("==== Detector is completed ===="));
 
     vector<TLDResultSet*> resultSetPerModel = groupResults(currentBoxList, scoredBoxList);
 
