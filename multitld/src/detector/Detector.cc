@@ -1,11 +1,6 @@
 #include "detector/Detector.hpp"
 
-//TODO Remove frame and boxlist from constructor we already giving them in init function
-Detector::Detector(Frame* frame, vector<Box*> boxList) {
-    firstFrame = frame;
-    firstBox = boxList[0];
-    nrOfModels = (int) boxList.size();
-
+Detector::Detector() {
     eClassifier = new EnsembleClassifier();
     nnClassifier = new NearestNeighborClassifier();
 
@@ -32,6 +27,10 @@ bool Detector::isNegative(Box* box, double varianceThresholdPerModel) {
 
 vector<Box*> Detector::init(Frame* frame, vector<Box*> boxList) {
     Random::seed();
+    firstFrame = frame;
+    firstBox = boxList[0];
+    nrOfModels = (int) boxList.size();
+
     initVarianceThresholds(frame, boxList);
 
     eClassifier->init(frame, boxList);
@@ -86,12 +85,6 @@ Box* Detector::init(Frame* frame, Box* box, int modelId) {
         double overlap = Box::computeOverlap(sampleBox, box);
         sampleBox->overlap = overlap;
 
-        //Check if positive
-        if (isPositive(sampleBox)) {
-            positiveQueue += sampleBox;
-            continue;
-        }
-
         //Compute Variance
         MeanVariance* meanVariance = firstFrame->integral->computeMeanVariance(
             (int) sampleBox->x1,
@@ -102,6 +95,12 @@ Box* Detector::init(Frame* frame, Box* box, int modelId) {
 
         sampleBox->mean = meanVariance->mean;
         sampleBox->variance = meanVariance->variance;
+
+        //Check if positive
+        if (isPositive(sampleBox)) {
+            positiveQueue += sampleBox;
+            continue;
+        }
 
         //Check if negative
         if (isNegative(sampleBox, varianceThresholdForModel)) {

@@ -39,8 +39,6 @@ public:
     int nrOfNegativeBoxes4NNAtInitialization;
 
     Detector();
-    Detector(Frame* frame, vector<Box*> boxList);
-
 
     void initVarianceThresholds(Frame* frame, vector<Box*> boxList);
     bool checkVariance(Frame* frame, ScoredBox* scoredBox);
