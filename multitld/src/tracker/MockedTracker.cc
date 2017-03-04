@@ -326,18 +326,18 @@ Option<Box>* parseFromLine(string line) {
 
 Tracker::Tracker() {
     // ifstream initFile("/tmp/mockedBoxList.csv");
-    ifstream initFile("/tmp/tld/simulations/car/mockedBoxList.csv");
+    ifstream initFile("/tmp/mtld/simulations/pedestrian2/mockedTrackedBox.csv");
     string line;
     while (getline(initFile, line)) {
         // printf("reading line: %s\n", line.c_str());
         Option<Box>* maybeBox = parseFromLine(line);
         if (maybeBox->isDefined()) {
-            mockedBoxList.push_back(maybeBox->get());
+            Box* box = maybeBox->get();
+            mockedBoxList.push_back(box);
         } else {
             mockedBoxList.push_back(nullptr);
         }
     }
-
     // Load Predefined Box List
 }
 
