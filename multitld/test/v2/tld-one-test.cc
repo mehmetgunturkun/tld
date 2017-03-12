@@ -33,7 +33,7 @@ int main(int argc, char** args) {
         printf("Frame(%d) >> Frame(%d)\n", frameNo, frameNo + 1);
         Frame* current = sequence->next();
         frameNo += 1;
-        printf("Frame(%s) >> Frame(%s)\n", previous->name.c_str(), current->name.c_str());
+        // printf("Frame(%s) >> Frame(%s)\n", previous->name.c_str(), current->name.c_str());
 
         boxList = tld->track(previous, current, boxList);
         Box* box = boxList[0];
@@ -43,6 +43,7 @@ int main(int argc, char** args) {
             builder->withBox(box);
             builder->display(100);
         } else {
+            printf("Frame(%d) >> Frame(%d) FAILED\n", frameNo, frameNo + 1);
             builder->display(0);
         }
 

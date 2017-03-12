@@ -46,7 +46,7 @@ Tracker::Tracker() {
     this->MARGIN = 5;
     this->TERM_CRITERIA = new TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, 20, 0.03);
     this->WIN_SIZE = new Size(4, 4);
-    this->fbErrorThreshold = 10.0f;
+    this->fbErrorThreshold = 15.0f;
 
     loadMockedBoxList();
     printf("Tracker is created\n");
@@ -239,11 +239,12 @@ vector<FBPoint*> Tracker::track(Frame* prev, Frame* curr, int nrOfPoints, vector
             float fbError = distance(*fPoint, *bPoint);
             float nccSim = ncc(fromImage, toImage, *fPoint, *tPoint);
 
-            DEBUG("P(%3.4f, %3.4f) - P(%3.4f, %3.4f) = %3.4f, %3.4f\n",
+            println("P(%4.3f, %4.3f) -> P(%4.3f, %4.3f) -> P(%4.3f, %4.3f)",
                 fPoint->x, fPoint->y,
-                bPoint->x, bPoint->y,
-                fbError,
-                nccSim);
+                tPoint->x, tPoint->y,
+                bPoint->x, bPoint->y
+            );
+
 
             FBPoint* fbPoint = new FBPoint(fromPoint, toPoint, bwPoint, fbError, nccSim);
             fbPoints.push_back(fbPoint);
@@ -366,7 +367,7 @@ Option<Box>* Tracker::estimate(Frame* prev, Frame* curr, Box* box, vector<FBPoin
     vector<float> nccErrors;
 
     println(YELLOW("REAL-TRACKER(IN) >> %s"), box->toCharArr());
-    
+
     int nrOfStablePoints = 0;
     for (int i = start; i < end; i++) {
         FBPoint* fbPoint = trackedPoints[i];
