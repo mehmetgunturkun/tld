@@ -239,7 +239,7 @@ vector<FBPoint*> Tracker::track(Frame* prev, Frame* curr, int nrOfPoints, vector
             float fbError = distance(*fPoint, *bPoint);
             float nccSim = ncc(fromImage, toImage, *fPoint, *tPoint);
 
-            println("P(%4.3f, %4.3f) -> P(%4.3f, %4.3f) -> P(%4.3f, %4.3f)",
+            println("P(%15.14f, %15.14f) -> P(%15.14f, %15.14f) -> P(%15.14f, %15.14f)",
                 fPoint->x, fPoint->y,
                 tPoint->x, tPoint->y,
                 bPoint->x, bPoint->y
