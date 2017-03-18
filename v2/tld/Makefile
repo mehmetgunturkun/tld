@@ -7,7 +7,7 @@ CXX := g++
 AR := ar
 
 OPENCV_CFLAGS := /opt/opencv/2.2/include
-OPENCV_LIBS := /opt/opencv/2.2/lib -lopencv_highgui -lopencv_core -lopencv_imgproc -lopencv_video
+OPENCV_LIBS := /opt/opencv/2.2/lib -lopencv_highgui -lopencv_core -lopencv_imgproc -lopencv_video -lopencv_calib3d -lopencv_features2d -lopencv_objdetect -lopencv_legacy
 
 # OPENCV_CFLAGS := /usr/local/Cellar/opencv/2.4.8/include
 # OPENCV_LIBS := /usr/local/Cellar/opencv/2.4.8/lib -lopencv_highgui -lopencv_core -lopencv_imgproc -lopencv_video
@@ -24,7 +24,10 @@ lib2_sources := \
 	src/common/Colors.cc \
 	src/common/string/StringStream.cc \
 	src/core/Box.cc \
-	src/core/Frame.cc
+	src/core/Frame.cc \
+	src/core/Sequence.cc \
+	src/tracker/FBPoint.cc \
+	src/tracker/Tracker.cc
 
 lib2_objects := $(patsubst %.cc,%.o,$(lib2_sources))
 lib2_target  := libtld.a

@@ -3,11 +3,70 @@
 #include "tracker/Tracker.hpp"
 #include "testbase/Sequence.hpp"
 
+float ncc(IplImage* im0, IplImage* im1) {
+    CvPoint2D32f p0 = CvPoint2D32f();
+    // p0.x = 0x1p+7;
+    // p0.y = 0x1.18p+7;
+
+    p0.x = 100.0f;
+    p0.y = 100.0f;
+
+    CvPoint2D32f p1 = CvPoint2D32f();
+    // p1.x = 0x1.0d63a4p+7;
+    // p1.y = 0x1.14b08p+7;
+
+    p1.x = 100.0f;
+    p1.y = 100.0f;
+
+    IplImage* rec0 = cvCreateImage(cvSize(10, 10), 8, 1);
+    IplImage* rec1 = cvCreateImage(cvSize(10, 10), 8, 1);
+    IplImage* res = cvCreateImage(cvSize(1, 1), 32, 1);
+
+
+    cvGetRectSubPix(im0, rec0, p0);
+    cvGetRectSubPix(im1, rec1, p1);
+
+    for (int i = 0; i < 10; i++) {
+        for (int j = 0; j < 10; j++) {
+            char pixel = rec0->imageData[i * 10 + j];
+            printf("%4d ", (int) pixel);
+        }
+        println("");
+    }
+
+    println("----------------------");
+
+    for (int i = 0; i < 10; i++) {
+        for (int j = 0; j < 10; j++) {
+            char pixel = rec1->imageData[i * 10 + j];
+            printf("%4d ", (int) pixel);
+        }
+        println("");
+    }
+
+    cvMatchTemplate(rec0, rec1, res, CV_TM_CCOEFF_NORMED);
+
+    float nccVal = ((float*) res->imageData)[0];
+    return nccVal;
+}
+
+
 int main(int argc, char** argv) {
     Arguments* args = new Arguments(argc, argv);
     string sequenceKey = args->getString("sequence");
 
     Sequence* sequence = new Sequence(sequenceKey);
+
+
+    Mat im1 = cv::imread("/Users/mehmetgunturkun/MasterThesis/ceng500-mscthesis/resources/04_pedestrian2/sequence/00001.jpg", CV_LOAD_IMAGE_GRAYSCALE);
+    Mat im2 = cv::imread("/Users/mehmetgunturkun/MasterThesis/ceng500-mscthesis/resources/04_pedestrian2/sequence/00002.jpg", CV_LOAD_IMAGE_GRAYSCALE);
+
+    IplImage* iplImage1 = new IplImage(im1);
+    IplImage* iplImage2 = new IplImage(im2);
+
+    println("mc1000");
+    ncc(iplImage1, iplImage2);
+    println("mc2000");
 
     Tracker* tracker = new Tracker();
 
@@ -131,7 +190,7 @@ int main(int argc, char** argv) {
     //
     // cout << res;
 
-    vector<FBPoint*> trackedPoints = tracker->track(frame1, frame2, nrOfPoints, pointList);
+    // vector<FBPoint*> trackedPoints = tracker->track(frame1, frame2, nrOfPoints, pointList);
 
     return EXIT_SUCCESS;
 }

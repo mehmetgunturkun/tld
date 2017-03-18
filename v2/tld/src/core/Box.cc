@@ -12,6 +12,23 @@ Box::Box(double x1, double y1, double x2, double y2) {
     this->height = y2 - y1 + 1;
 }
 
+Box::Box(int id, double x1, double y1, double x2, double y2) {
+    this->id = id;
+
+    this->x1 = x1;
+    this->y1 = y1;
+
+    this->x2 = x2;
+    this->y2 = y2;
+    this->width = x2 - x1 + 1;
+    this->height = y2 - y1 + 1;
+}
+
+Box* Box::move(double dx, double sx, double dy, double sy) {
+    Box* box = new Box(id, x1 - sx + dx, y1 - sy + dy, x2 + sx + dx, y2 + sy + dy);
+    return box;
+}
+
 string Box::toString() {
     stringstream ss;
     ss  << "Box("
