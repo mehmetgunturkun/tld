@@ -6,13 +6,13 @@ int main(int argc, char** argv) {
 
     string boxString = args->getString("boxString");
 
-    for (int i = 0; i < 20000000; i++) {
+    for (int i = 0; i < 1000; i++) {
         Option<Box*> maybeBox = Box::fromLine(boxString);
         if (maybeBox.isDefined()) {
             Box* box = maybeBox.get();
-            println("%s", box->toCharArr());
+            println("%d. %s", i, box->toCharArr());
 
-            // delete box;
+            delete box;
         } else {
             println("%s", ("There is no valid box in string: " + boxString).c_str());
         }

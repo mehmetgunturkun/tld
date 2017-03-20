@@ -9,7 +9,8 @@ Tracker::Tracker() {
 }
 
 Tracker::~Tracker() {
-
+  delete winSize;
+  delete termCriteria;
 }
 
 vector<Box*> Tracker::track(Frame* prev, Frame* curr, vector<Box*> boxList) {
@@ -38,6 +39,12 @@ vector<Box*> Tracker::track(Frame* prev, Frame* curr, vector<Box*> boxList) {
             boxList,
             trackedPoints
         );
+
+        for (int i = 0; i < nrOfPoints; i++) {
+          FBPoint* fbPoint = trackedPoints[i];
+          delete fbPoint;
+        }
+
         return estimatedBoxList;
     }
 }
@@ -91,7 +98,7 @@ float ncc(IplImage* im0, IplImage* im1, CvPoint2D32f p0, CvPoint2D32f p1) {
     IplImage* rec1 = cvCreateImage(cvSize(10, 10), 8, 1);
     IplImage* res = cvCreateImage(cvSize(1, 1), IPL_DEPTH_32F, 1);
 
-    printf("P0(%a, %a) -> P(%a, %a)\n", p0.x, p0.y, p1.x, p1.y);
+    // printf("P0(%a, %a) -> P(%a, %a)\n", p0.x, p0.y, p1.x, p1.y);
 
     cvGetRectSubPix(im0, rec0, p0);
     cvGetRectSubPix(im1, rec1, p1);
@@ -99,6 +106,10 @@ float ncc(IplImage* im0, IplImage* im1, CvPoint2D32f p0, CvPoint2D32f p1) {
     cvMatchTemplate(rec0, rec1, res, CV_TM_CCOEFF_NORMED);
 
     float nccVal = ((float*) res->imageData)[0];
+
+    cvReleaseImage(&rec0);
+    cvReleaseImage(&rec1);
+    cvReleaseImage(&res);
     return nccVal;
 }
 
@@ -175,11 +186,18 @@ vector<FBPoint*> Tracker::track(Frame* prev, Frame* curr, int nrOfPoints, vector
             CvPoint2D32f* tPoint = toPoints + i;
             CvPoint2D32f* bPoint = bwPoints + i;
 
-            println("P(%a, %a) -> P(%a, %a) -> P(%a, %a)",
+            // println("P(%a, %a) -> P(%a, %a) -> P(%a, %a)",
+            //     fPoint->x, fPoint->y,
+            //     tPoint->x, tPoint->y,
+            //     bPoint->x, bPoint->y
+            // );
+
+            println("P(%15.14f, %15.14f) -> P(%15.14f, %15.14f) -> P(%15.14f, %15.14f)",
                 fPoint->x, fPoint->y,
                 tPoint->x, tPoint->y,
                 bPoint->x, bPoint->y
             );
+
 
             float fbError = distance(*fPoint, *bPoint);
             float nccSim = ncc(fromImage, toImage, *fPoint, *tPoint);
@@ -191,6 +209,9 @@ vector<FBPoint*> Tracker::track(Frame* prev, Frame* curr, int nrOfPoints, vector
             fbPoints.push_back(FBPoint::failed);
         }
     }
+
+    cvReleaseImage(&fromPyramid);
+    cvReleaseImage(&toPyramid);
 
     return fbPoints;
 }
@@ -311,11 +332,11 @@ Option<Box*> Tracker::estimate(Frame* prev, Frame* curr, Box* box, vector<FBPoin
 
     Box* movedBox = box->move(medX, sx, medY, sy);
     if (isOut(curr, movedBox)) {
-        // println(RED("REAL-TRACKER(OUT) >> %s"), movedBox->toCharArr());
+        //println(RED("REAL-TRACKER(OUT) >> %s"), movedBox->toString().c_str());
         Option<Box*> failedBox = Option<Box*>();
         return failedBox;
     } else {
-        // println(GREEN("REAL-TRACKER(OUT) >> %s"), movedBox->toCharArr());
+        //println(GREEN("REAL-TRACKER(OUT) >> %s"), movedBox->toString().c_str());
         Option<Box*> successBox = Option<Box*>(movedBox);
         return successBox;
     }
@@ -343,7 +364,9 @@ vector<Box*> Tracker::fragmentAndEstimateBoxList(Frame* prev,
             int nrOfPoints = stableBox->nrOfPoints;
             Option<Box*> maybeBox = estimate(prev, curr, stableBox, trackedPoints, cursor, cursor + nrOfPoints);
             if (maybeBox.isDefined()) {
-                estimatedBoxList.push_back(maybeBox.get());
+                Box* nextBox = maybeBox.get();
+                printf("Box: %s\n", nextBox->toString().c_str());
+                estimatedBoxList.push_back(nextBox);
             } else {
                 estimatedBoxList.push_back(nullptr);
             }

@@ -6,13 +6,13 @@ CC := gcc
 CXX := g++
 AR := ar
 
-OPENCV_CFLAGS := /opt/opencv/2.2/include
-OPENCV_LIBS := /opt/opencv/2.2/lib -lopencv_highgui -lopencv_core -lopencv_imgproc -lopencv_video -lopencv_calib3d -lopencv_features2d -lopencv_objdetect -lopencv_legacy
+#OPENCV_CFLAGS := /opt/opencv/2.2/include
+#OPENCV_LIBS := /opt/opencv/2.2/lib -lopencv_highgui -lopencv_core -lopencv_imgproc -lopencv_video -lopencv_calib3d -lopencv_features2d -lopencv_objdetect -lopencv_legacy
+# /opt/opencv/2.2/include
+OPENCV_CFLAGS := -I/opt/opencv/2.2/include/opencv -I/opt/opencv/2.2/include
+OPENCV_LIBS := /opt/opencv/2.2/lib/ -lopencv_highgui -lopencv_core -lopencv_imgproc -lopencv_video
 
-# OPENCV_CFLAGS := /usr/local/Cellar/opencv/2.4.8/include
-# OPENCV_LIBS := /usr/local/Cellar/opencv/2.4.8/lib -lopencv_highgui -lopencv_core -lopencv_imgproc -lopencv_video
-
-CPPFLAGS += -Iinclude -I$(OPENCV_CFLAGS)
+CPPFLAGS += -Iinclude $(OPENCV_CFLAGS)
 CCFLAGS = -g -Wall --std=c99
 # CXXFLAGS = -g -Wall --std=c++11
 CXXFLAGS = -g -O3 -Wall --std=c++11

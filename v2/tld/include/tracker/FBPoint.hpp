@@ -4,6 +4,7 @@
 #include <string>
 #include <sstream>
 
+#include "common/Logging.hpp"
 #include "opencv2/core/types_c.h"
 
 using namespace std;
@@ -22,6 +23,7 @@ public:
 
     FBPoint();
     FBPoint(CvPoint2D32f* src, CvPoint2D32f* to, CvPoint2D32f* bwPoint, float fbErr, float nccSim);
+    ~FBPoint();
 
     string toString();
     const char* toCharArray();

@@ -11,7 +11,9 @@
 #include "common/Logging.hpp"
 
 // #define RESOURCE_DIR "/Users/mehmetgunturkun/MasterThesis/resources"
-#define RESOURCE_DIR "/Users/mehmetgunturkun/MasterThesis/ceng500-mscthesis/resources"
+// #define RESOURCE_DIR "/Users/mehmetgunturkun/MasterThesis/ceng500-mscthesis/resources"
+
+#define RESOURCE_DIR "/home/gunturkun/MasterThesis/resources"
 
 #define NO_LIMIT 0
 using namespace std;

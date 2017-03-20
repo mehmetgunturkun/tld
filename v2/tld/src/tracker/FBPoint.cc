@@ -19,6 +19,14 @@ FBPoint::FBPoint(CvPoint2D32f* src, CvPoint2D32f* to, CvPoint2D32f* bwPoint, flo
     ncc = nccSim;
 }
 
+FBPoint::~FBPoint() {
+  println("mc1000");
+  delete src;
+  println("mc2000");
+  delete to;
+  delete backwardPoint;
+}
+
 string FBPoint::toString() {
     stringstream ss;
     // if (this->state) {

@@ -34,21 +34,23 @@ bool isImageFile(string fileName) {
 }
 
 vector<string> listImageFiles(string directory) {
-    struct dirent *entry;
-    DIR* pDIR = opendir(directory.c_str());
+    struct dirent **namelist;
+    int n,i;
+    const char* directoryStr = directory.c_str();
+    n = scandir(directoryStr, &namelist, 0, versionsort);
+
     vector<string> fileList;
-    if( pDIR != NULL) {
-        entry = readdir(pDIR);
-        while(entry != NULL) {
-            string fileName = string(entry->d_name);
-             if (isImageFile(fileName)) {
-                 fileList.push_back(directory + "/" + fileName);
-             }
-             entry = readdir(pDIR);
-         }
-         closedir(pDIR);
-     }
-     return fileList;
+    for(i = 0 ; i < n; ++i) {
+        string fileName(namelist[i]->d_name);
+        if (isImageFile(fileName)) {
+          fileList.push_back(directory + "/" + fileName);
+        }
+        //free(namelist[i]);
+    }
+    // TODO We cannot free this pointer
+    //delete directoryStr;
+    free(namelist);
+    return fileList;
 }
 
 Sequence::Sequence(string key, int skip, int limit) {
@@ -99,7 +101,6 @@ bool Sequence::hasNext() {
 }
 
 Frame* Sequence::next() {
-
     string imageFile = files[processedFrames];
 
     Option<Frame*> maybeFrame = Frame::fromFile(processedFrames, imageFile);

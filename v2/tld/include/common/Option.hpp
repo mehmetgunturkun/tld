@@ -33,7 +33,7 @@ public:
         if (!empty) {
             return item;
         } else {
-            throw invalid_argument("None.get");
+            throw 20;
         }
     }
 };
