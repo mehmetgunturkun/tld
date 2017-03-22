@@ -6,6 +6,7 @@
 #include "common/Option.hpp"
 #include "core/Image.hpp"
 #include "core/IntegralImage.hpp"
+#include "core/Box.hpp"
 
 class Frame {
 public:
@@ -24,6 +25,10 @@ public:
     Frame(int id, string name, IplImage* originalImage, IplImage* grayscale, IplImage* gaussian);
     ~Frame();
 
+    int get(Point2f* point);
+    Frame* clone();
+
+    static Frame* warp(Frame* frame, Box* boxHull);
     static Option<Frame*> fromFile(int id, string fileName);
 };
 

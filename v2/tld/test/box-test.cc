@@ -1,6 +1,6 @@
 #include "common/Arguments.hpp"
 #include "core/Box.hpp"
-
+#include "detector/training/TrainingSet.hpp"
 int main(int argc, char** argv) {
     Arguments* args = new Arguments(argc, argv);
 

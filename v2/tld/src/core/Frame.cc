@@ -20,6 +20,17 @@ Frame::~Frame() {
     delete integralImage;
 }
 
+int Frame::get(Point2f* point) {
+    //TODO Should use gaussian
+    int index = this->width * (int) point->y + (int) point->x;
+    int pixel = (int) grayscale->imageData[index];
+    return pixel;
+}
+
+Frame* Frame::clone() {
+    //TODO Implementation
+    return this;
+}
 
 Option<Frame*> Frame::fromFile(int id, string fileName) {
     IplImage* originalImage = Image::imread(fileName, CV_LOAD_IMAGE_ANYCOLOR);
@@ -29,4 +40,9 @@ Option<Frame*> Frame::fromFile(int id, string fileName) {
 
     Option<Frame*> maybeFrame = Option<Frame*>(frame);
     return maybeFrame;
+}
+
+Frame* Frame::warp(Frame* frame, Box* hull) {
+    //TODO Implementation
+    return frame;
 }

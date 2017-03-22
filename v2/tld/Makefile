@@ -31,7 +31,14 @@ lib2_sources := \
 	src/core/ScoredBox.cc \
 	src/tracker/FBPoint.cc \
 	src/tracker/Tracker.cc \
-	src/detector/core/BoxIterator.cc
+	src/detector/core/BoxIterator.cc \
+	src/detector/ensemble/PixelComparison.cc \
+	src/detector/ensemble/CodeGenerator.cc \
+	src/detector/ensemble/DecisionTree.cc \
+	src/detector/ensemble/Branch.cc \
+	src/detector/ensemble/Leaf.cc \
+	src/detector/ensemble/BaseClassifier.cc \
+	src/detector/ensemble/EnsembleClassifier.cc
 
 lib2_objects := $(patsubst %.cc,%.o,$(lib2_sources))
 lib2_target  := libtld.a
