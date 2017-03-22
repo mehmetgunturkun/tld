@@ -28,7 +28,8 @@ lib2_sources := \
 	src/core/IntegralImage.cc \
 	src/core/Sequence.cc \
 	src/tracker/FBPoint.cc \
-	src/tracker/Tracker.cc
+	src/tracker/Tracker.cc \
+	src/detector/core/BoxIterator.cc
 
 lib2_objects := $(patsubst %.cc,%.o,$(lib2_sources))
 lib2_target  := libtld.a
