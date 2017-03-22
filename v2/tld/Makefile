@@ -25,6 +25,7 @@ lib2_sources := \
 	src/common/string/StringStream.cc \
 	src/core/Box.cc \
 	src/core/Frame.cc \
+	src/core/IntegralImage.cc \
 	src/core/Sequence.cc \
 	src/tracker/FBPoint.cc \
 	src/tracker/Tracker.cc

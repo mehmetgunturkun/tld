@@ -40,10 +40,10 @@ vector<Box*> Tracker::track(Frame* prev, Frame* curr, vector<Box*> boxList) {
             trackedPoints
         );
 
-        for (int i = 0; i < nrOfPoints; i++) {
-          FBPoint* fbPoint = trackedPoints[i];
-          delete fbPoint;
-        }
+        // for (int i = 0; i < nrOfPoints; i++) {
+        //   FBPoint* fbPoint = trackedPoints[i];
+        //   delete fbPoint;
+        // }
 
         return estimatedBoxList;
     }
@@ -122,6 +122,8 @@ vector<FBPoint*> Tracker::track(Frame* prev, Frame* curr, int nrOfPoints, vector
     IplImage* toImage = curr->grayscale;
     IplImage* toPyramid = cvCreateImage( imageSize, 8, 1 );
 
+    println("Frame(%s) >> Frame(%s)", prev->name.c_str(), curr->name.c_str());
+
     CvPoint2D32f* fromPoints = (CvPoint2D32f*)cvAlloc(nrOfPoints * sizeof(CvPoint2D32f));
     CvPoint2D32f* toPoints = (CvPoint2D32f*)cvAlloc(nrOfPoints * sizeof(CvPoint2D32f));
     CvPoint2D32f* bwPoints = (CvPoint2D32f*)cvAlloc(nrOfPoints * sizeof(CvPoint2D32f));
@@ -186,17 +188,11 @@ vector<FBPoint*> Tracker::track(Frame* prev, Frame* curr, int nrOfPoints, vector
             CvPoint2D32f* tPoint = toPoints + i;
             CvPoint2D32f* bPoint = bwPoints + i;
 
-            // println("P(%a, %a) -> P(%a, %a) -> P(%a, %a)",
+            // println("%2d. P(%15.14f, %15.14f) -> P(%15.14f, %15.14f) -> P(%15.14f, %15.14f)", i,
             //     fPoint->x, fPoint->y,
             //     tPoint->x, tPoint->y,
             //     bPoint->x, bPoint->y
             // );
-
-            println("P(%15.14f, %15.14f) -> P(%15.14f, %15.14f) -> P(%15.14f, %15.14f)",
-                fPoint->x, fPoint->y,
-                tPoint->x, tPoint->y,
-                bPoint->x, bPoint->y
-            );
 
 
             float fbError = distance(*fPoint, *bPoint);

@@ -41,15 +41,16 @@ vector<string> listImageFiles(string directory) {
 
     vector<string> fileList;
     for(i = 0 ; i < n; ++i) {
-        string fileName(namelist[i]->d_name);
+        struct dirent *namelist_i = namelist[i];
+        string fileName(namelist_i->d_name);
         if (isImageFile(fileName)) {
           fileList.push_back(directory + "/" + fileName);
         }
         //free(namelist[i]);
+        delete[] namelist_i;
     }
     // TODO We cannot free this pointer
-    //delete directoryStr;
-    free(namelist);
+    delete[] namelist;
     return fileList;
 }
 
@@ -59,6 +60,18 @@ Sequence::Sequence(string key, int skip, int limit) {
 
     string resourceString(RESOURCE_DIR);
     string sampleDirectory = resourceString + "/" + key;
+
+    struct stat info;
+    const char* pathname = sampleDirectory.c_str();
+    if( stat( pathname, &info ) != 0 ) {
+        printf( "cannot access %s\n", pathname );
+        throw invalid_argument(key + " does not exist under " + resourceString);
+    } else if( info.st_mode & S_IFDIR )  // S_ISDIR() doesn't exist on my windows
+        printf( "%s is a directory\n", pathname );
+    else
+        printf( "%s is no directory\n", pathname );
+
+
     this->dir = sampleDirectory;
     string sequenceDirectory = sampleDirectory + "/sequence";
 
@@ -66,13 +79,13 @@ Sequence::Sequence(string key, int skip, int limit) {
     nrOfFrames =  (int) files.size();
 
     if (limit == NO_LIMIT) {
-        println("Setting limit to nrOfFrames: %d", nrOfFrames);
+        //println("Setting limit to nrOfFrames: %d", nrOfFrames);
         this->limit = nrOfFrames;
     }
 
     processedFrames = skip;
 
-    string initDir = sampleDirectory + "/evaluations/init.txt";
+    string initDir = sampleDirectory + "/evaluations/corrected.init.txt";
     this->outputFile = sampleDirectory + "/evaluations/mTLD.txt";
     ifstream initFile(initDir);
     if (initFile.is_open()) {
@@ -85,6 +98,10 @@ Sequence::Sequence(string key, int skip, int limit) {
             initBox = maybeBox.get();
         }
     }
+}
+
+Sequence::~Sequence() {
+    delete initBox;
 }
 
 bool Sequence::hasNext() {

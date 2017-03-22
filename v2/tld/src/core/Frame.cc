@@ -8,6 +8,8 @@ Frame::Frame(int id, string name, IplImage* originalImage, IplImage* grayscale, 
     this->grayscale = grayscale;
     this->gaussian = gaussian;
 
+    this->integralImage = new IntegralImage(this->grayscale);
+
     this->width = originalImage->width;
     this->height = originalImage->height;
 }
@@ -15,6 +17,7 @@ Frame::Frame(int id, string name, IplImage* originalImage, IplImage* grayscale, 
 Frame::~Frame() {
     cvReleaseImage(&originalImage);
     cvReleaseImage(&grayscale);
+    delete integralImage;
 }
 
 

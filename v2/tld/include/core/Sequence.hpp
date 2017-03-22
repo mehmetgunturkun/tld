@@ -1,6 +1,9 @@
 #ifndef SEQUENCE_H
 #define SEQUENCE_H
 
+#include <sys/types.h>
+#include <sys/stat.h>
+
 #include <dirent.h>
 #include <iostream>
 #include <fstream>
@@ -31,6 +34,7 @@ public:
     int limit;
 
     Sequence(string key, int skip = 0, int limit = NO_LIMIT);
+    ~Sequence();
     bool hasNext();
     Frame* next();
     Frame* get(int frameNo);

@@ -5,6 +5,7 @@
 
 #include "common/Option.hpp"
 #include "core/Image.hpp"
+#include "core/IntegralImage.hpp"
 
 class Frame {
 public:
@@ -17,6 +18,8 @@ public:
     IplImage* originalImage;
     IplImage* grayscale;
     IplImage* gaussian;
+
+    IntegralImage* integralImage;
 
     Frame(int id, string name, IplImage* originalImage, IplImage* grayscale, IplImage* gaussian);
     ~Frame();

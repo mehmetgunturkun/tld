@@ -15,7 +15,7 @@ int main(int argc, char** argv) {
 
 int run(Arguments args) {
     string sequenceKey = args.getString("sequence");
-    Sequence sequence = Sequence(sequenceKey, 5);
+    Sequence sequence = Sequence(sequenceKey);
 
     Frame* prevFrame = sequence.next();
     Box* initBox = sequence.initBox;

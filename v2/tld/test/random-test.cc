@@ -14,21 +14,13 @@ using namespace std;
 float ncc(IplImage* im0, IplImage* im1, CvPoint2D32f p0, CvPoint2D32f p1);
 
 int main(int argc, char** argv) {
-    IplImage* im0 = cvLoadImage("/tmp/00001.jpg", CV_LOAD_IMAGE_GRAYSCALE);
-    IplImage* im1 = cvLoadImage("/tmp/00002.jpg", CV_LOAD_IMAGE_GRAYSCALE);
+    char* str1 = (char*) malloc(sizeof(char) * 3);
+    str1[0] = 'a';
+    str1[1] = 'a';
+    str1[2] = '\0';
+    string str2(str1);
 
-    CvPoint2D32f p0 = CvPoint2D32f();
-    p0.x = 100.0f;
-    p0.y = 100.0f;
-
-    CvPoint2D32f p1 = CvPoint2D32f();
-    p1.x = 100.0f;
-    p1.y = 100.0f;
-
-    ncc(im0, im1, p0, p1);
-
-    return 0;
-
+    delete[] str1;
 }
 
 float ncc(IplImage* im0, IplImage* im1, CvPoint2D32f p0, CvPoint2D32f p1) {
