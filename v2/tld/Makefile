@@ -27,6 +27,8 @@ lib2_sources := \
 	src/core/Frame.cc \
 	src/core/IntegralImage.cc \
 	src/core/Sequence.cc \
+	src/core/Score.cc \
+	src/core/ScoredBox.cc \
 	src/tracker/FBPoint.cc \
 	src/tracker/Tracker.cc \
 	src/detector/core/BoxIterator.cc
