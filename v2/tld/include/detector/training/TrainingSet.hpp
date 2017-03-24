@@ -16,6 +16,10 @@ public:
         this->item = item;
         this->label = label;
     }
+
+    ~Labelled() {
+        delete item;
+    }
 };
 
 template <typename Type>

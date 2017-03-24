@@ -364,6 +364,11 @@ void EnsembleClassifier::doTrain(vector<Labelled<CodeVector>*> samples, int mode
             }
         }
     }
+
+    for (int i = 0; i < nrOfSamples; i++) {
+        Labelled<CodeVector>* labelledBinaryCode = samples[i];
+        delete labelledBinaryCode;
+    }
 }
 
 void EnsembleClassifier::updateBaseClassifiers(CodeVector* codeVector, int modelId, bool label) {
