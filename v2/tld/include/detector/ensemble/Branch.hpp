@@ -11,7 +11,9 @@ private:
 
 public:
     bool dirtyBit;
+
     Branch(int nrOfModels);
+    ~Branch();
 
     double getProbability(int modelId);
     vector<double> getProbabilities();

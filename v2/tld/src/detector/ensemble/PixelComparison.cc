@@ -5,6 +5,11 @@ PixelComparison::PixelComparison(Point2f* f, Point2f* t) {
     to = t;
 }
 
+PixelComparison::~PixelComparison() {
+    delete from;
+    delete to;
+}
+
 Point2f* PixelComparison::normalize(Point2f* point, Box* box) {
     Point2f* normPoint = new Point2f(
         box->x1 + floor(point->x * (box->width - 1) + 0.5),
@@ -24,4 +29,17 @@ bool PixelComparison::compare(Frame* frame, Box* box) {
     free(normTo);
 
     return fromPixel > toPixel;
+}
+
+string PixelComparison::toString() {
+    stringstream ss;
+    ss  << "PC("
+        << "P1("
+        << from->x << ", "
+        << from->y << ")"
+        << " -> "
+        << "P2("
+        << to->x << ", "
+        << to->y << ")";
+    return ss.str();
 }

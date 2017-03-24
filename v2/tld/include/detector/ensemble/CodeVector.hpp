@@ -1,6 +1,10 @@
 #ifndef CODE_VECTOR_H
 #define CODE_VECTOR_H
 
+#include <vector>
+
+using namespace std;
+
 class CodeVector {
 private:
     vector<int> codes;

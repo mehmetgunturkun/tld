@@ -7,6 +7,13 @@ DecisionTree::DecisionTree(int nrOfModels) {
     }
 }
 
+DecisionTree::~DecisionTree() {
+    for (int i = 0; i < pow(2, 13); i++) {
+        Branch* branch = tree[i];
+        delete branch;
+    }
+}
+
 vector<double> DecisionTree::getProbabilities(int binaryCode) {
     Branch* branch = tree[binaryCode];
     vector<double> probabilities = branch->getProbabilities();

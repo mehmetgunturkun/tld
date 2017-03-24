@@ -2,7 +2,15 @@
 
 CodeGenerator::CodeGenerator(vector<PixelComparison*> pixelComparisons) {
     this->pixelComparisons = pixelComparisons;
-    this->nrOfComparisons = 13;
+    this->nrOfComparisons = (int) pixelComparisons.size();
+}
+
+CodeGenerator::~CodeGenerator() {
+    for (int i = 0; i < nrOfComparisons; i++) {
+        PixelComparison* comp = pixelComparisons[i];
+        printf("%s\n", comp->toString().c_str());
+        delete comp;
+    }
 }
 
 int CodeGenerator::generateBinaryCode(Frame* frame, Box* box) {

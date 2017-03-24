@@ -38,6 +38,7 @@ public:
     vector<BaseClassifier*> baseClassifiers;
 
     EnsembleClassifier();
+    ~EnsembleClassifier();
 
     void init(Frame* firstFrame, vector<Box*> boxList);
 
@@ -47,6 +48,7 @@ public:
 
     bool classify(Frame* frame, ScoredBox* scoredBox);
     CodeVector* generateBinaryCode(Frame* frame, Box* box);
+    double getProbability(CodeVector* codeVector, int modelId);
 
     void train(TrainingSet<Box> ts, int modelId, double varianceThreshold);
     vector<Labelled<CodeVector>*> generateSamples(

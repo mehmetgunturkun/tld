@@ -23,6 +23,7 @@ lib2_sources := \
 	src/common/Arguments.cc \
 	src/common/Colors.cc \
 	src/common/string/StringStream.cc \
+	src/common/Random.cc \
 	src/core/Box.cc \
 	src/core/Frame.cc \
 	src/core/IntegralImage.cc \

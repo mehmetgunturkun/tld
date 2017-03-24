@@ -9,6 +9,13 @@ Branch::Branch(int nrOfModels) {
     }
 }
 
+Branch::~Branch() {
+    for (int i = 0; i < nrOfLeaves; i++) {
+        Leaf* leaf = branch[i];
+        delete leaf;
+    }
+}
+
 vector<double> Branch::getProbabilities() {
     vector<double> probabilities(nrOfLeaves);
     for (int i = 0; i < nrOfLeaves; i++) {

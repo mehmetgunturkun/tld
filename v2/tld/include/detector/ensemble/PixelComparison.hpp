@@ -9,6 +9,8 @@ class PixelComparison {
     Point2f* to;
 public:
     PixelComparison(Point2f* fromPoint, Point2f* toPoint);
+    ~PixelComparison();
+    
     Point2f* normalize(Point2f* point, Box* box);
     bool compare(Frame* frame, Box* box);
     string toString();
