@@ -6,11 +6,10 @@ CC := gcc
 CXX := g++
 AR := ar
 
-#OPENCV_CFLAGS := /opt/opencv/2.2/include
-#OPENCV_LIBS := /opt/opencv/2.2/lib -lopencv_highgui -lopencv_core -lopencv_imgproc -lopencv_video -lopencv_calib3d -lopencv_features2d -lopencv_objdetect -lopencv_legacy
-# /opt/opencv/2.2/include
-OPENCV_CFLAGS := -I/opt/opencv/2.2/include/opencv -I/opt/opencv/2.2/include
-OPENCV_LIBS := /opt/opencv/2.2/lib/ -lopencv_highgui -lopencv_core -lopencv_imgproc -lopencv_video
+# OPENCV_CFLAGS := -I/opt/opencv/2.2/include/opencv -I/opt/opencv/2.2/include
+OPENCV_CFLAGS := -I/home/gunturkun/bin/opencv/2.2.0/include/opencv -I/home/gunturkun/bin/opencv/2.2.0/include
+# OPENCV_LIBS := /opt/opencv/2.2/lib/ -lopencv_highgui -lopencv_core -lopencv_imgproc -lopencv_video
+OPENCV_LIBS := /home/gunturkun/bin/opencv/2.2.0/lib/ -lopencv_highgui -lopencv_core -lopencv_imgproc -lopencv_video
 
 CPPFLAGS += -Iinclude $(OPENCV_CFLAGS)
 CCFLAGS = -g -Wall --std=c99
@@ -26,6 +25,7 @@ lib2_sources := \
 	src/common/Random.cc \
 	src/core/Box.cc \
 	src/core/Frame.cc \
+	src/core/Gaussian.cc \
 	src/core/IntegralImage.cc \
 	src/core/Sequence.cc \
 	src/core/Score.cc \
@@ -39,7 +39,8 @@ lib2_sources := \
 	src/detector/ensemble/Branch.cc \
 	src/detector/ensemble/Leaf.cc \
 	src/detector/ensemble/BaseClassifier.cc \
-	src/detector/ensemble/EnsembleClassifier.cc
+	src/detector/ensemble/EnsembleClassifier.cc \
+	src/detector/Detector.cc
 
 lib2_objects := $(patsubst %.cc,%.o,$(lib2_sources))
 lib2_target  := libtld.a

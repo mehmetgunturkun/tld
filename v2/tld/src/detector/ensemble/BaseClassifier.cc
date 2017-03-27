@@ -37,3 +37,9 @@ double BaseClassifier::score(Frame* frame, Box* box, EnsembleScore* score, int m
     double probability = decTree->getProbability(binaryCode, modelId);
     return probability;
 }
+
+int BaseClassifier::generateBinaryCode(Frame* frame, Box* box, EnsembleScore* score) {
+    int binaryCode = this->generateBinaryCode(frame, box);
+    score->setBinaryCode(id, binaryCode);
+    return binaryCode;
+}

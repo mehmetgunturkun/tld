@@ -17,6 +17,9 @@ Frame::Frame(int id, string name, IplImage* originalImage, IplImage* grayscale, 
 Frame::~Frame() {
     cvReleaseImage(&originalImage);
     cvReleaseImage(&grayscale);
+
+    //TODO Check the tru way to release gaussian image.
+    delete gaussian;
     delete integralImage;
 }
 
@@ -35,8 +38,9 @@ Frame* Frame::clone() {
 Option<Frame*> Frame::fromFile(int id, string fileName) {
     IplImage* originalImage = Image::imread(fileName, CV_LOAD_IMAGE_ANYCOLOR);
     IplImage* grayImage = Image::imread(fileName, CV_LOAD_IMAGE_GRAYSCALE);
+    IplImage* gaussianImage = Gaussian::blur(grayImage, 12, 2.0);
 
-    Frame* frame = new Frame(id, fileName, originalImage, grayImage, grayImage);
+    Frame* frame = new Frame(id, fileName, originalImage, grayImage, gaussianImage);
 
     Option<Frame*> maybeFrame = Option<Frame*>(frame);
     return maybeFrame;

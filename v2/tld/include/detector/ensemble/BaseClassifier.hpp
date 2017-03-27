@@ -22,6 +22,9 @@ public:
 
     double score(Frame* frame, Box* box, EnsembleScore* score, int modelId);
     vector<double> score(Frame* frame, Box* box, EnsembleScore* score);
+
+    int generateBinaryCode(Frame* frame, Box* box, EnsembleScore* score);
+
 };
 
 #endif

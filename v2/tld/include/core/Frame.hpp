@@ -8,6 +8,8 @@
 #include "core/IntegralImage.hpp"
 #include "core/Box.hpp"
 
+#include "core/Gaussian.hpp"
+
 class Frame {
 public:
     int id;

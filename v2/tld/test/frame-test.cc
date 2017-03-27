@@ -1,20 +1,28 @@
 #include "common/Arguments.hpp"
+#include "core/Sequence.hpp"
 #include "core/Frame.hpp"
 
 int main(int argc, char** argv) {
-    Arguments* args = new Arguments(argc, argv);
+    Arguments args = Arguments(argc, argv);
+    Sequence sequence = Sequence(args.getString("sequence"));
 
-    string fileName = args->getString("fileName");
+    for (int i = 0; i < 1; i++) {
+        Frame* frame = sequence.next();
+        println("%s", frame->name.c_str());
 
-    for (int i = 0; i < 20000000; i++) {
-        Option<Frame*> maybeFrame = Frame::fromFile(i, fileName);
-        if (maybeFrame.isDefined()) {
-            Frame* frame = maybeFrame.get();
-            println("%s", frame->name.c_str());
+        IplImage* grayscale = frame->grayscale;
 
-            delete frame;
-        } else {
-            println("%s", ("There is no valid frame under: " + fileName).c_str());
+        long total = 0;
+
+        for (int i = 0; i < frame->height; i++) {
+            for (int j = 0; j < frame->width; j++) {
+                char pixel = grayscale->imageData[i * frame->width + j];
+                total += (uchar) pixel;
+            }
         }
+
+        println("Total: %10lu", total);
+
+        delete frame;
     }
 }

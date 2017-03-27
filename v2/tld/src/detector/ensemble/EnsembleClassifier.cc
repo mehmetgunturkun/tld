@@ -411,3 +411,21 @@ bool EnsembleClassifier::classify(Frame* frame, ScoredBox* scoredBox) {
 
     return score->isAnyModellClassified;
 }
+
+//Remove this code
+
+void EnsembleClassifier::score(Frame* frame, ScoredBox* scoredBox) {
+    if (scoredBox->isScored("ensemble")) {
+        // Already defined!
+    } else {
+        EnsembleScore* ensembleScore = new EnsembleScore(nrOfModels, nrOfBaseClassifiers);
+        Box* box = scoredBox->box;
+
+        for (int i = 0; i < nrOfBaseClassifiers; i++) {
+            BaseClassifier* bc = baseClassifiers[i];
+            bc->generateBinaryCode(frame, box, ensembleScore);
+        }
+
+        scoredBox->withScore("ensemble", ensembleScore);
+    }
+}

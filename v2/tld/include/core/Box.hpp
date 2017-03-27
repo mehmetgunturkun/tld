@@ -8,6 +8,9 @@
 #include "common/Option.hpp"
 #include "common/string/StringStream.hpp"
 
+#define MIN_DOUBLE(a,b) (a < b ? a : b)
+#define MAX_DOUBLE(a,b) (a > b ? a : b)
+
 using namespace std;
 
 class Box {
@@ -39,5 +42,17 @@ public:
     const char* toCharArr();
 
     static Option<Box*> fromLine(string line);
+    static double computeOverlap(Box* b1, Box* b2);
 };
+
+struct OverlapOrdered {
+  bool operator() (Box* box1, Box* box2) {
+      return box1->overlap >= box2->overlap;
+  }
+
+  bool compare(Box* box1, Box* box2) {
+      return box1->overlap > box2->overlap;
+  }
+};
+
 #endif

@@ -3,8 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int main(void)
-{
+int main(void) {
     struct dirent **namelist;
     int n,i;
 

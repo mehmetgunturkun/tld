@@ -6,7 +6,7 @@
 
 #include "opencv2/core/core.hpp"
 #include "opencv2/imgproc/imgproc_c.h"
-
+#include "opencv2/core/types_c.h"
 #include "opencv2/highgui/highgui.hpp"
 
 using namespace std;
@@ -44,17 +44,19 @@ public:
         return dest;
     }
 
+    static IplImage* gaussian(IplImage* image, double sigma) {
+        IplImage* dest = cvCreateImage(cvGetSize(image), image->depth, 1);
 
-    // static Mat* gaussian(Mat* image, double sigma) {
-    //     Mat kernel = getGaussianKernel(12, sigma);
-    //     Mat kernelTranspose = Mat(kernel.cols, kernel.rows, kernel.type());
-    //     cv::transpose(kernel, kernelTranspose);
-    //     Mat kernel2d = kernel * kernelTranspose;
-    //
-    //     Mat* dest = new Mat(*image);
-    //     cv::filter2D(*image, *dest, -1, kernel2d, Point(-1, -1), 0, BORDER_CONSTANT);
-    //     return dest;
-    // }
+        // Mat kernel = getGaussianKernel(12, sigma);
+        // Mat kernel;
+        // Mat kernelTranspose = Mat(kernel.cols, kernel.rows, kernel.type());
+        // cv::transpose(kernel, kernelTranspose);
+        // Mat kernel2d = kernel * kernelTranspose;
+        //
+        // //Mat* dest = new Mat(*image);
+        // cvfilter2D(*image, *dest, -1, kernel2d, Point(-1, -1));
+        return dest;
+    }
 
     // static Mat* warp(Mat* img, double x1, double y1, double x2, double y2) {
     //     // Parameter initialization
