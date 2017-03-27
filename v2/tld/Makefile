@@ -26,6 +26,7 @@ lib2_sources := \
 	src/core/Box.cc \
 	src/core/Frame.cc \
 	src/core/Gaussian.cc \
+	src/core/Warp.cc \
 	src/core/IntegralImage.cc \
 	src/core/Sequence.cc \
 	src/core/Score.cc \
