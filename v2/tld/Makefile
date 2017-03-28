@@ -24,10 +24,11 @@ lib2_sources := \
 	src/common/string/StringStream.cc \
 	src/common/Random.cc \
 	src/core/Box.cc \
-	src/core/Frame.cc \
-	src/core/Gaussian.cc \
+	src/core/Image.cc \
 	src/core/Warp.cc \
 	src/core/IntegralImage.cc \
+	src/core/Gaussian.cc \
+	src/core/Frame.cc \
 	src/core/Sequence.cc \
 	src/core/Score.cc \
 	src/core/ScoredBox.cc \
