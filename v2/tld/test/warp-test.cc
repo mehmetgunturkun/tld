@@ -8,7 +8,7 @@ int main(int argc, char** argv) {
 
     Frame* frame = sequence.next();
     Box* initBox = sequence.initBox;
-    IplImage* grayscale = frame->grayscale;
+    IplImage* gaussian = frame->gaussian;
 
     double x1 = initBox->x1;
     double y1 = initBox->y1;
@@ -16,9 +16,24 @@ int main(int argc, char** argv) {
     double x2 = initBox->x2;
     double y2 = initBox->y2;
 
-    IplImage* _img = Image::warp(grayscale, x1, y1, x2, y2);
+    IplImage* _img = Image::warp(gaussian, x1, y1, x2, y2);
 
-    Mat originalImage = cvarrToMat(grayscale);
+    double total = 0.0;
+
+    println("Warped: %3d x %3d", _img->width, _img->height);
+
+    for (int i = 0; i < _img->height; i++) {
+        for (int j = 0; j < _img->width; j++) {
+            double p = CV_IMAGE_ELEM(_img, double, i, j);
+            total += p;
+        }
+    }
+
+    println("%s", initBox->toString().c_str());
+
+    println("Total: %64.50f", total);
+
+    Mat originalImage = cvarrToMat(gaussian);
     Mat warpedImage = cvarrToMat(_img);
 
     for (int i = 0; i < warpedImage.rows; i++) {
@@ -29,7 +44,7 @@ int main(int argc, char** argv) {
         }
     }
 
-    imshow("WARPED", originalImage);
-    waitKey(0);
+    //imshow("WARPED", originalImage);
+    //waitKey(0);
 
 }

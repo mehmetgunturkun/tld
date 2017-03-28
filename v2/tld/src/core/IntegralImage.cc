@@ -43,7 +43,9 @@ int* IntegralImage::computeIntegralImage(IplImage* img, int (f)(int)) {
             if ( i > 0 && j > 0) {
                     left_up = integral[(i-1)*width + j-1];
             }
-            int sum = up + left - left_up + f((int) img->imageData[i*width+j]);
+
+            int pixel = (int) CV_IMAGE_ELEM(img, uchar, i, j);
+            int sum = up + left - left_up + f(pixel);
             integral[(i*width) + j] = sum;
         }
     }

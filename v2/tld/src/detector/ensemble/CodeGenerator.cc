@@ -15,7 +15,6 @@ CodeGenerator::~CodeGenerator() {
 
 int CodeGenerator::generateBinaryCode(Frame* frame, Box* box) {
     int binaryCode = 0;
-    printf("---------------------------\n");
     for (int i = 0 ; i < nrOfComparisons; i++) {
         binaryCode <<= 1;
         PixelComparison* comparison = pixelComparisons[i];
@@ -24,8 +23,6 @@ int CodeGenerator::generateBinaryCode(Frame* frame, Box* box) {
             binaryCode |= 1;
         }
     }
-    printf("---------------------------\n");
-    
     return binaryCode;
 }
 

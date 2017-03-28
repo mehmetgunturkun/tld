@@ -80,7 +80,9 @@ Box* Detector::init(Frame* frame, Box* box, int modelId) {
     BoxIterator* boxIterator = new BoxIterator(frame, firstBox);
     int id = 0;
 
-    double varianceThresholdForModel = varianceList[modelId] / 2.0;
+    //TODO Change it when NNC is integrated. This is value is only for 04_pedestrian2 sequence
+    // double varianceThresholdForModel = varianceList[modelId] / 2.0;
+    double varianceThresholdForModel = 472.139;
 
     while (boxIterator->hasNext()) {
         Box* sampleBox = boxIterator->next();

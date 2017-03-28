@@ -245,7 +245,7 @@ vector<Labelled<CodeVector>*> EnsembleClassifier::generateSamples(
         // Create binary codes for positive samples
         int nrOfPositiveSamples = (int) positiveBoxList.size();
 
-        int nrOfWarps = 3;
+        int nrOfWarps = 2;
         int warpNo = 1;
         Frame* currentFrame = frame->clone();
 

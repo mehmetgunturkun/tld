@@ -93,8 +93,8 @@ Frame* Frame::warp(Frame* frame, Box* box) {
             double p = CV_IMAGE_ELEM(warpedImage, double, i ,j);
             int pint = (int) round(p);
 
-            int idx = (i + y1) * width + j + x1;
-            gaussian->imageData[idx] = (char) pint;
+            int idx = ((i + y1) * gaussian->widthStep) + j + x1;
+            gaussian->imageData[idx] = (uchar) pint;
         }
     }
     return copied;

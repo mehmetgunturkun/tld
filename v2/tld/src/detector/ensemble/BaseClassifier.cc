@@ -46,7 +46,9 @@ int BaseClassifier::generateBinaryCode(Frame* frame, Box* box, EnsembleScore* sc
 
 void BaseClassifier::dumpBaseClassifier() {
     println("===== BaseClassifier(%2d) =====", this->id);
+    println("------------- CG --------------");
     codeGen->dumpCodeGeneration();
-    //decTree->dumpDecisionTree();
+    println("------------- DT --------------");
+    decTree->dumpDecisionTree();
     println("===============================");
 }

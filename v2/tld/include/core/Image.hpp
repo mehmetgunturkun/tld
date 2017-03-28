@@ -126,13 +126,5 @@ public:
         IplImage* warpedImg = Warp::warp(img, h, xmin, ymin, xmax, ymax);
         return warpedImg;
     }
-
-    // static Mat* patch(Mat* img, double x1, double y1, double x2, double y2) {
-    //     return img;
-    // }
-    //
-    // static Mat* warp(Mat* img) {
-    //     return Image::warp(img, 0.02, 0.02, 0.0, 0);
-    // }
 };
 #endif
