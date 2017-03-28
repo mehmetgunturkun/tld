@@ -49,7 +49,7 @@ vector<string> listImageFiles(string directory) {
         //free(namelist[i]);
         delete[] namelist_i;
     }
-    // TODO We cannot free this pointer
+
     delete[] namelist;
     return fileList;
 }

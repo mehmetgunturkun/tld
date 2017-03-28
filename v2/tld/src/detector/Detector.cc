@@ -150,7 +150,7 @@ Box* Detector::init(Frame* frame, Box* box, int modelId) {
     );
 
     eClassifier->train(trainingSet4Ensemble, modelId, 0.0);
-    //TODO Ipen that up after NNC
+    //TODO Open that up after NNC
     // nnClassifier->train(trainingSet4NN, modelId);
 
     return closestBox;

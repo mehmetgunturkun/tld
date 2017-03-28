@@ -3,11 +3,12 @@
 
 #include <string>
 
+#include "common/Random.hpp"
 #include "common/Option.hpp"
+
 #include "core/Image.hpp"
 #include "core/IntegralImage.hpp"
 #include "core/Box.hpp"
-
 #include "core/Gaussian.hpp"
 
 class Frame {
