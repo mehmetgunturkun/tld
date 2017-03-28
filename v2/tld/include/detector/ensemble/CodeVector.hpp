@@ -7,9 +7,9 @@ using namespace std;
 
 class CodeVector {
 private:
-    vector<int> codes;
 public:
     int size;
+    vector<int> codes;
 
     CodeVector(int nrOfBaseClassifiers) {
         codes.resize(nrOfBaseClassifiers);

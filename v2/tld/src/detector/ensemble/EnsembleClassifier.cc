@@ -412,8 +412,15 @@ bool EnsembleClassifier::classify(Frame* frame, ScoredBox* scoredBox) {
     return score->isAnyModellClassified;
 }
 
-//Remove this code
+void EnsembleClassifier::dumpEnsembleClassifier() {
+    for (int i = 0; i < nrOfBaseClassifiers; i++) {
+        BaseClassifier* bc = baseClassifiers[i];
+        bc->dumpBaseClassifier();
+    }
+}
 
+
+//Remove this code
 void EnsembleClassifier::score(Frame* frame, ScoredBox* scoredBox) {
     if (scoredBox->isScored("ensemble")) {
         // Already defined!

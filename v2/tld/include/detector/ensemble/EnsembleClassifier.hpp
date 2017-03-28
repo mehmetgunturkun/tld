@@ -67,6 +67,8 @@ public:
     void updateBaseClassifiers(CodeVector* codeVector, int modelId, bool label);
     void doTrain(vector<Labelled<CodeVector>*> samples, int modelId);
 
+    void dumpEnsembleClassifier();
+
     //TODO Remove this function
     void score(Frame* frame, ScoredBox* scoredBox);
 

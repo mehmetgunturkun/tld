@@ -24,6 +24,7 @@ public:
     vector<double> score(Frame* frame, Box* box, EnsembleScore* score);
 
     int generateBinaryCode(Frame* frame, Box* box, EnsembleScore* score);
+    void dumpBaseClassifier();
 
 };
 

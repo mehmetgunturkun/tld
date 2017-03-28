@@ -20,10 +20,13 @@ Point2f* PixelComparison::normalize(Point2f* point, Box* box) {
 
 bool PixelComparison::compare(Frame* frame, Box* box) {
     Point2f* normFrom = normalize(from, box);
-    Point2f* normTo = normalize(to, box);
-
     int fromPixel = frame->get(normFrom);
+    printf("%6s: P(%4.3f, %4.3f) = %d\n", "From", normFrom->x, normFrom->y, fromPixel);
+
+    Point2f* normTo = normalize(to, box);
     int toPixel = frame->get(normTo);
+    printf("%6s: P(%4.3f, %4.3f) = %d\n", "To", normTo->x, normTo->y, toPixel);
+
 
     free(normFrom);
     free(normTo);

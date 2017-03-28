@@ -85,7 +85,7 @@ Sequence::Sequence(string key, int skip, int limit) {
 
     processedFrames = skip;
 
-    string initDir = sampleDirectory + "/evaluations/corrected.init.txt";
+    string initDir = sampleDirectory + "/evaluations/init.txt";
     this->outputFile = sampleDirectory + "/evaluations/mTLD.txt";
     ifstream initFile(initDir);
     if (initFile.is_open()) {

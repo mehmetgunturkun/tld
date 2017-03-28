@@ -7,8 +7,9 @@
 
 class EnsembleScore: public Score {
 private:
-    CodeVector* binaryCodes;
 public:
+    CodeVector* binaryCodes;
+
     vector<double> scores;
     bool isMerged;
 

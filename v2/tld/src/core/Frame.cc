@@ -47,7 +47,26 @@ Frame* Frame::clone() {
 Option<Frame*> Frame::fromFile(int id, string fileName) {
     IplImage* originalImage = Image::imread(fileName, CV_LOAD_IMAGE_ANYCOLOR);
     IplImage* grayImage = Image::imread(fileName, CV_LOAD_IMAGE_GRAYSCALE);
-    IplImage* gaussianImage = Gaussian::blur(grayImage, 12, 2.0);
+
+    long total = 0;
+    for (int i = 0; i < grayImage->height; i++) {
+        for (int j = 0; j < grayImage->width; j++) {
+            uchar pixel = CV_IMAGE_ELEM(grayImage, uchar, i, j);
+            total += pixel;
+        }
+    }
+    printf("Gray : %10lu\n", total);
+
+    IplImage* gray4Blur = Image::bgr2gray(originalImage);
+    IplImage* gaussianImage = Gaussian::blur(gray4Blur, 12, 2.0);
+    total = 0;
+    for (int i = 0; i < grayImage->height; i++) {
+        for (int j = 0; j < grayImage->width; j++) {
+            uchar pixel = CV_IMAGE_ELEM(gaussianImage, uchar, i, j);
+            total += pixel;
+        }
+    }
+    printf("Gauss: %10lu\n", total);
 
     Frame* frame = new Frame(id, fileName, originalImage, grayImage, gaussianImage);
 

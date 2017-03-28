@@ -43,3 +43,10 @@ int BaseClassifier::generateBinaryCode(Frame* frame, Box* box, EnsembleScore* sc
     score->setBinaryCode(id, binaryCode);
     return binaryCode;
 }
+
+void BaseClassifier::dumpBaseClassifier() {
+    println("===== BaseClassifier(%2d) =====", this->id);
+    codeGen->dumpCodeGeneration();
+    //decTree->dumpDecisionTree();
+    println("===============================");
+}
