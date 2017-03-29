@@ -25,6 +25,7 @@ lib2_sources := \
 	src/common/Random.cc \
 	src/core/Box.cc \
 	src/core/Image.cc \
+	src/core/util/ImageBuilder.cc \
 	src/core/Warp.cc \
 	src/core/IntegralImage.cc \
 	src/core/Gaussian.cc \

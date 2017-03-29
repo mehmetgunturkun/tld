@@ -2,6 +2,7 @@
 
 ScoredBox::ScoredBox(Box* box) {
     this->box = box;
+    this->isDetected = false;
 }
 
 ScoredBox::~ScoredBox() {
