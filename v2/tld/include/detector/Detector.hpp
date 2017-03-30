@@ -11,6 +11,7 @@
 #include "detector/variance/VarianceScore.hpp"
 #include "detector/core/BoxIterator.hpp"
 #include "detector/ensemble/EnsembleClassifier.hpp"
+#include "detector/nn/NearestNeighborClassifier.hpp"
 
 
 class Detector {
@@ -34,6 +35,7 @@ public:
     int nrOfNegativeBoxes4NNAtInitialization;
 
     EnsembleClassifier* eClassifier;
+    NearestNeighborClassifier* nnClassifier;
 
     Detector();
 

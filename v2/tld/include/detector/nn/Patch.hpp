@@ -21,5 +21,7 @@ public:
     Patch(Frame* frame, Box* box);
     string toString();
 
+    static double computeVariance(Patch* patch);
+
 };
 #endif

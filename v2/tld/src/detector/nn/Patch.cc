@@ -134,3 +134,28 @@ double computeMean(IplImage* m) {
     double mean = sum / nrOfPixels;
     return mean;
 }
+
+double Patch::computeVariance(Patch* patch) {
+    IplImage* patchData = patch->data;
+    double sum = 0.0;
+    for (int i = 0 ; i < Patch::HEIGHT; i++) {
+        for (int j = 0 ; j < Patch::WIDTH; j++) {
+            double p = CV_IMAGE_GET_ELEM(patchData, double, i, j);
+            sum += p;
+        }
+    }
+
+    double mean = sum / 225;
+
+    double variance = 0.0;
+    for (int i = 0 ; i < Patch::HEIGHT; i++) {
+        for (int j = 0 ; j < Patch::WIDTH; j++) {
+            double p = CV_IMAGE_GET_ELEM(patchData, double, i, j);
+            p = p - mean;
+            variance += (p * p);
+        }
+    }
+
+    variance = variance / 224;
+    return variance;
+}

@@ -2,8 +2,7 @@
 
 Detector::Detector() {
     eClassifier = new EnsembleClassifier();
-    //TODO Open up after NNC
-    // nnClassifier = new NearestNeighborClassifier();
+    nnClassifier = new NearestNeighborClassifier();
 
     maxScaleLimit = 10;
     minimumPatchSize = 24;
@@ -35,8 +34,7 @@ vector<Box*> Detector::init(Frame* frame, vector<Box*> boxList) {
     initVarianceThresholds(frame, boxList);
 
     eClassifier->init(frame, boxList);
-    //TODO Open up after NNC
-    // nnClassifier->init(frame, boxList);
+    nnClassifier->init(frame, boxList);
 
     int nrOfBoxes = (int) boxList.size();
     vector<Box*> correctedBoxList;
@@ -56,11 +54,10 @@ void Detector::initVarianceThresholds(Frame* frame, vector<Box*> boxList) {
     for (int i = 0; i < nrOfModels; i++) {
         int modelId = i;
 
-        //TODO Open this up after NNC
-        // Box* box = boxList[i];
-        // Box* correctedBox = getClosestBox(frame, box);
-        // double boxVariance = nnClassifier->getPatchVariance(frame, correctedBox);
-        double boxVariance = 0.0;
+        Box* box = boxList[i];
+        Box* correctedBox = getClosestBox(frame, box);
+        double boxVariance = nnClassifier->getPatchVariance(frame, correctedBox);
+        // double boxVariance = 0.0;
         boxVariance = boxVariance / 2.0;
 
         this->varianceList[modelId] = boxVariance;
@@ -80,9 +77,8 @@ Box* Detector::init(Frame* frame, Box* box, int modelId) {
     BoxIterator* boxIterator = new BoxIterator(frame, firstBox);
     int id = 0;
 
-    //TODO Change it when NNC is integrated. This is value is only for 04_pedestrian2 sequence
-    // double varianceThresholdForModel = varianceList[modelId] / 2.0;
-    double varianceThresholdForModel = 472.139;
+    double varianceThresholdForModel = varianceList[modelId] / 2.0;
+    // double varianceThresholdForModel = 472.139;
 
     while (boxIterator->hasNext()) {
         Box* sampleBox = boxIterator->next();
@@ -152,8 +148,7 @@ Box* Detector::init(Frame* frame, Box* box, int modelId) {
     );
 
     eClassifier->train(trainingSet4Ensemble, modelId, 0.0);
-    //TODO Open that up after NNC
-    // nnClassifier->train(trainingSet4NN, modelId);
+    nnClassifier->train(trainingSet4NN, modelId);
 
     return closestBox;
 }
@@ -259,8 +254,7 @@ void Detector::learn(Frame* current, Box* box, vector<ScoredBox*> grids, int mod
     );
 
     eClassifier->train(trainingSet4Ensemble, modelId, 0.0);
-    //TODO Open this up after NNC
-    //nnClassifier->train(trainingSet4NN, modelId);
+    nnClassifier->train(trainingSet4NN, modelId);
 }
 
 vector<ScoredBox*> Detector::score(Frame* frame, vector<Box*> boxList) {
@@ -279,8 +273,7 @@ vector<ScoredBox*> Detector::score(Frame* frame, vector<Box*> boxList) {
 
 void Detector::score(Frame* frame, ScoredBox* scoredBox) {
     eClassifier->score(frame, scoredBox);
-    //TODO Open up after NNC
-    // nnClassifier->score(frame, scoredBox);
+    nnClassifier->score(frame, scoredBox);
 }
 
 bool Detector::checkVariance(Frame* frame, ScoredBox* scoredBox) {
@@ -327,10 +320,9 @@ vector<ScoredBox*> Detector::detect(Frame* frame) {
             continue;
         }
 
-        //TODO Open this up after NNC
-        // if (!nnClassifier->classify(frame, scoredBox)) {
-        //     continue;
-        // }
+        if (!nnClassifier->classify(frame, scoredBox)) {
+            continue;
+        }
 
         DEBUGALL(
             NNScore* nnScore = (NNScore*) scoredBox->getScore("nn");
@@ -346,15 +338,13 @@ vector<ScoredBox*> Detector::detect(Frame* frame) {
 
 ScoredBox* Detector::validate(Frame* frame, Box* box, int modelId) {
     ScoredBox* scoredBox = new ScoredBox(box);
-    //TODO Open up after NNC
-    // nnClassifier->validate(frame, scoredBox, modelId);
+    nnClassifier->validate(frame, scoredBox, modelId);
     return scoredBox;
 }
 
 bool Detector::evaluate(Frame* frame, Box* box, double minVariance, int modelId) {
-    //TODO Open up after NNC
-    //bool evaluationResult = nnClassifier->evaluate(frame, box, minVariance, modelId);
-    return false;
+    bool evaluationResult = nnClassifier->evaluate(frame, box, minVariance, modelId);
+    return evaluationResult;
 }
 
 Box* Detector::getClosestBox(Frame* frame, Box* box) {

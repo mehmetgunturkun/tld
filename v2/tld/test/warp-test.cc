@@ -2,6 +2,8 @@
 #include "core/Sequence.hpp"
 #include "core/Frame.hpp"
 
+#include "boost/format.hpp"
+
 int main(int argc, char** argv) {
     Arguments args = Arguments(argc, argv);
     Sequence sequence = Sequence(args.getString("sequence"));
