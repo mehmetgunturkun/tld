@@ -15,6 +15,13 @@
 using namespace std;
 using namespace cv;
 
+#define CV_IMAGE_GET_ELEM( image, elemtype, row, col )       \
+    CV_IMAGE_ELEM( image, elemtype, row, col )
+
+#define CV_IMAGE_SET_ELEM( image, elemtype, row, col, elem )       \
+    elemtype* loc = ((elemtype*)((image)->imageData + (image)->widthStep*(row))); \
+    loc[(col)] = elem
+
 class Image {
 public:
     static IplImage* imread(string fileName);
