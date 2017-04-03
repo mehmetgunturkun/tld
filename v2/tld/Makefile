@@ -23,6 +23,8 @@ lib2_sources := \
 	src/common/Colors.cc \
 	src/common/string/StringStream.cc \
 	src/common/Random.cc \
+	src/common/clustering/Distance.cc \
+	src/common/clustering/Cluster.cc \
 	src/core/Box.cc \
 	src/core/Image.cc \
 	src/core/util/ImageBuilder.cc \
