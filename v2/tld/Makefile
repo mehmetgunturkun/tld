@@ -38,6 +38,7 @@ lib2_sources := \
 	src/tracker/FBPoint.cc \
 	src/tracker/Tracker.cc \
 	src/detector/core/BoxIterator.cc \
+	src/detector/ensemble/EnsembleScore.cc \
 	src/detector/ensemble/PixelComparison.cc \
 	src/detector/ensemble/CodeGenerator.cc \
 	src/detector/ensemble/DecisionTree.cc \

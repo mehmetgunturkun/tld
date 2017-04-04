@@ -2,7 +2,6 @@
 
 int Cluster::clusterId = 0;
 
-
 Cluster::Cluster(int id) {
     this->id = id;
     this->size = 0;
@@ -44,6 +43,7 @@ vector<Cluster*> Cluster::build(vector<Distance*> distances, int nrOfDistances, 
 
         bool p0Clustered = index.count(distance->item0) > 0;
         bool p1Clustered = index.count(distance->item1) > 0;
+
         if (distance->value >= maxDistance) {
             if (p0Clustered && p1Clustered) {
                 //do nothing
@@ -75,28 +75,28 @@ vector<Cluster*> Cluster::build(vector<Distance*> distances, int nrOfDistances, 
                 index[distance->item1] = c1;
             }
         } else {
-            // Both have clusters.
-            // Might merge those clusters,
-            // if they are in different clusters
+            if (p0Clustered && p1Clustered) {
+                // Both have clusters.
+                // Might merge those clusters,
+                // if they are in different clusters
+                Cluster* c0 = index[distance->item0];
+                Cluster* c1 = index[distance->item1];
+                if (c0->id != c1->id) {
+                    Cluster* c3 = c0->merge(c1);
 
-            Cluster* c0 = index[distance->item0];
-            Cluster* c1 = index[distance->item1];
+                    clusterIndex.erase(c0->id);
+                    clusterIndex.erase(c1->id);
+                    clusterIndex[c3->id] = c3;
 
-            if (c0->id != c1->id) {
-                Cluster* c3 = c0->merge(c1);
+                    for (int i = 0; i < c3->size; i++) {
+                        int pid = c3->cluster[i];
+                        index[pid] = c3;
+                    }
 
-                clusterIndex.erase(c0->id);
-                clusterIndex.erase(c1->id);
-                clusterIndex[c3->id] = c3;
-
-                for (int i = 0; i < c3->size; i++) {
-                    int pid = c3->cluster[i];
-                    index[pid] = c3;
+                    //TODO
+                    //delete c0
+                    //delete c1
                 }
-
-                //TODO
-                //delete c0
-                //delete c1
             } else if (p0Clustered) {
                 Cluster* c0 = index[distance->item0];
                 c0->add(distance->item1);

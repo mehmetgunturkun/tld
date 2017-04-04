@@ -24,7 +24,7 @@ int run(Arguments args) {
     Tracker* tracker = new Tracker();
 
     int no = 1;
-    while (sequence.hasNext() && no < 2) {
+    while (sequence.hasNext() && no < 10) {
         Frame* currentFrame = sequence.next();
         // println("%s is going to be processed", currentFrame->name.c_str());
 
@@ -43,5 +43,3 @@ int run(Arguments args) {
     delete tracker;
     return 0;
 }
-
-//// Box(0, 191.569, 262.153, 190.569, 261.153, -7.16725e-07, 1.6159e-06)

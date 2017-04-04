@@ -1,7 +1,9 @@
 #ifndef SCORE_H
 #define SCORE_H
 
+
 #include <vector>
+#include <stdexcept>
 
 using namespace std;
 
