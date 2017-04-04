@@ -5,6 +5,9 @@
 #include <unordered_map>
 #include <algorithm>
 
+#include "common/clustering/Cluster.hpp"
+#include "common/collection/BoundedPriorityQueue.hpp"
+
 #include "core/Box.hpp"
 #include "core/Score.hpp"
 
@@ -23,6 +26,13 @@ public:
 
     bool isClassified(string classifierKey, int modelId);
     bool isScored(string classifierKey);
+
+    ScoredBox* clone();
+    ScoredBox* sum(ScoredBox* other);
+    ScoredBox* divide(int n);
+
+    static vector<ScoredBox*> cluster(vector<ScoredBox*> boxList, int nrOfBoxes);
+    static ScoredBox* merge(vector<ScoredBox*> scoredBoxList, int nrOfBoxes);
 };
 
 struct ScoredBoxOverlapOrdered {

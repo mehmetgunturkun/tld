@@ -32,10 +32,16 @@ public:
     //For tracking. TODO Find a better way to do that.
     int nrOfPoints;
 
+    //For TLD, TODO Find a better way to do that.
+    bool isValid;
+
     Box(double x1, double y1, double x2, double y2);
     Box(int id, double x1, double y1, double x2, double y2);
 
     Box* move(double dx, double sx, double dy, double sy);
+    Box* clone();
+    Box* sum(Box* other);
+    Box* divide(int n);
 
     string toString();
     string toTLDString();

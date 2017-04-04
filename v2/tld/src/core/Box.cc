@@ -29,6 +29,31 @@ Box* Box::move(double dx, double sx, double dy, double sy) {
     return box;
 }
 
+Box* Box::clone() {
+    Box* clone = new Box(id, x1, y1, x2, y2);
+    return clone;
+}
+
+Box* Box::sum(Box* other) {
+    double x1 = (this->x1 + other->x1);
+    double y1 = (this->y1 + other->y1);
+    double x2 = (this->x2 + other->x2);
+    double y2 = (this->y2 + other->y2);
+
+    Box* sum = new Box(0, x1, y1, x2, y2);
+    return sum;
+}
+
+Box* Box::divide(int n) {
+    double new_x1 = this->x1 / n;
+    double new_x2 = this->x2 / n;
+    double new_y1 = this->y1 / n;
+    double new_y2 = this->y2 / n;
+
+    Box* newBox = new Box(this->id, new_x1, new_y1, new_x2, new_y2);
+    return newBox;
+}
+
 string Box::toString() {
     stringstream ss;
     ss  << "Box("
