@@ -66,6 +66,7 @@ Option<Frame*> Frame::fromFile(int id, string fileName) {
             total += pixel;
         }
     }
+    cvReleaseImage(&gray4Blur);
     printf("Gauss: %10lu\n", total);
 
     Frame* frame = new Frame(id, fileName, originalImage, grayImage, gaussianImage);

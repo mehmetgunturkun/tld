@@ -24,7 +24,7 @@ int run(Arguments args) {
     Tracker* tracker = new Tracker();
 
     int no = 1;
-    while (sequence.hasNext() && no < 10) {
+    while (sequence.hasNext()) {
         Frame* currentFrame = sequence.next();
         // println("%s is going to be processed", currentFrame->name.c_str());
 
@@ -33,8 +33,10 @@ int run(Arguments args) {
           println(RED("Tracker stopped processing"));
           return 1;
         }
+
         //println("%s", boxList[0]->toCharArr());
         delete prevFrame;
+        // delete oldBox;
         prevFrame = currentFrame;
         no += 1;
     }

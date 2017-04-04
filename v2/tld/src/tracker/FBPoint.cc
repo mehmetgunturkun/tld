@@ -20,11 +20,13 @@ FBPoint::FBPoint(CvPoint2D32f* src, CvPoint2D32f* to, CvPoint2D32f* bwPoint, flo
 }
 
 FBPoint::~FBPoint() {
-  println("mc1000");
-  delete src;
-  println("mc2000");
-  delete to;
-  delete backwardPoint;
+    println("mc1000");
+    cvFree(&src);
+    println("mc1100");
+    cvFree(&to);
+    println("mc1200");
+    cvFree(&backwardPoint);
+    println("mc1300");
 }
 
 string FBPoint::toString() {

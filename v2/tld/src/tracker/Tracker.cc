@@ -40,10 +40,10 @@ vector<Box*> Tracker::track(Frame* prev, Frame* curr, vector<Box*> boxList) {
             trackedPoints
         );
 
-        // for (int i = 0; i < nrOfPoints; i++) {
-        //   FBPoint* fbPoint = trackedPoints[i];
-        //   delete fbPoint;
-        // }
+        for (int i = 0; i < nrOfPoints; i++) {
+          CvPoint2D32f* point = points[i];
+          cvFree(&point);
+        }
 
         return estimatedBoxList;
     }
@@ -124,9 +124,9 @@ vector<FBPoint*> Tracker::track(Frame* prev, Frame* curr, int nrOfPoints, vector
 
     println("Frame(%s) >> Frame(%s)", prev->name.c_str(), curr->name.c_str());
 
-    CvPoint2D32f* fromPoints = (CvPoint2D32f*)cvAlloc(nrOfPoints * sizeof(CvPoint2D32f));
-    CvPoint2D32f* toPoints = (CvPoint2D32f*)cvAlloc(nrOfPoints * sizeof(CvPoint2D32f));
-    CvPoint2D32f* bwPoints = (CvPoint2D32f*)cvAlloc(nrOfPoints * sizeof(CvPoint2D32f));
+    CvPoint2D32f* fromPoints    = (CvPoint2D32f*) cvAlloc(nrOfPoints * sizeof(CvPoint2D32f));
+    CvPoint2D32f* toPoints      = (CvPoint2D32f*) cvAlloc(nrOfPoints * sizeof(CvPoint2D32f));
+    CvPoint2D32f* bwPoints      = (CvPoint2D32f*) cvAlloc(nrOfPoints * sizeof(CvPoint2D32f));
 
     char* statusForw = (char*)  cvAlloc(nrOfPoints);
     char* statusBack = (char*)  cvAlloc(nrOfPoints);
@@ -208,6 +208,8 @@ vector<FBPoint*> Tracker::track(Frame* prev, Frame* curr, int nrOfPoints, vector
 
     cvReleaseImage(&fromPyramid);
     cvReleaseImage(&toPyramid);
+    cvFree(&statusForw);
+    cvFree(&statusBack);
 
     return fbPoints;
 }
