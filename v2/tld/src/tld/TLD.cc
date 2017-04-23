@@ -191,7 +191,7 @@ Option<Box*> TLD::integrate(Frame* frame, Box* oldBox, Box* maybeTrackedBox, vec
     printf(CYAN("==== Evaluate is started ====\n"));
     if (maybeFinalBox.isDefined() && maybeFinalBox.get()->isValid) {
         Box* finalBox = maybeFinalBox.get();
-        bool evaluateResult = detector->evaluate(frame, finalBox, 489.111, modelId);
+        bool evaluateResult = detector->evaluate(frame, finalBox, modelId);
         finalBox->isValid = evaluateResult;
         shouldLearn = evaluateResult;
     }

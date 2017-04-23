@@ -23,7 +23,7 @@ int main(int argc, char** args) {
     boxList = tld->init(firstFrame, boxList);
 
     Frame* previous = firstFrame;
-    while (sequence.hasNext() && previous->id < 15) {
+    while (sequence.hasNext() && previous->id < 150) {
         Frame* current = sequence.next();
         printf("Frame(%d) >> Frame(%d)\n", previous->id, current->id);
 

@@ -369,8 +369,9 @@ ScoredBox* Detector::validate(Frame* frame, Box* box, int modelId) {
     return scoredBox;
 }
 
-bool Detector::evaluate(Frame* frame, Box* box, double minVariance, int modelId) {
-    bool evaluationResult = nnClassifier->evaluate(frame, box, minVariance, modelId);
+bool Detector::evaluate(Frame* frame, Box* box, int modelId) {
+    double varianceThresholdForModel = varianceList[modelId] / 2.0;
+    bool evaluationResult = nnClassifier->evaluate(frame, box, varianceThresholdForModel, modelId);
     return evaluationResult;
 }
 

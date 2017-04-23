@@ -53,7 +53,7 @@ public:
     vector<ScoredBox*> detect(Frame* frame);
 
     ScoredBox* validate(Frame* frame, Box* box, int modelId);
-    bool evaluate(Frame* frame, Box* box, double minVariance, int modelId);
+    bool evaluate(Frame* frame, Box* box, int modelId);
 
     vector<ScoredBox*> score(Frame* frame, vector<Box*> boxList);
     void score(Frame* frame, ScoredBox* scoredBox);

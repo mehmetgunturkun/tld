@@ -34,7 +34,7 @@ int main(int argc, char** args) {
     boxList = tld->init(firstFrame, boxList);
 
     Frame* previous = firstFrame;
-    while (sequence.hasNext() && previous->id < 200) {
+    while (sequence.hasNext() && previous->id < 150) {
         Frame* current = sequence.next();
         printf("Frame(%d) >> Frame(%d)\n", previous->id, current->id);
 
@@ -45,10 +45,10 @@ int main(int argc, char** args) {
         if (box != nullptr) {
             // string boxString = box->toTLDString();
             builder->withBox(box);
-            builder->display(100);
+            builder->display(1);
         } else {
             printf("Frame(%d) >> Frame(%d) FAILED\n", previous->id, current->id);
-            builder->display(0);
+            builder->display(1);
         }
         previous = current;
     }

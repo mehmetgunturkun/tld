@@ -48,7 +48,7 @@ vector<Box*> StubbedTracker::track(Frame* prev, Frame* curr, vector<Box*> boxLis
     }
 
     printf("TRACKER(OUT): ");
-    if (inputBox != NULL) {
+    if (outputBox != NULL) {
         outputBox->print();
     } else {
         printf("\n");
