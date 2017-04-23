@@ -64,7 +64,6 @@ void Detector::initVarianceThresholds(Frame* frame, vector<Box*> boxList) {
         Box* box = boxList[i];
         Box* correctedBox = getClosestBox(frame, box);
         double boxVariance = nnClassifier->getPatchVariance(frame, correctedBox);
-        // double boxVariance = 0.0;
         boxVariance = boxVariance / 2.0;
 
         this->varianceList[modelId] = boxVariance;
@@ -76,7 +75,6 @@ void Detector::initVarianceThresholds(Frame* frame, vector<Box*> boxList) {
     }
 
     this->minimumVariance = minimumVariance;
-    // this->varianceThreshold = this->minimumVariance / 2.0;
 }
 
 Box* Detector::init(Frame* frame, Box* box, int modelId) {
@@ -87,7 +85,6 @@ Box* Detector::init(Frame* frame, Box* box, int modelId) {
     int id = 0;
 
     double varianceThresholdForModel = varianceList[modelId] / 2.0;
-    // double varianceThresholdForModel = 472.139;
 
     while (boxIterator->hasNext()) {
         Box* sampleBox = boxIterator->next();
@@ -348,13 +345,6 @@ vector<ScoredBox*> Detector::detect(Frame* frame) {
         if (!nnClassifier->classify(frame, scoredBox)) {
             continue;
         }
-
-        DEBUGALL(
-            NNScore* nnScore = (NNScore*) scoredBox->getScore("nn");
-            double relativeScore = nnScore->relativeScores[0];
-            double conservativeValue = nnScore->conservativeScores[0];
-            println("NN >> %s, %g, %g\n", nextBox->toCharArr(), relativeScore, conservativeValue);
-        )
 
         scoredBox->isDetected = true;
     }
