@@ -35,6 +35,5 @@ IplImage* Gaussian::blur(IplImage* img, int kernelSize, double sigma) {
     *blurred = blurred->rowRange(gaussianKernel.rows/2, blurred->rows - (gaussianKernel.rows-1)/2);
 
     IplImage* blurredImage = new IplImage(*blurred);
-    delete blurred;
     return blurredImage;
 }

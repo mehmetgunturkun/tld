@@ -30,6 +30,13 @@ public:
     static IplImage* imread(const char* fileName, int imageType);
     static IplImage* rgb2gray(IplImage* image);
     static IplImage* bgr2gray(IplImage* image);
-    static IplImage* warp(IplImage* img, double x1, double y1, double x2, double y2);
+    static IplImage* warp(IplImage* img,
+        double x1,
+        double y1,
+        double x2,
+        double y2,
+        double angle,
+        double scale,
+        double shift);
 };
 #endif

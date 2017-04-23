@@ -24,6 +24,8 @@ private:
     double POSITIVE_SCORE_THRESHOLD;
 public:
     NearestNeighborClassifier();
+    ~NearestNeighborClassifier();
+    
     void init(Frame* firstFrame, vector<Box*> boxList);
     double getPatchVariance(Frame* frame, Box* box);
 

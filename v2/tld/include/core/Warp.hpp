@@ -6,6 +6,7 @@
 #include "opencv2/core/types_c.h"
 #include "opencv2/highgui/highgui.hpp"
 
+#include "core/Image.hpp"
 using namespace cv;
 
 class Warp {

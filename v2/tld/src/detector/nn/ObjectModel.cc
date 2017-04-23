@@ -13,6 +13,19 @@ ObjectModel::ObjectModel() {
     nrOfNegativePatches = 0;
 }
 
+ObjectModel::~ObjectModel() {
+    for (int i = 0; i < nrOfPositivePatches; i++) {
+        Patch* positivePatch = positivePatchList[i];
+        delete positivePatch;
+    }
+
+    for (int i = 0; i < nrOfNegativePatches; i++) {
+        Patch* negativePatch = negativePatchList[i];
+        delete negativePatch;
+    }
+}
+
+
 ObjectScore* ObjectModel::computeScore(Patch* sample) {
     if (nrOfPositivePatches == 0) {
         ObjectScore* objectScore = new ObjectScore(0.0, 0.0, false, false, 0);

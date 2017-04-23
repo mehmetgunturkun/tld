@@ -15,6 +15,7 @@ public:
 
     EnsembleScore(int nrOfModels, int nrOfBaseClassifiers);
     EnsembleScore(vector<double> scores);
+    ~EnsembleScore();
 
     void setBinaryCode(int index, int code);
     int getBinaryCode(int index);

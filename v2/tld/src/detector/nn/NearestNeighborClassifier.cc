@@ -11,6 +11,13 @@ void NearestNeighborClassifier::init(Frame* firstFrame, vector<Box*> boxList) {
     }
 }
 
+NearestNeighborClassifier::~NearestNeighborClassifier() {
+    for (int i = 0; i < nrOfModels; i++) {
+        ObjectModel* model = this->models[i];
+        delete model;
+    }
+}
+
 double computePatchVariance(Patch* p) {
     return Patch::computeVariance(p);
 }
@@ -18,6 +25,8 @@ double computePatchVariance(Patch* p) {
 double NearestNeighborClassifier::getPatchVariance(Frame* frame, Box* box) {
     Patch* patch = new Patch(frame, box);
     double variance = Patch::computeVariance(patch);
+
+    delete patch;
     return variance;
 }
 
@@ -34,6 +43,8 @@ bool NearestNeighborClassifier::classify(Frame* frame, ScoredBox* scoredBox) {
 
         relativeScores[i] = objectScore->relativeScore;
         conservativeScores[i] = objectScore->conservativeScore;
+
+        delete objectScore;
     }
 
     bool anyModelClassified = false;
@@ -156,7 +167,18 @@ vector<Labelled<Patch>*> NearestNeighborClassifier::generateSamples(
             Patch* patch = new Patch(frame, box);
             patchList.push_back(new Labelled<Patch>(patch, 0));
         }
-        return patchList;
+
+        Random::seed();
+        vector<Labelled<Patch>*> shuffledPatchList = Random::randomSample(patchList);
+
+        if (nrOfPositiveSamples > 0) {
+            Box* box = positiveBoxList[0];
+            Patch* patch = new Patch(frame, box);
+
+            shuffledPatchList.insert(shuffledPatchList.begin(), new Labelled<Patch>(patch, 1));
+        }
+
+        return shuffledPatchList;
 }
 
 vector<Labelled<Patch>*> NearestNeighborClassifier::generateSamples(
@@ -195,7 +217,24 @@ vector<Labelled<Patch>*> NearestNeighborClassifier::generateSamples(
             samples.push_back(new Labelled<Patch>(patch, 0));
         }
 
-        return samples;
+        Random::seed();
+        vector<Labelled<Patch>*> shuffledSamples = Random::randomSample(samples);
+
+        if (nrOfPositiveSamples > 0) {
+            ScoredBox* scoredBox = positiveBoxList[0];
+            Box* box = scoredBox->box;
+            NNScore* nnScore = (NNScore*) scoredBox->getScore("nn");
+            Patch* patch;
+            if (nnScore == NULL) {
+                patch = nnScore->patch;
+            } else {
+                patch = new Patch(frame, box);
+            }
+
+            shuffledSamples.insert(shuffledSamples.begin(), new Labelled<Patch>(patch, 1));
+        }
+
+        return shuffledSamples;
 }
 
 void NearestNeighborClassifier::train(TrainingSet<Box> ts, int modelId) {
@@ -209,7 +248,6 @@ void NearestNeighborClassifier::train(TrainingSet<Box> ts, int modelId) {
         negativeBoxList
     );
     doTrain(samples, modelId);
-    println("Train is completed");
 }
 
 void NearestNeighborClassifier::train(TrainingSet<ScoredBox> ts, int modelId) {
@@ -241,18 +279,37 @@ void NearestNeighborClassifier::doTrain(vector<Labelled<Patch>*> samples, int mo
 
         if (label == 1) {
             if (relativeScore <= 0.65) {
+                // printf("%4d. NNC(+) >>> Model(%5d).update\n", i + 1, patch->id);
+                labelledPatch->added = true;
                 if (isInPositive == true) {
                     model->add(patch, true);
                     continue;
                 }
+
                 model->add(patch, closestPositivePatchIndex, true);
+            } else {
+                // printf("%4d. NNC(+) >>> Model(%5d).ignore. Relative Score: %4.3f\n", i + 1, patch->id, relativeScore);
             }
         }
 
         if (label == 0) {
             if (relativeScore > 0.5) {
+                // printf("%4d. NNC(-) >>> Model(%5d).update\n", i + 1, patch->id);
+                labelledPatch->added = true;
                 model->add(patch, false);
+            } else {
+                // printf("%4d. NNC(-) >>> Model(%5d).ignore. Relative Score: %4.3f\n", i + 1, patch->id, relativeScore);
             }
         }
+
+        delete objectScore;
+    }
+
+    for (int i = 0; i < nrOfSamples; i++) {
+        Labelled<Patch>* labelledPatch = samples[i];
+        if (!(labelledPatch->added)) {
+            delete labelledPatch->item;
+        }
+        delete labelledPatch;
     }
 }

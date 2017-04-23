@@ -3,9 +3,8 @@
 Branch::Branch(int nrOfModels) {
     nrOfLeaves = nrOfModels;
     dirtyBit = false;
-    branch.resize(nrOfLeaves);
     for (int i = 0; i < nrOfLeaves; i++) {
-        branch[i] = new Leaf();
+        branch.push_back(new Leaf());
     }
 }
 

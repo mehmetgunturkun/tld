@@ -22,14 +22,17 @@ int main(int argc, char** argv) {
     vector<ScoredBox*> scoredBoxList = detector->detect(secondFrame);
     int nrOfScoredBox = (int) scoredBoxList.size();
 
-
-    detector->eClassifier->dumpEnsembleClassifier();
-
     for (int i = 0; i < nrOfScoredBox; i++) {
         ScoredBox* scoredBox = scoredBoxList[i];
-        if (scoredBox->isDetected) {
-            ImageBuilder builder = ImageBuilder(secondFrame);
-            builder.withBox(scoredBox->box).display(0);
-        }
+        delete scoredBox;
+    //     if (scoredBox->isDetected) {
+    //         ImageBuilder builder = ImageBuilder(secondFrame);
+    //         builder.withBox(scoredBox->box).display(0);
+    //     }
     }
+
+
+    delete firstFrame;
+    delete secondFrame;
+    delete detector;
 }

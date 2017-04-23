@@ -47,10 +47,10 @@ vector<string> listImageFiles(string directory) {
           fileList.push_back(directory + "/" + fileName);
         }
         //free(namelist[i]);
-        delete[] namelist_i;
+        free(namelist_i);
     }
 
-    delete[] namelist;
+    free(namelist);
     return fileList;
 }
 

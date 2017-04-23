@@ -12,13 +12,16 @@ class Labelled {
 public:
     Type* item;
     int label;
+    bool added;
+
     Labelled(Type* item, int label) {
         this->item = item;
         this->label = label;
+        this->added = false;
     }
 
     ~Labelled() {
-        delete item;
+        //delete item;
     }
 };
 

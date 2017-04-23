@@ -13,8 +13,8 @@ IntegralImage::IntegralImage(IplImage* img) {
 }
 
 IntegralImage::~IntegralImage() {
-    delete [] integralImage;
-    delete [] integralSquaredImage;
+    free(integralImage);
+    free(integralSquaredImage);
 }
 
 int* IntegralImage::computeIntegralImage(IplImage* img) {

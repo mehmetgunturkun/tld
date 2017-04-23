@@ -10,6 +10,13 @@ Box::Box(double x1, double y1, double x2, double y2) {
     this->y2 = y2;
     this->width = x2 - x1 + 1;
     this->height = y2 - y1 + 1;
+
+    this->mean = 0.0;
+    this->variance = 0.0;
+    this->overlap = 0.0;
+
+    this->nrOfPoints = 0.0;
+    this->isValid = false;
 }
 
 Box::Box(int id, double x1, double y1, double x2, double y2) {
@@ -22,6 +29,13 @@ Box::Box(int id, double x1, double y1, double x2, double y2) {
     this->y2 = y2;
     this->width = x2 - x1 + 1;
     this->height = y2 - y1 + 1;
+
+    this->mean = 0.0;
+    this->variance = 0.0;
+    this->overlap = 0.0;
+
+    this->nrOfPoints = 0.0;
+    this->isValid = false;
 }
 
 Box* Box::move(double dx, double sx, double dy, double sy) {
@@ -54,6 +68,10 @@ Box* Box::divide(int n) {
     return newBox;
 }
 
+void Box::print() {
+    printf("Box(%a, %a, %a, %a)\n", x1, y1, x2, y2);
+}
+
 string Box::toString() {
     stringstream ss;
     ss  << "Box("
@@ -61,20 +79,16 @@ string Box::toString() {
         << x1 << ", "
         << y1 << ", "
         << x2 << ", "
-        << y2 << ", "
-        << width << ", "
-        << height<< ")";
+        << y2;
     return ss.str();
 }
 
 string Box::toTLDString() {
     stringstream ss;
-    ss  << (x1 + 1.0) << ", "
-        << (y1 + 1.0) << ", "
-        << (x2 + 1.0) << ", "
-        << (y2 + 1.0) << ", "
-        << width << ", "
-        << height;
+    ss  << (x1 + 1.0) << ","
+        << (y1 + 1.0) << ","
+        << (x2 + 1.0) << ","
+        << (y2 + 1.0);
     return ss.str();
 }
 
@@ -96,7 +110,7 @@ Option<Box*> Box::fromLine(string line) {
         return none;
     }
 
-    Box* box = new Box(x1 - 1, y1 - 1, x2 - 1, y2 - 1);
+    Box* box = new Box(x1, y1, x2, y2);
     Option<Box*> maybeBox = Option<Box*>(box);
     return maybeBox;
 }

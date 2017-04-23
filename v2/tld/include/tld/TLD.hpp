@@ -4,6 +4,7 @@
 #include "core/ScoredBox.hpp"
 
 #include "tracker/Tracker.hpp"
+#include "tracker/StubbedTracker.hpp"
 #include "detector/Detector.hpp"
 
 #include "tld/TrackerResult.hpp"
@@ -24,11 +25,11 @@ class TLD {
 public:
     int nrOfModels;
 
-    Tracker* tracker;
+    StubbedTracker* tracker;
     Detector* detector;
 
     TLD();
-    TLD(Tracker* tracker, Detector* detector);
+    TLD(StubbedTracker* tracker, Detector* detector);
 
     vector<Box*> init(Frame* frame, vector<Box*> boxList);
 

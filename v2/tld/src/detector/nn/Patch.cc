@@ -32,7 +32,13 @@ Patch::Patch(Frame* frame, Box* box) {
         }
     }
 
+    cvReleaseImage(&src);
+    id = box->id;
     data = patch;
+}
+
+Patch::~Patch() {
+    cvReleaseImage(&data);
 }
 
 string Patch::toString() {

@@ -17,6 +17,7 @@ int main(int argc, char** argv) {
     Detector* detector = new Detector();
     detector->init(firstFrame, boxList);
 
-    detector->eClassifier->dumpEnsembleClassifier();
+    delete firstFrame;
+    delete detector;
 
 }

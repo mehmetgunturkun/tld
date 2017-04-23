@@ -2,6 +2,7 @@
 #define OBJECT_MODEL_H
 
 #include <vector>
+#include "common/Logging.hpp"
 #include "detector/nn/Patch.hpp"
 
 using namespace std;
@@ -26,6 +27,7 @@ public:
     vector<Patch*> negativePatchList;
 
     ObjectModel();
+    ~ObjectModel();
 
     tuple<double, int> computeInitialPositiveSimilarity(Patch* sample);
     tuple<double, int> computePositiveSimilarity(Patch* sample);

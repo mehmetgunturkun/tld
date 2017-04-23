@@ -27,11 +27,4 @@ int main(int argc, char** argv) {
     delete firstFrame;
     delete iterator;
     delete sequence;
-
-    // if (nrOfBoxes == size) {
-    //     printf(GREEN("Seq(%s) => total number of boxes: %d = %d\n"), key.c_str(), nrOfBoxes, size);
-    // } else {
-    //     printf(RED("Seq(%s) => total number of boxes: %d ≠ %d\n"), key.c_str(), nrOfBoxes, size);
-    // }
-
 }

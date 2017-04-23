@@ -1,6 +1,7 @@
 #include "detector/ensemble/EnsembleClassifier.hpp"
 
 EnsembleClassifier::EnsembleClassifier() {
+    this->initiated = false;
     this->classifierName = "ensemble";
 
     this->nrOfBaseClassifiers = 10;
@@ -12,20 +13,24 @@ EnsembleClassifier::EnsembleClassifier() {
 }
 
 EnsembleClassifier::~EnsembleClassifier() {
-    for (int i = 0; i < nrOfBaseClassifiers; i++) {
-        BaseClassifier* bc = baseClassifiers[i];
-        delete bc;
+    if (this->initiated) {
+        for (int i = 0; i < nrOfBaseClassifiers; i++) {
+            BaseClassifier* bc = baseClassifiers[i];
+            delete bc;
+        }
     }
 }
 
 //Initialization Logic
 
 void EnsembleClassifier::init(Frame* firstFrame, vector<Box*> boxList) {
+    this->initiated = true;
     this->nrOfModels = (int) boxList.size();
     this->baseClassifiers = generateBaseClassifier();
 }
 
 vector<BaseClassifier*> EnsembleClassifier::generateBaseClassifier() {
+    Random::seed();
     vector<PixelComparison*> allComparisons = produceAllComparisons();
     printf("Number of all comparisons: %d\n", (int) allComparisons.size());
 
@@ -231,7 +236,11 @@ void EnsembleClassifier::train(TrainingSet<Box> ts, int modelId, double variance
     vector<Box*> negativeBoxList = ts.negativeSamples;
 
     vector<Labelled<CodeVector>*> samples = generateSamples(frame, positiveBoxList, negativeBoxList, varianceThreshold);
-    doTrain(samples, modelId);
+
+    Random::seed();
+    vector<Labelled<CodeVector>*> shuffledSamples = Random::randomSample(samples);
+
+    doTrain(shuffledSamples, modelId);
 }
 
 vector<Labelled<CodeVector>*> EnsembleClassifier::generateSamples(
@@ -239,13 +248,17 @@ vector<Labelled<CodeVector>*> EnsembleClassifier::generateSamples(
     vector<Box*> positiveBoxList,
     vector<Box*> negativeBoxList,
     double varianceThreshold) {
+        double angle = 20.0;
+        double scale = 0.02;
+        double shift = 0.02;
+
         vector<Labelled<CodeVector>*> binaryCodes;
         Random::seed();
 
         // Create binary codes for positive samples
         int nrOfPositiveSamples = (int) positiveBoxList.size();
 
-        int nrOfWarps = 2;
+        int nrOfWarps = 3;
         int warpNo = 1;
         Frame* currentFrame = frame->clone();
 
@@ -265,12 +278,14 @@ vector<Labelled<CodeVector>*> EnsembleClassifier::generateSamples(
                 }
             }
 
-            currentFrame = Frame::warp(frame, boxHull);
+            delete currentFrame;
+            currentFrame = Frame::warp(frame, boxHull, angle, scale, shift);
             warpNo++;
         } while (warpNo <= nrOfWarps);
 
-        free(bbHull);
-        free(boxHull);
+        delete currentFrame;
+        delete bbHull;
+        delete boxHull;
 
         // Create binary codes for negative samples
         int nrOfNegativeSamples = (int) negativeBoxList.size();
@@ -297,10 +312,18 @@ vector<Labelled<CodeVector>*> EnsembleClassifier::generateSamples(
     vector<ScoredBox*> positiveBoxList,
     vector<ScoredBox*> negativeBoxList,
     double varianceThreshold) {
-        Random::seed();
+        double angle = 10.0;
+        double scale = 0.02;
+        double shift = 0.02;
+
         vector<Labelled<CodeVector>*> binaryCodes;
+        Random::seed();
 
         int nrOfPositiveSamples = (int) positiveBoxList.size();
+
+        int nrOfWarps = 3;
+        int warpNo = 1;
+        Frame* currentFrame = frame->clone();
 
         BoxHull* bbHull = new BoxHull();
         for (int i = 0; i < nrOfPositiveSamples; i++) {
@@ -309,9 +332,6 @@ vector<Labelled<CodeVector>*> EnsembleClassifier::generateSamples(
         }
         Box* boxHull = bbHull->getBox();
 
-        int nrOfWarps = 1;
-        int warpNo = 1;
-        Frame* currentFrame = frame->clone();
         do {
             for (int i = 0; i < nrOfPositiveSamples; i++) {
                 Box* box = positiveBoxList[i]->box;
@@ -319,7 +339,7 @@ vector<Labelled<CodeVector>*> EnsembleClassifier::generateSamples(
                 binaryCodes.push_back(new Labelled<CodeVector>(codeVector, 1));
             }
 
-            currentFrame = Frame::warp(frame, boxHull);
+            currentFrame = Frame::warp(frame, boxHull, angle, scale, shift);
             warpNo++;
         } while (warpNo <= nrOfWarps);
 
@@ -343,30 +363,46 @@ void EnsembleClassifier::doTrain(vector<Labelled<CodeVector>*> samples, int mode
     int nrOfSamples = (int) samples.size();
     int step = nrOfSamples / 10;
 
-    // vector<Labelled<CodeVector>*> shuffledSamples = Random::randomSample(samples);
-
     for (int trial = 0; trial < nrOfBootstrap; trial++) {
         for (int i = 0; i < step; i++) {
             for (int k = 0; k < 10; k++) {
-                Labelled<CodeVector>* labelledBinaryCode = samples[k * step + i];
+                int sampleIndex = k * step + i;
+
+                Labelled<CodeVector>* labelledBinaryCode = samples[sampleIndex];
                 CodeVector* codeVector = labelledBinaryCode->item;
                 int label = labelledBinaryCode->label;
 
                 double probability = getProbability(codeVector, modelId);
 
-                if (label == 1 && probability <= positiveUpdateThreshold) {
-                    updateBaseClassifiers(codeVector, modelId, true);
+                if (label == 1) {
+                    if (probability <= positiveUpdateThreshold) {
+                        //printf("%4d. ENC(+) >>> update\n", sampleIndex);
+                        updateBaseClassifiers(codeVector, modelId, true);
+                    } else {
+                        // printf("%4d. ENC(+) >>> ignore\n", sampleIndex);
+                    }
                 }
 
-                if (label == 0 && probability >= negativeUpdateThreshold) {
-                    updateBaseClassifiers(codeVector, modelId, false);
+                if (label == 0) {
+                    if (probability >= negativeUpdateThreshold) {
+                        // printf("%4d. ENC(-) >>> update", sampleIndex);
+                        updateBaseClassifiers(codeVector, modelId, false);
+                    } else {
+                        // printf("%4d. ENC(-) >>> ignore\n", sampleIndex);
+                    }
                 }
+
+                // for (int i = 0; i < codeVector->size; i++) {
+                //     printf("%d, ", codeVector->get(i));
+                // }
+                // printf("\n");
             }
         }
     }
 
     for (int i = 0; i < nrOfSamples; i++) {
         Labelled<CodeVector>* labelledBinaryCode = samples[i];
+        delete labelledBinaryCode->item;
         delete labelledBinaryCode;
     }
 }

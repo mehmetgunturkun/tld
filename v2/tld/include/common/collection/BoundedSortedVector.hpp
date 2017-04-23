@@ -28,6 +28,11 @@ public:
         this->count = 0;
     }
 
+    ~BoundedSortedVector() {
+        delete this->comp;
+    }
+
+
     void operator+=(T* item) {
         if (this->limit == UNLIMITED) {
             this->push_back(item);
@@ -37,8 +42,12 @@ public:
             this->count += 1;
 
             if (this->count > this->limit) {
+                T* lastItem = this->back();
+
                 this->count -= 1;
                 this->pop_back();
+
+                delete lastItem;
             }
         }
     }

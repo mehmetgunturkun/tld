@@ -38,6 +38,7 @@ public:
     NearestNeighborClassifier* nnClassifier;
 
     Detector();
+    ~Detector();
 
     void initVarianceThresholds(Frame* frame, vector<Box*> boxList);
     bool checkVariance(Frame* frame, ScoredBox* scoredBox);

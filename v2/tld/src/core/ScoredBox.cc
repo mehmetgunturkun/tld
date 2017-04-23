@@ -6,6 +6,7 @@ ScoredBox::ScoredBox(Box* box) {
 }
 
 ScoredBox::~ScoredBox() {
+    delete box;
     for ( auto it = scoreMap.begin(); it != scoreMap.end(); ++it ) {
         Score* score = it->second;
         delete score;

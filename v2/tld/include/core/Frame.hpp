@@ -31,7 +31,11 @@ public:
     int get(Point2f* point);
     Frame* clone();
 
-    static Frame* warp(Frame* frame, Box* boxHull);
+    static Frame* warp(Frame* frame,
+        Box* boxHull,
+        double angle,
+        double scale,
+        double shift);
     static Option<Frame*> fromFile(int id, string fileName);
 };
 

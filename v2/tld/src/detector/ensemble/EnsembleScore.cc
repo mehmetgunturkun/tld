@@ -11,6 +11,10 @@ EnsembleScore::EnsembleScore(vector<double> scores) {
     this->scores = scores;
 }
 
+EnsembleScore::~EnsembleScore() {
+    delete binaryCodes;
+}
+
 void EnsembleScore::setBinaryCode(int index, int code) {
     binaryCodes->set(index, code);
 }

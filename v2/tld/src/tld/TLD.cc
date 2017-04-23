@@ -8,11 +8,11 @@ void TLDResultSet::add(ScoredBox* scoredBox) {
 }
 
 TLD::TLD() {
-    this->tracker = new Tracker();
+    this->tracker = new StubbedTracker("", 0);
     this->detector = new Detector();
 }
 
-TLD::TLD(Tracker* tracker, Detector* detector) {
+TLD::TLD(StubbedTracker* tracker, Detector* detector) {
     this->tracker = tracker;
     this->detector = detector;
     this->nrOfModels = 0;
@@ -26,6 +26,8 @@ vector<Box*> TLD::init(Frame* frame, vector<Box*> boxList) {
 }
 
 vector<Box*> TLD::track(Frame* prev, Frame* curr, vector<Box*> prevBoxList) {
+    println("Frame(%s) >> Frame(%s)", prev->name.c_str(), curr->name.c_str());
+
     printf(GREEN("==== Tracker is started ====\n"));
     vector<Box*> currentBoxList = tracker->track(prev, curr, prevBoxList);
     printf(GREEN("==== Tracker is completed ====\n"));
@@ -34,11 +36,11 @@ vector<Box*> TLD::track(Frame* prev, Frame* curr, vector<Box*> prevBoxList) {
     vector<ScoredBox*> scoredBoxList = detector->detect(curr);
     printf(RED("==== Detector is completed ====\n"));
 
-    printf(WHITE("==== Grouping is started ====\n"));
+    // printf(WHITE("==== Grouping is started ====\n"));
     vector<TLDResultSet*> resultSetPerModel = groupResults(currentBoxList, scoredBoxList);
-    printf(WHITE("==== Grouping is started ====\n"));
+    // printf(WHITE("==== Grouping is started ====\n"));
 
-    printf(WHITE("==== Integration is started ====\n"));
+    // printf(WHITE("==== Integration is started ====\n"));
     vector<Box*> estimatedBoxList;
     for (int modelId = 0; modelId < nrOfModels; modelId++) {
         TLDResultSet* resultSet = resultSetPerModel[modelId];
@@ -47,14 +49,15 @@ vector<Box*> TLD::track(Frame* prev, Frame* curr, vector<Box*> prevBoxList) {
 
         if (maybeCurrentBox.isDefined()) {
             Box* currentBox = maybeCurrentBox.get();
-            printf("TLD >> %s\n", currentBox->toCharArr());
+            printf("TLD >> ");
+            currentBox->print();
             estimatedBoxList.push_back(currentBox);
         } else {
             estimatedBoxList.push_back(nullptr);
             printf("No valid result for %d!\n", modelId);
         }
     }
-    printf(WHITE("==== Integration is completed ====\n"));
+    // printf(WHITE("==== Integration is completed ====\n"));
 
     return estimatedBoxList;
 }
@@ -150,7 +153,8 @@ Option<Box*> TLD::integrate(Frame* frame, Box* oldBox, Box* maybeTrackedBox, vec
                 // Detector.Combine
                 printf("Tracker OK, Detector COMBINE\n");
                 Box* combinedBox = combineClosestBoxes(scoredTrackBox, candidateBoxList);
-                printf("COMBINED >>> %s\n", combinedBox->toCharArr());
+                printf("COMBINED >>> ");
+                combinedBox->print();
                 maybeFinalBox = Option<Box*>(combinedBox);
                 shouldLearn = shouldLearn && true;
             }
@@ -187,7 +191,7 @@ Option<Box*> TLD::integrate(Frame* frame, Box* oldBox, Box* maybeTrackedBox, vec
     printf(CYAN("==== Evaluate is started ====\n"));
     if (maybeFinalBox.isDefined() && maybeFinalBox.get()->isValid) {
         Box* finalBox = maybeFinalBox.get();
-        bool evaluateResult = detector->evaluate(frame, finalBox, 489.4352, modelId);
+        bool evaluateResult = detector->evaluate(frame, finalBox, 489.111, modelId);
         finalBox->isValid = evaluateResult;
         shouldLearn = evaluateResult;
     }
@@ -203,6 +207,7 @@ Option<Box*> TLD::integrate(Frame* frame, Box* oldBox, Box* maybeTrackedBox, vec
     } else {
         printf("Not going to learn\n");
     }
+    printf(YELLOW("==== Learner is completed ====\n"));
 
     return maybeFinalBox;
 };
@@ -288,10 +293,10 @@ vector<ScoredBox*> TLD::getMoreConfidentBoxList(ScoredBox* trackScoredBox, vecto
 Box* TLD::combineClosestBoxes(ScoredBox* trackScoredBox, vector<ScoredBox*> detectedBoxes) {
     Box* trackBox = trackScoredBox->box;
 
-    double x1 = trackBox->x1 * 10;
-    double y1 = trackBox->y1 * 10;
-    double x2 = trackBox->x2 * 10;
-    double y2 = trackBox->y2 * 10;
+    double x1 = trackBox->x1 * 10.0;
+    double y1 = trackBox->y1 * 10.0;
+    double x2 = trackBox->x2 * 10.0;
+    double y2 = trackBox->y2 * 10.0;
     int patchCount = 10;
 
     int patchSize = (int) detectedBoxes.size();

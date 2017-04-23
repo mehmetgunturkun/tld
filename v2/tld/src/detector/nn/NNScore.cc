@@ -14,6 +14,10 @@ NNScore::NNScore(Patch* patch) {
     this->patch = patch;
 }
 
+NNScore::~NNScore() {
+    delete this->patch;
+}
+
 Score* NNScore::clone() {
     NNScore* clone = new NNScore();
     clone->patch = this->patch;

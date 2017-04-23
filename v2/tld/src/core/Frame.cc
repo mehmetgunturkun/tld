@@ -18,8 +18,11 @@ Frame::~Frame() {
     cvReleaseImage(&originalImage);
     cvReleaseImage(&grayscale);
 
-    //TODO Check the tru way to release gaussian image.
-    delete gaussian;
+    //TODO Check the true way to release gaussian image.
+    // printf("mc1200\n");
+    // cout << gaussian << endl;
+    // cvReleaseImage(&gaussian);
+
     delete integralImage;
 }
 
@@ -55,10 +58,27 @@ Option<Frame*> Frame::fromFile(int id, string fileName) {
             total += pixel;
         }
     }
-    printf("Gray : %10lu\n", total);
 
-    IplImage* gray4Blur = Image::bgr2gray(originalImage);
-    IplImage* gaussianImage = Gaussian::blur(gray4Blur, 12, 2.0);
+    IplImage* gaussianImage;
+    if (originalImage->nChannels == 3) {
+        IplImage* gray4Blur = Image::bgr2gray(originalImage);
+        long total3 = 0;
+        for (int i = 0; i < gray4Blur->height; i++) {
+            for (int j = 0; j < gray4Blur->width; j++) {
+                uchar pixel = CV_IMAGE_ELEM(gray4Blur, uchar, i, j);
+                total3 += pixel;
+            }
+        }
+
+        gaussianImage = Gaussian::blur(gray4Blur, 12, 2.0);
+        cvReleaseImage(&gray4Blur);
+
+    } else {
+        IplImage* gray4Blur = Image::imread(fileName, CV_LOAD_IMAGE_GRAYSCALE);
+        gaussianImage = Gaussian::blur(gray4Blur, 12, 2.0);
+        cvReleaseImage(&gray4Blur);
+    }
+
     total = 0;
     for (int i = 0; i < grayImage->height; i++) {
         for (int j = 0; j < grayImage->width; j++) {
@@ -66,8 +86,6 @@ Option<Frame*> Frame::fromFile(int id, string fileName) {
             total += pixel;
         }
     }
-    cvReleaseImage(&gray4Blur);
-    printf("Gauss: %10lu\n", total);
 
     Frame* frame = new Frame(id, fileName, originalImage, grayImage, gaussianImage);
 
@@ -75,28 +93,33 @@ Option<Frame*> Frame::fromFile(int id, string fileName) {
     return maybeFrame;
 }
 
-Frame* Frame::warp(Frame* frame, Box* box) {
-    Frame* copied = frame->clone();
-    double x1 = box->x1;
-    double y1 = box->y1;
+Frame* Frame::warp(Frame* frame,
+    Box* box,
+    double angle,
+    double scale,
+    double shift) {
+        Frame* copied = frame->clone();
+        double x1 = box->x1;
+        double y1 = box->y1;
 
-    double x2 = box->x2;
-    double y2 = box->y2;
-    IplImage* gaussian = copied->gaussian;
+        double x2 = box->x2;
+        double y2 = box->y2;
+        IplImage* gaussian = copied->gaussian;
 
-    Random::seed();
-    IplImage* warpedImage = Image::warp(gaussian, x1, y1, x2, y2);
-    int width = warpedImage->width;
-    int height = warpedImage->height;
+        Random::seed();
+        IplImage* warpedImage = Image::warp(gaussian, x1, y1, x2, y2, angle, scale, shift);
+        int width = warpedImage->width;
+        int height = warpedImage->height;
 
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-            double p = CV_IMAGE_ELEM(warpedImage, double, i ,j);
-            int pint = (int) round(p);
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                double p = CV_IMAGE_ELEM(warpedImage, double, i ,j);
+                int pint = (int) round(p);
 
-            int idx = ((i + y1) * gaussian->widthStep) + j + x1;
-            gaussian->imageData[idx] = (uchar) pint;
+                int idx = ((i + y1) * gaussian->widthStep) + j + x1;
+                gaussian->imageData[idx] = (uchar) pint;
+            }
         }
-    }
-    return copied;
+        cvReleaseImage(&warpedImage);
+        return copied;
 }

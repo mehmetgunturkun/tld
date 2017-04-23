@@ -43,6 +43,7 @@ public:
     Box* sum(Box* other);
     Box* divide(int n);
 
+    void print();
     string toString();
     string toTLDString();
     const char* toCharArr();

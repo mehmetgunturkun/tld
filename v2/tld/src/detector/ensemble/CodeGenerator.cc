@@ -8,7 +8,6 @@ CodeGenerator::CodeGenerator(vector<PixelComparison*> pixelComparisons) {
 CodeGenerator::~CodeGenerator() {
     for (int i = 0; i < nrOfComparisons; i++) {
         PixelComparison* comp = pixelComparisons[i];
-        printf("%s\n", comp->toString().c_str());
         delete comp;
     }
 }

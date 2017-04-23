@@ -17,6 +17,7 @@ public:
     NNScore();
     NNScore(Patch* patch);
     NNScore(Patch* patch, vector<double> relativeScores, vector<double> conservativeScores);
+    ~NNScore();
 
     Score* sum(Score* other);
     Score* divide(int n);

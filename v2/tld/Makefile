@@ -18,6 +18,8 @@ CXXFLAGS = -g -O3 -Wall --std=c++11
 LDFLAGS  += $(OPENCV_LIBS)
 ARFLAGS = ruv
 
+# sudo LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6 matlab
+
 lib2_sources := \
 	src/common/Arguments.cc \
 	src/common/Colors.cc \
@@ -37,6 +39,7 @@ lib2_sources := \
 	src/core/ScoredBox.cc \
 	src/tracker/FBPoint.cc \
 	src/tracker/Tracker.cc \
+	src/tracker/StubbedTracker.cc \
 	src/detector/core/BoxIterator.cc \
 	src/detector/ensemble/EnsembleScore.cc \
 	src/detector/ensemble/PixelComparison.cc \

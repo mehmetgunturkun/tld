@@ -26,6 +26,7 @@ using namespace std;
 
 class EnsembleClassifier {
 public:
+    bool initiated;
     string classifierName;
     int nrOfBaseClassifiers;
     int nrOfPixelComparisons;

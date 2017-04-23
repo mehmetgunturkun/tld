@@ -87,11 +87,10 @@ IplImage* Warp::warp(IplImage* _img, double* h, double xMin, double yMin, double
     int width = (int) (xMax - xMin + 1);
     int height = (int) (yMax - yMin + 1);
 
-    Mat* result = new Mat(height, width, CV_64F, 0.0);
-    double* resultData = (double*) result->data;
+    IplImage* warpedImage =cvCreateImage(cvSize(width, height), IPL_DEPTH_64F, 1);
+    double* resultData = (double*) warpedImage->imageData;
 
     warp_image_roi(imageData, imageWidth, imageHeight, h, xMin, xMax, yMin, yMax, 0.0, resultData);
-
-    IplImage* warpedImage = new IplImage(*result);
+    free(imageData);
     return warpedImage;
 }

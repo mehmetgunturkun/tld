@@ -40,6 +40,16 @@ int main(int argc, char** argv) {
 
     nnClassifier->train(set1, 0);
 
+    for (int i = 0; i < (int) positiveBoxList.size(); i++) {
+        Box* b = positiveBoxList[i];
+        delete b;
+    }
+
+    for (int i = 0; i < (int) negativeBoxList.size(); i++) {
+        Box* b = negativeBoxList[i];
+        delete b;
+    }
+
     delete nnClassifier;
     delete firstFrame;
 

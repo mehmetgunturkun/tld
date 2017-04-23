@@ -16,14 +16,25 @@ int main(int argc, char** args) {
     Frame* firstFrame = sequence.next();
     Box* initBox = sequence.initBox;
     initBox->isValid = true;
+
+    initBox->x1 -= 1.0;
+    initBox->y1 -= 1.0;
+    initBox->x2 -= 1.0;
+    initBox->y2 -= 1.0;
+
     vector<Box*> boxList = { initBox };
     printf("%s\n", initBox->toString().c_str());
 
+    string stubFile = arguments.getString("stubFile");
+    StubbedTracker* tracker = new StubbedTracker(stubFile, sequence.nrOfFrames);
+
     TLD* tld = new TLD();
+    tld->tracker = tracker;
+
     boxList = tld->init(firstFrame, boxList);
 
     Frame* previous = firstFrame;
-    while (sequence.hasNext() && previous->id < 15) {
+    while (sequence.hasNext() && previous->id < 200) {
         Frame* current = sequence.next();
         printf("Frame(%d) >> Frame(%d)\n", previous->id, current->id);
 

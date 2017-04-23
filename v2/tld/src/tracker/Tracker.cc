@@ -65,14 +65,18 @@ vector<CvPoint2D32f*> Tracker::decomposePoints(int nrOfBoxes, vector<Box*> boxLi
     int id = 0;
     for (int i = 0; i < nrOfBoxes; i++) {
         Box* box = boxList[i];
+        printf("%s\n", box->toTLDString().c_str());
         int nrOfPoints = 0;
         float horizontalStep = computeStep(box->x1, box->x2, 10);
         float verticalStep = computeStep(box->y1, box->y2, 10);
-        for (float j = margin; j <= box->height - margin; j = j + verticalStep) {
-            for (float i = margin; i <= box->width - margin; i = i + horizontalStep) {
+        for (float i = margin; i <= box->width - margin; i = i + horizontalStep) {
+            for (float j = margin; j <= box->height - margin; j = j + verticalStep) {
+
                 CvPoint2D32f* point = (CvPoint2D32f*) cvAlloc(sizeof(CvPoint2D32f));
                 point->x = box->x1 + i;
                 point->y = box->y1 + j;
+
+                //printf("Point(%20.25f, %20.25f)\n", point->x, point->y);
 
                 nrOfPoints += 1;
                 points.push_back(point);
@@ -122,7 +126,25 @@ vector<FBPoint*> Tracker::track(Frame* prev, Frame* curr, int nrOfPoints, vector
     IplImage* toImage = curr->grayscale;
     IplImage* toPyramid = cvCreateImage( imageSize, 8, 1 );
 
-    println("Frame(%s) >> Frame(%s)", prev->name.c_str(), curr->name.c_str());
+    // long totalI = 0;
+    // for (int i = 0; i < fromImage->height; i++) {
+    //     for (int j = 0; j < fromImage->width; j++) {
+    //         uchar pixel = CV_IMAGE_ELEM(fromImage, uchar, i, j);
+    //         printf("%3d ", pixel);
+    //         totalI += pixel;
+    //     }
+    //     printf("\n");
+    // }
+    // printf("Total(%d) = %10lu\n", 0, totalI);
+    //
+    // long totalJ = 0;
+    // for (int i = 0; i < toImage->height; i++) {
+    //     for (int j = 0; j < toImage->width; j++) {
+    //         uchar pixel = CV_IMAGE_ELEM(toImage, uchar, i, j);
+    //         totalJ += pixel;
+    //     }
+    // }
+    // printf("Total(%d) = %10lu\n", 1, totalJ);
 
     CvPoint2D32f* fromPoints    = (CvPoint2D32f*) cvAlloc(nrOfPoints * sizeof(CvPoint2D32f));
     CvPoint2D32f* toPoints      = (CvPoint2D32f*) cvAlloc(nrOfPoints * sizeof(CvPoint2D32f));
@@ -147,6 +169,9 @@ vector<FBPoint*> Tracker::track(Frame* prev, Frame* curr, int nrOfPoints, vector
         bwPoint->x = point->x;
         bwPoint->y = point->y;
     }
+
+
+    //printf("NrOfPoints: %d\n", nrOfPoints);
 
     cvCalcOpticalFlowPyrLK(
         fromImage,
@@ -189,6 +214,13 @@ vector<FBPoint*> Tracker::track(Frame* prev, Frame* curr, int nrOfPoints, vector
             CvPoint2D32f* bPoint = bwPoints + i;
 
             // println("%2d. P(%15.14f, %15.14f) -> P(%15.14f, %15.14f) -> P(%15.14f, %15.14f)", i,
+            //     fPoint->x, fPoint->y,
+            //     tPoint->x, tPoint->y,
+            //     bPoint->x, bPoint->y
+            // );
+
+
+            // println("%2d. P(%10a, %10a) -> P(%10a, %10a) -> P(%10a, %10a)", i,
             //     fPoint->x, fPoint->y,
             //     tPoint->x, tPoint->y,
             //     bPoint->x, bPoint->y
@@ -279,6 +311,8 @@ Option<Box*> Tracker::estimate(Frame* prev, Frame* curr, Box* box, vector<FBPoin
         printf("Invalid Box -- high fb error - %f\n", medFBE);
         Option<Box*> failedBox = Option<Box*>();
         return failedBox;
+    } else {
+        printf("Med(fb) = %21.20f/%a\n", medFBE, medFBE);
     }
 
     vector<FBPoint*> reliablePoints;
@@ -286,6 +320,18 @@ Option<Box*> Tracker::estimate(Frame* prev, Frame* curr, Box* box, vector<FBPoin
         FBPoint* fbPoint = trackedPoints[i];
         if (fbPoint->state && fbPoint->fbError <= medFBE && fbPoint->ncc >= medNCC) {
             reliablePoints.push_back(fbPoint);
+            // println(GREEN("%2d. P(%10a, %10a) -> P(%10a, %10a) -> P(%10a, %10a). Dx = %21.20f"), i,
+            //     fbPoint->src->x, fbPoint->src->y,
+            //     fbPoint->to->x, fbPoint->to->y,
+            //     fbPoint->backwardPoint->x, fbPoint->backwardPoint->y,
+            //     dx
+            // );
+        } else {
+            // println(RED("%2d. P(%10a, %10a) -> P(%10a, %10a) -> P(%10a, %10a)"), i,
+            //     fbPoint->src->x, fbPoint->src->y,
+            //     fbPoint->to->x, fbPoint->to->y,
+            //     fbPoint->backwardPoint->x, fbPoint->backwardPoint->y
+            // );
         }
     }
 
@@ -294,6 +340,8 @@ Option<Box*> Tracker::estimate(Frame* prev, Frame* curr, Box* box, vector<FBPoin
         printf("No reliable boxes\n");
         Option<Box*> failedBox = Option<Box*>();
         return failedBox;
+    } else {
+        printf("There are %3d reliable points for estimation\n", nrOfReliablePoints);
     }
 
     vector<CvPoint2D32f*> fromPoints;
@@ -325,8 +373,16 @@ Option<Box*> Tracker::estimate(Frame* prev, Frame* curr, Box* box, vector<FBPoin
     float sx = 0.5 * (medS - 1.0) * box->width;
     float sy = 0.5 * (medS - 1.0) * box->height;
 
+    sx = 0.0f;
+    sy = 0.0f;
+
     float medX = median(dxList);
     float medY = median(dyList);
+
+    //printf("dx: %25.20f/%a\n", medX, medX);
+    //printf("dy: %25.20f/%a\n", medY, medY);
+    //printf("sx: %25.20f/%a\n", sx, sx);
+    //printf("sy: %25.20f/%a\n", sy, sy);
 
     Box* movedBox = box->move(medX, sx, medY, sy);
     if (isOut(curr, movedBox)) {
@@ -363,7 +419,10 @@ vector<Box*> Tracker::fragmentAndEstimateBoxList(Frame* prev,
             Option<Box*> maybeBox = estimate(prev, curr, stableBox, trackedPoints, cursor, cursor + nrOfPoints);
             if (maybeBox.isDefined()) {
                 Box* nextBox = maybeBox.get();
-                printf("Box: %s\n", nextBox->toString().c_str());
+                printf("TRACKER( IN): ");
+                stableBox->print();
+                printf("TRACKER(OUT): ");
+                nextBox->print();
                 estimatedBoxList.push_back(nextBox);
             } else {
                 estimatedBoxList.push_back(nullptr);

@@ -1,4 +1,6 @@
 #include "detector/Detector.hpp"
+#include <iostream>
+#include <fstream>
 
 Detector::Detector() {
     eClassifier = new EnsembleClassifier();
@@ -14,6 +16,11 @@ Detector::Detector() {
 
     positiveBoxOverlapThreshold = 0.6;
     negativeBoxOverlapThreshold = 0.2;
+}
+
+Detector::~Detector() {
+    delete eClassifier;
+    delete nnClassifier;
 }
 
 bool Detector::isPositive(Box* box) {
@@ -64,6 +71,8 @@ void Detector::initVarianceThresholds(Frame* frame, vector<Box*> boxList) {
         if (boxVariance < minimumVariance) {
             minimumVariance = boxVariance;
         }
+
+        delete correctedBox;
     }
 
     this->minimumVariance = minimumVariance;
@@ -99,6 +108,8 @@ Box* Detector::init(Frame* frame, Box* box, int modelId) {
         sampleBox->mean = meanVariance->mean;
         sampleBox->variance = meanVariance->variance;
 
+        delete meanVariance;
+
         //Check if positive
         if (isPositive(sampleBox)) {
             positiveQueue += sampleBox;
@@ -112,12 +123,14 @@ Box* Detector::init(Frame* frame, Box* box, int modelId) {
             continue;
         }
 
-        free(sampleBox);
+        delete sampleBox;
     }
+
+    delete boxIterator;
 
     vector<Box*> positiveBoxList4Ensemble = positiveQueue.toVector();
 
-    Box* closestBox = positiveBoxList4Ensemble[0];
+    Box* closestBox = positiveBoxList4Ensemble[0]->clone();
     vector<Box*> positiveScoredBoxList4NN = { closestBox };
 
     Random::seed();
@@ -132,7 +145,6 @@ Box* Detector::init(Frame* frame, Box* box, int modelId) {
     Random::seed();
     vector<Box*> negativeBoxList4NNFirstPart = Random::splitData(negativeBoxList4NN, 2);
 
-    // TODO filter
     TrainingSet<Box> trainingSet4Ensemble = TrainingSet<Box>(
         frame,
         positiveBoxList4Ensemble,
@@ -149,6 +161,18 @@ Box* Detector::init(Frame* frame, Box* box, int modelId) {
 
     eClassifier->train(trainingSet4Ensemble, modelId, 0.0);
     nnClassifier->train(trainingSet4NN, modelId);
+
+    int nrOfPositiveSamples = (int) positiveBoxList4Ensemble.size();
+    for (int i = 0; i < nrOfPositiveSamples; i++) {
+        Box* box = positiveBoxList4Ensemble[i];
+        delete box;
+    }
+
+    int nrOfNegativeSamples = (int) negativeQueue.size();
+    for (int i = 0; i < nrOfNegativeSamples; i++) {
+        Box* box = negativeQueue[i];
+        delete box;
+    }
 
     return closestBox;
 }
@@ -287,16 +311,17 @@ bool Detector::checkVariance(Frame* frame, ScoredBox* scoredBox) {
     box->mean = meanVariance->mean;
     box->variance = meanVariance->variance;
 
-    vector<int> classifiedModelIds;
+    delete meanVariance;
+
+    VarianceScore* score = new VarianceScore();
     for (int i = 0; i < this->nrOfModels; i++) {
         double variance = this->varianceList[i];
         if (box->variance >= variance) {
-            classifiedModelIds.push_back(i);
+            score->classifiedModelIds.push_back(i);
         }
     }
 
-    VarianceScore* score = new VarianceScore();
-    score->classifiedModelIds = classifiedModelIds;
+
     score->isAnyModellClassified = box->variance >= minimumVariance;
     scoredBox->withScore("variance", score);
 
@@ -333,6 +358,8 @@ vector<ScoredBox*> Detector::detect(Frame* frame) {
 
         scoredBox->isDetected = true;
     }
+
+    delete iterator;
     return allBoxList;
 }
 
@@ -357,8 +384,14 @@ Box* Detector::getClosestBox(Frame* frame, Box* box) {
 
         if (overlap > minimumOverlap) {
             minimumOverlap = overlap;
+            delete closestBox;
             closestBox = nextBox;
+        } else {
+            delete nextBox;
         }
     }
+
+    delete boxIterator;
+
     return closestBox;
 }

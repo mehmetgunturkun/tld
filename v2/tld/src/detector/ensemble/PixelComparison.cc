@@ -25,8 +25,8 @@ bool PixelComparison::compare(Frame* frame, Box* box) {
     Point2f* normTo = normalize(to, box);
     int toPixel = frame->get(normTo);
 
-    free(normFrom);
-    free(normTo);
+    delete normFrom;
+    delete normTo;
 
     return fromPixel > toPixel;
 }
