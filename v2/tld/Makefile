@@ -11,7 +11,9 @@ OPENCV_CFLAGS := -I/home/gunturkun/bin/opencv/2.2.0/include/opencv -I/home/guntu
 # OPENCV_LIBS := /opt/opencv/2.2/lib/ -lopencv_highgui -lopencv_core -lopencv_imgproc -lopencv_video
 OPENCV_LIBS := /home/gunturkun/bin/opencv/2.2.0/lib/ -lopencv_highgui -lopencv_core -lopencv_imgproc -lopencv_video
 
-CPPFLAGS += -Iinclude $(OPENCV_CFLAGS)
+JSON_LIB := /home/gunturkun/bin/jsoncpp/lib/libjsoncpp.a
+
+CPPFLAGS += -Iinclude $(OPENCV_CFLAGS) -I/home/gunturkun/bin/jsoncpp/include
 CCFLAGS = -g -Wall --std=c99
 # CXXFLAGS = -g -Wall --std=c++11
 CXXFLAGS = -g -O3 -Wall --std=c++11
@@ -22,6 +24,7 @@ ARFLAGS = ruv
 
 lib2_sources := \
 	src/common/Arguments.cc \
+	src/common/Config.cc \
 	src/common/Colors.cc \
 	src/common/string/StringStream.cc \
 	src/common/Random.cc \
@@ -87,7 +90,7 @@ $(lib2_target) : $(lib2_objects) Makefile
 	@echo ----------------------------------------
 
 $(tool2_targets): $(test_target)/%-app: test/%.o $(lib2_target) Makefile
-	$(CXX) $(CXXFLAGS) -I$(OPENCV_CFLAGS) $< $(lib2_target) $(lib_target) -L$(LDFLAGS) -o $@
+	$(CXX) $(CXXFLAGS) -I$(OPENCV_CFLAGS) $< $(lib2_target) $(JSON_LIB) $(lib_target) -L$(LDFLAGS) -o $@
 	@echo ----------------------------------------
 	@echo ... Built $@ ...
 	@echo ----------------------------------------
