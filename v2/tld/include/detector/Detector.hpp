@@ -29,10 +29,12 @@ public:
     double negativeBoxOverlapThreshold;
 
     int nrOfPositiveBoxes4EnsembleAtInitialization;
-    // int nrOfNegativeBoxes4EnsembleAtInitialization;
+    int nrOfPositiveBoxes4EnsembleAtUpdate;
 
     int nrOfPositiveBoxes4NNAtInitialization;
     int nrOfNegativeBoxes4NNAtInitialization;
+
+    double maxOverlapOfNegativeSampleForNN;
 
     EnsembleClassifier* eClassifier;
     NearestNeighborClassifier* nnClassifier;

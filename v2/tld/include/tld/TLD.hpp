@@ -28,6 +28,10 @@ public:
     StubbedTracker* tracker;
     Detector* detector;
 
+    double trackedBoxValidationScoreThreshold;
+    double moreConfidentBoxOverlapThreshold;
+    double minimumOverlapToCombine;
+
     TLD();
     TLD(StubbedTracker* tracker, Detector* detector);
 

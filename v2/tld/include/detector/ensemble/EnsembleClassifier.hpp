@@ -36,6 +36,16 @@ public:
     double positiveUpdateThreshold;
     double negativeUpdateThreshold;
 
+    int nrOfWarpsForInitialization;
+    double warpingAngleForInitialization;
+    double warpingScaleForInitialization;
+    double warpingShiftForInitializaiton;
+
+    int nrOfWarpsForUpdate;
+    double warpingAngleForUpdate;
+    double warpingScaleForUpdate;
+    double warpingShiftForUpdate;
+
     vector<BaseClassifier*> baseClassifiers;
 
     EnsembleClassifier();

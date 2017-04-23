@@ -21,11 +21,17 @@ class NearestNeighborClassifier {
 private:
     int nrOfModels;
     vector<ObjectModel*> models;
-    double POSITIVE_SCORE_THRESHOLD;
+
+    double minimumRelativeScoreForClassification;
+    double minimumConservativeScoreForValidation;
+    double minimumRelativeScoreForEvaluation;
+
+    double maximumRelativeScoreForPositiveUpdate;
+    double minimumRelativeScoreForNegativeUpdate;
 public:
     NearestNeighborClassifier();
     ~NearestNeighborClassifier();
-    
+
     void init(Frame* firstFrame, vector<Box*> boxList);
     double getPatchVariance(Frame* frame, Box* box);
 

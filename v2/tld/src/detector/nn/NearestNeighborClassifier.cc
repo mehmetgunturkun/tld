@@ -1,7 +1,12 @@
 #include "detector/nn/NearestNeighborClassifier.hpp"
 
 NearestNeighborClassifier::NearestNeighborClassifier() {
-    POSITIVE_SCORE_THRESHOLD = 0.65;
+    minimumRelativeScoreForClassification = 0.65;
+    minimumConservativeScoreForValidation = 0.70;
+    minimumRelativeScoreForEvaluation = 0.50;
+
+    maximumRelativeScoreForPositiveUpdate = 0.65;
+    minimumRelativeScoreForNegativeUpdate = 0.50;
 }
 
 void NearestNeighborClassifier::init(Frame* firstFrame, vector<Box*> boxList) {
@@ -51,7 +56,7 @@ bool NearestNeighborClassifier::classify(Frame* frame, ScoredBox* scoredBox) {
     vector<int> classifiedModelIds;
     for (int j = 0; j < nrOfModels; j++) {
         double score = relativeScores[j];
-        if (score > POSITIVE_SCORE_THRESHOLD) {
+        if (score > minimumRelativeScoreForClassification) {
             anyModelClassified = true;
             classifiedModelIds.push_back(j);
         }
@@ -80,7 +85,7 @@ bool NearestNeighborClassifier::validate(Frame* frame, ScoredBox* scoredBox, int
 
     bool anyModelClassified = false;
     vector<int> classifiedModelIds;
-    if (conservativeScore > 0.7) {
+    if (conservativeScore > minimumConservativeScoreForValidation) {
         anyModelClassified = true;
         // printf("High conservative score - %f!\n", conservativeScore);
         classifiedModelIds.push_back(modelId);
@@ -117,7 +122,7 @@ bool NearestNeighborClassifier::evaluate(Frame* frame, Box* box, double minVaria
 
     printf("EVALUATE >> %s, %3.5f\n", box->toCharArr(), objectScore->relativeScore);
 
-    if (objectScore->relativeScore < 0.5) {
+    if (objectScore->relativeScore < minimumRelativeScoreForEvaluation) {
         printf("NN >> Fast Change\n");
         return false;
     }
@@ -278,7 +283,7 @@ void NearestNeighborClassifier::doTrain(vector<Labelled<Patch>*> samples, int mo
         int closestPositivePatchIndex = objectScore->closestPositivePatchIndex;
 
         if (label == 1) {
-            if (relativeScore <= 0.65) {
+            if (relativeScore <= maximumRelativeScoreForPositiveUpdate) {
                 // printf("%4d. NNC(+) >>> Model(%5d).update\n", i + 1, patch->id);
                 labelledPatch->added = true;
                 if (isInPositive == true) {
@@ -293,7 +298,7 @@ void NearestNeighborClassifier::doTrain(vector<Labelled<Patch>*> samples, int mo
         }
 
         if (label == 0) {
-            if (relativeScore > 0.5) {
+            if (relativeScore > minimumRelativeScoreForNegativeUpdate) {
                 // printf("%4d. NNC(-) >>> Model(%5d).update\n", i + 1, patch->id);
                 labelledPatch->added = true;
                 model->add(patch, false);

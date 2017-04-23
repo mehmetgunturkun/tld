@@ -10,6 +10,16 @@ EnsembleClassifier::EnsembleClassifier() {
     this->positiveLabelThreshold = 0.5 * nrOfBaseClassifiers;
     this->positiveUpdateThreshold = 0.5 * nrOfBaseClassifiers;
     this->negativeUpdateThreshold = 0.5 * nrOfBaseClassifiers;
+
+    this->nrOfWarpsForInitialization = 3;
+    this->warpingAngleForInitialization = 20.0;
+    this->warpingScaleForInitialization = 0.02;
+    this->warpingShiftForInitializaiton = 0.02;
+
+    this->nrOfWarpsForUpdate = 3;
+    this->warpingAngleForUpdate = 10.0;
+    this->warpingScaleForUpdate = 0.02;
+    this->warpingShiftForUpdate = 0.02;
 }
 
 EnsembleClassifier::~EnsembleClassifier() {
@@ -22,7 +32,6 @@ EnsembleClassifier::~EnsembleClassifier() {
 }
 
 //Initialization Logic
-
 void EnsembleClassifier::init(Frame* firstFrame, vector<Box*> boxList) {
     this->initiated = true;
     this->nrOfModels = (int) boxList.size();
@@ -248,9 +257,9 @@ vector<Labelled<CodeVector>*> EnsembleClassifier::generateSamples(
     vector<Box*> positiveBoxList,
     vector<Box*> negativeBoxList,
     double varianceThreshold) {
-        double angle = 20.0;
-        double scale = 0.02;
-        double shift = 0.02;
+        double angle = warpingAngleForInitialization;
+        double scale = warpingScaleForInitialization;
+        double shift = warpingShiftForInitializaiton;
 
         vector<Labelled<CodeVector>*> binaryCodes;
         Random::seed();
@@ -258,7 +267,7 @@ vector<Labelled<CodeVector>*> EnsembleClassifier::generateSamples(
         // Create binary codes for positive samples
         int nrOfPositiveSamples = (int) positiveBoxList.size();
 
-        int nrOfWarps = 3;
+        int nrOfWarps = nrOfWarpsForInitialization;
         int warpNo = 1;
         Frame* currentFrame = frame->clone();
 
@@ -312,16 +321,16 @@ vector<Labelled<CodeVector>*> EnsembleClassifier::generateSamples(
     vector<ScoredBox*> positiveBoxList,
     vector<ScoredBox*> negativeBoxList,
     double varianceThreshold) {
-        double angle = 10.0;
-        double scale = 0.02;
-        double shift = 0.02;
+        double angle = warpingAngleForUpdate;
+        double scale = warpingScaleForUpdate;
+        double shift = warpingShiftForUpdate;
 
         vector<Labelled<CodeVector>*> binaryCodes;
         Random::seed();
 
         int nrOfPositiveSamples = (int) positiveBoxList.size();
 
-        int nrOfWarps = 3;
+        int nrOfWarps = nrOfWarpsForUpdate;
         int warpNo = 1;
         Frame* currentFrame = frame->clone();
 
@@ -391,11 +400,6 @@ void EnsembleClassifier::doTrain(vector<Labelled<CodeVector>*> samples, int mode
                         // printf("%4d. ENC(-) >>> ignore\n", sampleIndex);
                     }
                 }
-
-                // for (int i = 0; i < codeVector->size; i++) {
-                //     printf("%d, ", codeVector->get(i));
-                // }
-                // printf("\n");
             }
         }
     }
@@ -417,7 +421,6 @@ void EnsembleClassifier::updateBaseClassifiers(CodeVector* codeVector, int model
 }
 
 //Classify Logic
-
 bool EnsembleClassifier::classify(Frame* frame, ScoredBox* scoredBox) {
     vector<double> scores(nrOfModels);
     EnsembleScore* score = new EnsembleScore(nrOfModels, nrOfBaseClassifiers);

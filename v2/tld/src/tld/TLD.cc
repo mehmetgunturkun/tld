@@ -10,6 +10,10 @@ void TLDResultSet::add(ScoredBox* scoredBox) {
 TLD::TLD() {
     this->tracker = new StubbedTracker("", 0);
     this->detector = new Detector();
+
+    this->trackedBoxValidationScoreThreshold = 0.7;
+    this->moreConfidentBoxOverlapThreshold = 0.5;
+    this->minimumOverlapToCombine = 0.7;
 }
 
 TLD::TLD(StubbedTracker* tracker, Detector* detector) {
@@ -36,11 +40,8 @@ vector<Box*> TLD::track(Frame* prev, Frame* curr, vector<Box*> prevBoxList) {
     vector<ScoredBox*> scoredBoxList = detector->detect(curr);
     printf(RED("==== Detector is completed ====\n"));
 
-    // printf(WHITE("==== Grouping is started ====\n"));
     vector<TLDResultSet*> resultSetPerModel = groupResults(currentBoxList, scoredBoxList);
-    // printf(WHITE("==== Grouping is started ====\n"));
 
-    // printf(WHITE("==== Integration is started ====\n"));
     vector<Box*> estimatedBoxList;
     for (int modelId = 0; modelId < nrOfModels; modelId++) {
         TLDResultSet* resultSet = resultSetPerModel[modelId];
@@ -57,7 +58,6 @@ vector<Box*> TLD::track(Frame* prev, Frame* curr, vector<Box*> prevBoxList) {
             printf("No valid result for %d!\n", modelId);
         }
     }
-    // printf(WHITE("==== Integration is completed ====\n"));
 
     return estimatedBoxList;
 }
@@ -229,7 +229,7 @@ Option<ScoredBox*> TLD::validate(Frame* current, Box* oldBox, Box* trackedBox, i
             ScoredBox* validatedScoredBox = detector->validate(current, trackedBox, modelId);
             double validatedScore = validatedScoredBox->getScoreValue("nn", modelId);
 
-            if (validatedScore > 0.7) {
+            if (validatedScore > trackedBoxValidationScoreThreshold) {
                 printf("TLD >> Valid box\n");
                 trackedBox->isValid = true;
                 Option<ScoredBox*> someTrackedBox = Option<ScoredBox*>(validatedScoredBox);
@@ -270,7 +270,6 @@ DetectorResult* TLD::partition(vector<ScoredBox*> scoredBoxList, int modelId) {
 }
 
 vector<ScoredBox*> TLD::getMoreConfidentBoxList(ScoredBox* trackScoredBox, vector<ScoredBox*> detectedBoxes, int modelId) {
-    float minOverlap = 0.5;
     vector<ScoredBox*> moreConfidentBoxList;
     int nrOfBoxes = (int) detectedBoxes.size();
 
@@ -282,7 +281,7 @@ vector<ScoredBox*> TLD::getMoreConfidentBoxList(ScoredBox* trackScoredBox, vecto
         float detectScore = scoredBox->getScoreValue("nn", modelId);
 
         float overlap = Box::computeOverlap(trackBox, scoredBox->box);
-        if (overlap < minOverlap && detectScore > trackScore) {
+        if (overlap < moreConfidentBoxOverlapThreshold && detectScore > trackScore) {
             moreConfidentBoxList.push_back(scoredBox);
         }
     }
@@ -304,7 +303,7 @@ Box* TLD::combineClosestBoxes(ScoredBox* trackScoredBox, vector<ScoredBox*> dete
         ScoredBox* scoredBox = detectedBoxes[i];
         Box* box = scoredBox->box;
         float overlap = Box::computeOverlap(trackBox, box);
-        if (overlap > 0.7) {
+        if (overlap > minimumOverlapToCombine) {
             x1 += box->x1;
             y1 += box->y1;
             x2 += box->x2;
