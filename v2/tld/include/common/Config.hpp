@@ -8,6 +8,8 @@
 #include <json/json.h>
 #include <json/value.h>
 
+#include "common/string/StringStream.hpp"
+
 using namespace std;
 
 class Config {

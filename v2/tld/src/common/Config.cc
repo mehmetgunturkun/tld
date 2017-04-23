@@ -22,11 +22,14 @@ vector<string> split(const std::string &s, char delim) {
 
 
 Json::Value getJsonValue(Json::Value root, string key) {
-    vector<string> keys = split(key, '.');
-    Json::Value valuePtr = root[keys[0]];
-    for (int i = 1; i < (int) keys.size(); i++) {
-        valuePtr = valuePtr[keys[i]];
+    StringStream stream = StringStream(key, '.');
+
+    Json::Value valuePtr = root;
+    while (stream.hasNext()) {
+        string subKey = stream.next();
+        valuePtr = valuePtr[subKey];
     }
+
     return valuePtr;
 }
 

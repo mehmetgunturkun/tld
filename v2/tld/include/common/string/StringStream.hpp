@@ -14,6 +14,7 @@ private:
     char delimiter;
 public:
     StringStream(string& str, char delim = ',');
+    bool hasNext();
     string next();
 };
 
