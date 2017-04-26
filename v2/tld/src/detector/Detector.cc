@@ -202,7 +202,7 @@ void Detector::learn(Frame* current, Box* box, vector<ScoredBox*> grids, int mod
         if (isPositive(sample->box)) {
             nrOfPositive += 1;
             score(current, sample);
-            positiveQueue += sample;
+            positiveQueue.append(sample);
             continue;
         }
 

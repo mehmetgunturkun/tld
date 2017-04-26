@@ -16,6 +16,11 @@ public:
         size = nrOfBaseClassifiers;
     }
 
+    CodeVector(vector<int> codes) {
+        this->size = (int) codes.size();
+        this->codes = codes;
+    }
+
     void set(int index, int binaryCode) {
         codes[index] = binaryCode;
     }

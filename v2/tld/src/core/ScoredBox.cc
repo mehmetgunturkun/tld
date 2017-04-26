@@ -27,6 +27,12 @@ double ScoredBox::getScoreValue(string key, int modelId) {
     return score->getValue(modelId);
 }
 
+Score* ScoredBox::remove(string key) {
+    Score* score = scoreMap[key];
+    scoreMap.erase(key);
+    return score;
+}
+
 bool ScoredBox::isClassified(string classifierKey, int modelId) {
     Score* score = getScore(classifierKey);
     if (score == NULL) {
@@ -53,30 +59,16 @@ ScoredBox* ScoredBox::clone() {
     return clone;
 }
 
-ScoredBox* ScoredBox::sum(ScoredBox* other) {
-    Box* summedBox = this->box->sum(other->box);
-    ScoredBox* mergedBox = new ScoredBox(summedBox);
-    for ( auto it = this->scoreMap.begin(); it != this->scoreMap.end(); ++it ) {
-        Score* thisScore = it->second;
-        Score* otherScore = other->scoreMap[it->first];
-
-        Score* newScore = thisScore->sum(otherScore);
-        mergedBox->scoreMap[it->first] = newScore;
-    }
-    return mergedBox;
-}
-
-ScoredBox* ScoredBox::divide(int n) {
-    this->box = this->box->divide(n);
-    for ( auto it = this->scoreMap.begin(); it != this->scoreMap.end(); ++it ) {
-        Score* thisScore = it->second;
-        thisScore = thisScore->divide(n);
-    }
-    return this;
-}
-
 vector<Distance*> computeDistances(vector<ScoredBox*> boxList, int nrOfBoxes);
 vector<ScoredBox*> combineClusters(vector<Cluster*> cluster, vector<ScoredBox*> boxList);
+
+template <typename T>
+void free_vector(vector<T*> vector) {
+    int size = (int) vector.size();
+    for (int i = 0; i < size; i++) {
+        delete vector[i];
+    }
+}
 
 vector<ScoredBox*> ScoredBox::cluster(vector<ScoredBox*> boxList, int nrOfBoxes) {
     if (nrOfBoxes == 1) {
@@ -86,6 +78,10 @@ vector<ScoredBox*> ScoredBox::cluster(vector<ScoredBox*> boxList, int nrOfBoxes)
     vector<Distance*> distances = computeDistances(boxList, nrOfBoxes);
     vector<Cluster*> clusters = Cluster::build(distances, (int) distances.size(), 0.5);
     vector<ScoredBox*> clusteredBoxes = combineClusters(clusters, boxList);
+
+    free_vector(distances);
+    free_vector(clusters);
+
     return clusteredBoxes;
 
 }
@@ -139,4 +135,26 @@ ScoredBox* ScoredBox::merge(vector<ScoredBox*> scoredBoxList, int nrOfBoxes) {
     }
     tempBox = tempBox->divide(nrOfBoxes);
     return tempBox;
+}
+
+ScoredBox* ScoredBox::sum(ScoredBox* other) {
+    Box* summedBox = this->box->sum(other->box);
+    ScoredBox* mergedBox = new ScoredBox(summedBox);
+    for ( auto it = this->scoreMap.begin(); it != this->scoreMap.end(); ++it ) {
+        Score* thisScore = it->second;
+        Score* otherScore = other->scoreMap[it->first];
+
+        Score* newScore = thisScore->sum(otherScore);
+        mergedBox->scoreMap[it->first] = newScore;
+    }
+    return mergedBox;
+}
+
+ScoredBox* ScoredBox::divide(int n) {
+    this->box = this->box->divide(n);
+    for ( auto it = this->scoreMap.begin(); it != this->scoreMap.end(); ++it ) {
+        Score* thisScore = it->second;
+        thisScore = thisScore->divide(n);
+    }
+    return this;
 }

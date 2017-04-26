@@ -347,19 +347,22 @@ vector<Labelled<CodeVector>*> EnsembleClassifier::generateSamples(
                 CodeVector* codeVector = generateBinaryCode(currentFrame, box);
                 binaryCodes.push_back(new Labelled<CodeVector>(codeVector, 1));
             }
-
+            delete currentFrame;
             currentFrame = Frame::warp(frame, boxHull, angle, scale, shift);
+
+            //currentFrame = Frame::warp(frame, boxHull, angle, scale, shift);
             warpNo++;
         } while (warpNo <= nrOfWarps);
 
-        free(bbHull);
-        free(boxHull);
+        delete bbHull;
+        delete boxHull;
 
         // Create binary codes for negative samples
         int nrOfNegativeSamples = (int) negativeBoxList.size();
         for (int i = 0; i < nrOfNegativeSamples; i++) {
             EnsembleScore* score = (EnsembleScore*) negativeBoxList[i]->getScore("ensemble");
-            CodeVector* codeVector = score->getCodeVector();
+            CodeVector* cv = score->binaryCodes;
+            CodeVector* codeVector = new CodeVector(cv->codes);
             binaryCodes.push_back(new Labelled<CodeVector>(codeVector, 0));
         }
 

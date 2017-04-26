@@ -22,6 +22,7 @@ public:
 
     ScoredBox* withScore(string key, Score* score);
     Score* getScore(string key);
+    Score* remove(string key);
     double getScoreValue(string key, int modelId);
 
     bool isClassified(string classifierKey, int modelId);

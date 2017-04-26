@@ -93,6 +93,8 @@ bool NearestNeighborClassifier::validate(Frame* frame, ScoredBox* scoredBox, int
         // printf("Low conservative score - %f!\n", conservativeScore);
     }
 
+    delete objectScore;
+
     NNScore* score = new NNScore(patch, relativeScores, conservativeScores);
     score->isAnyModellClassified = anyModelClassified;
 
@@ -120,20 +122,24 @@ bool NearestNeighborClassifier::evaluate(Frame* frame, Box* box, double minVaria
     ObjectModel* model = models[modelId];
     ObjectScore* objectScore = model->computeScore(patch);
 
-    printf("EVALUATE >> %s, %3.5f\n", box->toCharArr(), objectScore->relativeScore);
+    printf("EVALUATE >> %s, %3.5f\n", box->toTLDString().c_str(), objectScore->relativeScore);
 
+    bool evaluationsResult = true;
     if (objectScore->relativeScore < minimumRelativeScoreForEvaluation) {
         printf("NN >> Fast Change\n");
-        return false;
+        evaluationsResult = false;
     }
 
     double patchVariance = computePatchVariance(patch);
     if (patchVariance < minVariance) {
         printf("NN >> Low Variance\n");
-        return false;
+        evaluationsResult = false;
     }
 
-    return true;
+    delete patch;
+    delete objectScore;
+
+    return evaluationsResult;
 }
 
 void NearestNeighborClassifier::dumpNearestNeighborClassifier() {

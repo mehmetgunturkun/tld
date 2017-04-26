@@ -110,9 +110,9 @@ bool Sequence::hasNext() {
         println("There are no frames");
     }
 
-    bool belowTheLimit = processedFrames < limit;
+    bool belowTheLimit = processedFrames <= limit;
     if (!belowTheLimit) {
-        println("Exceeded The Limit: %d >= %d", processedFrames, limit);
+        println("Exceeded The Limit: %d > %d", processedFrames, limit);
     }
     return hasMoreFrames && belowTheLimit;
 }

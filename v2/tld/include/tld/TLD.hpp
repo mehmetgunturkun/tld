@@ -34,6 +34,7 @@ public:
 
     TLD();
     TLD(StubbedTracker* tracker, Detector* detector);
+    ~TLD();
 
     vector<Box*> init(Frame* frame, vector<Box*> boxList);
 

@@ -33,6 +33,7 @@ public:
     vector<Box*> mockedBoxList;
 
     StubbedTracker(string fileName, int nrOfFrames);
+    ~StubbedTracker();
     vector<Box*> track(Frame* prev, Frame* curr, vector<Box*> boxList);
 };
 

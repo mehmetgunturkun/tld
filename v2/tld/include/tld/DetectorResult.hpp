@@ -9,7 +9,7 @@ using namespace std;
 class DetectorResult {
 public:
     bool isValid;
-
+    vector<ScoredBox*> allBoxList;
     vector<ScoredBox*> highVarianceBoxList;
     vector<ScoredBox*> candidateBoxList;
     vector<ScoredBox*> detectedBoxList;
@@ -20,5 +20,6 @@ public:
                    vector<ScoredBox*> detectedBoxList,
                    vector<ScoredBox*> clusteredBoxList,
                    int modelId);
+   ~DetectorResult();
 };
 #endif

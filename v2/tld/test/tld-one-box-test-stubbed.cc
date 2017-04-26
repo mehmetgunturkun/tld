@@ -9,7 +9,7 @@ int main(int argc, char** args) {
     Arguments arguments = Arguments(argc, args);
 
     string key = arguments.getString("sequence");
-    int limit = arguments.getIntOrDefault("limit", 0);
+    int limit = arguments.getIntOrDefault("limit", NO_LIMIT);
 
     printf("Going to run for %s\n", key.c_str());
     Sequence sequence = Sequence(key, 0, limit);
@@ -31,16 +31,16 @@ int main(int argc, char** args) {
     TLD* tld = new TLD();
     tld->tracker = tracker;
 
-    boxList = tld->init(firstFrame, boxList);
+    vector<Box*> correctedBoxList = tld->init(firstFrame, boxList);
 
     Frame* previous = firstFrame;
-    while (sequence.hasNext() && previous->id < 150) {
+    while (sequence.hasNext()) {
         Frame* current = sequence.next();
         printf("Frame(%d) >> Frame(%d)\n", previous->id, current->id);
 
-        boxList = tld->track(previous, current, boxList);
+        vector<Box*> currentCorrectedBoxList = tld->track(previous, current, correctedBoxList);
 
-        Box* box = boxList[0];
+        Box* box = currentCorrectedBoxList[0];
         ImageBuilder* builder = new ImageBuilder(current);
         if (box != nullptr) {
             // string boxString = box->toTLDString();
@@ -50,8 +50,19 @@ int main(int argc, char** args) {
             printf("Frame(%d) >> Frame(%d) FAILED\n", previous->id, current->id);
             builder->display(1);
         }
+
+        for (int i = 0; i < 1; i++) {
+            delete correctedBoxList[i];
+        }
+
+        correctedBoxList = currentCorrectedBoxList;
+
+        delete previous;
         previous = current;
     }
+
+    delete previous;
+    delete tld;
 
     return EXIT_SUCCESS;
 }

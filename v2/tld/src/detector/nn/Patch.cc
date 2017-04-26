@@ -113,6 +113,8 @@ IplImage* convertToDoubleWithDoubles(IplImage* m, Box* b) {
     H[8] = 1.0;
 
     IplImage* warpedPatch = Warp::warp(m, H, xmin, ymin, xmax, ymax);
+    free(H);
+    
     for (int i = 0; i < warpedPatch->height; i++) {
         for (int j = 0; j < warpedPatch->width; j++) {
             double pixel = CV_IMAGE_ELEM(warpedPatch, double, i, j);

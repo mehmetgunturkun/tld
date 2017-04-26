@@ -8,7 +8,7 @@ void TLDResultSet::add(ScoredBox* scoredBox) {
 }
 
 TLD::TLD() {
-    this->tracker = new StubbedTracker("", 0);
+    this->tracker = (StubbedTracker*) NULL;
     this->detector = new Detector();
 
     this->trackedBoxValidationScoreThreshold = 0.7;
@@ -22,10 +22,16 @@ TLD::TLD(StubbedTracker* tracker, Detector* detector) {
     this->nrOfModels = 0;
 }
 
+TLD::~TLD() {
+    delete tracker;
+    delete detector;
+}
+
 vector<Box*> TLD::init(Frame* frame, vector<Box*> boxList) {
     this->nrOfModels = (int) boxList.size();
 
     vector<Box*> correctedBox = detector->init(frame, boxList);
+    printf("Initialization is completed\n");
     return correctedBox;
 }
 
@@ -36,9 +42,9 @@ vector<Box*> TLD::track(Frame* prev, Frame* curr, vector<Box*> prevBoxList) {
     vector<Box*> currentBoxList = tracker->track(prev, curr, prevBoxList);
     printf(GREEN("==== Tracker is completed ====\n"));
 
-    printf(RED("==== Detector is started ====\n"));
+    // printf(RED("==== Detector is started ====\n"));
     vector<ScoredBox*> scoredBoxList = detector->detect(curr);
-    printf(RED("==== Detector is completed ====\n"));
+    // printf(RED("==== Detector is completed ====\n"));
 
     vector<TLDResultSet*> resultSetPerModel = groupResults(currentBoxList, scoredBoxList);
 
@@ -57,6 +63,8 @@ vector<Box*> TLD::track(Frame* prev, Frame* curr, vector<Box*> prevBoxList) {
             estimatedBoxList.push_back(nullptr);
             printf("No valid result for %d!\n", modelId);
         }
+
+        delete resultSet;
     }
 
     return estimatedBoxList;
@@ -145,7 +153,7 @@ Option<Box*> TLD::integrate(Frame* frame, Box* oldBox, Box* maybeTrackedBox, vec
                 ScoredBox* detectedBox = moreConfidentBoxList[0];
                 // ImageBuilder* builder = new ImageBuilder(frame);
                 // builder->withBox(detectedBox->box, Colors::BLUE)->withTitle("override")->display(0);
-                Box* box = detectedBox->box;
+                Box* box = detectedBox->box->clone();
                 box->isValid = false;
                 shouldLearn = false;
                 maybeFinalBox = Option<Box*>(box);
@@ -161,8 +169,11 @@ Option<Box*> TLD::integrate(Frame* frame, Box* oldBox, Box* maybeTrackedBox, vec
         } else {
             // Detector.Fail
             printf("Tracker OK, Detector FAILED\n");
-            maybeFinalBox = Option<Box*>(scoredTrackBox->box);
+            Box* trackedBox = scoredTrackBox->box->clone();
+            maybeFinalBox = Option<Box*>(trackedBox);
         }
+
+        delete scoredTrackBox;
     } else {
         // Tracker.Fail
         if (detectedBoxList.size() > 0) {
@@ -170,7 +181,7 @@ Option<Box*> TLD::integrate(Frame* frame, Box* oldBox, Box* maybeTrackedBox, vec
                 printf("Tracker FAIL, Detector ONE-BOX\n");
                 // Detector.Success
                 ScoredBox* detectedBox = clusteredBoxList[0];
-                maybeFinalBox = Option<Box*>(detectedBox->box);
+                maybeFinalBox = Option<Box*>(detectedBox->box->clone());
             } else if (clusteredBoxList.size() > 1) {
                 // There are multiple boxes no way to decide!
                 printf("Tracker FAIL, Detector MULTIPLE-BOX\n");
@@ -188,17 +199,18 @@ Option<Box*> TLD::integrate(Frame* frame, Box* oldBox, Box* maybeTrackedBox, vec
     }
 
     // Evaluation
-    printf(CYAN("==== Evaluate is started ====\n"));
+    // printf(CYAN("==== Evaluate is started ====\n"));
     if (maybeFinalBox.isDefined() && maybeFinalBox.get()->isValid) {
         Box* finalBox = maybeFinalBox.get();
         bool evaluateResult = detector->evaluate(frame, finalBox, modelId);
         finalBox->isValid = evaluateResult;
         shouldLearn = evaluateResult;
     }
-    printf(CYAN("==== Evaluate is completed ====\n"));
+    // printf(CYAN("==== Evaluate is completed ====\n"));
 
     // Learning
-    printf(YELLOW("==== Learner is started ====\n"));
+    // printf(YELLOW("==== Learner is started ====\n"));
+    // shouldLearn = false;
     if (shouldLearn) {
         Box* finalBox = maybeFinalBox.get();
         printf("Going to learn %s\n", finalBox->toCharArr());
@@ -207,7 +219,9 @@ Option<Box*> TLD::integrate(Frame* frame, Box* oldBox, Box* maybeTrackedBox, vec
     } else {
         printf("Not going to learn\n");
     }
-    printf(YELLOW("==== Learner is completed ====\n"));
+    // printf(YELLOW("==== Learner is completed ====\n"));
+
+    delete detectorResult;
 
     return maybeFinalBox;
 };

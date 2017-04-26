@@ -52,6 +52,24 @@ public:
         }
     }
 
+
+    void append(T* item) {
+        if (this->limit == UNLIMITED) {
+            this->push_back(item);
+        } else {
+            int index = getNextIndex(item);
+            this->insert(this->begin() + index, item);
+            this->count += 1;
+
+            if (this->count > this->limit) {
+                T* lastItem = this->back();
+
+                this->count -= 1;
+                this->pop_back();
+            }
+        }
+    }
+
     vector<T*> toVector() {
         vector<T*> vect;
         for (int i = 0; i < this->count; i++) {
