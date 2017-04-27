@@ -72,7 +72,8 @@ void free_vector(vector<T*> vector) {
 
 vector<ScoredBox*> ScoredBox::cluster(vector<ScoredBox*> boxList, int nrOfBoxes) {
     if (nrOfBoxes == 1) {
-        return boxList;
+        vector<ScoredBox*> clusteredBoxes = { boxList[0]->clone() };
+        return clusteredBoxes;
     }
 
     vector<Distance*> distances = computeDistances(boxList, nrOfBoxes);
@@ -138,16 +139,15 @@ ScoredBox* ScoredBox::merge(vector<ScoredBox*> scoredBoxList, int nrOfBoxes) {
 }
 
 ScoredBox* ScoredBox::sum(ScoredBox* other) {
-    Box* summedBox = this->box->sum(other->box);
-    ScoredBox* mergedBox = new ScoredBox(summedBox);
+    this->box = this->box->sum(other->box);
     for ( auto it = this->scoreMap.begin(); it != this->scoreMap.end(); ++it ) {
         Score* thisScore = it->second;
         Score* otherScore = other->scoreMap[it->first];
 
         Score* newScore = thisScore->sum(otherScore);
-        mergedBox->scoreMap[it->first] = newScore;
+        this->scoreMap[it->first] = newScore;
     }
-    return mergedBox;
+    return this;
 }
 
 ScoredBox* ScoredBox::divide(int n) {

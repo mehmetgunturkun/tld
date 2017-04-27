@@ -19,8 +19,11 @@ public:
     IplImage* data;
 
     Patch(Frame* frame, Box* box);
+    Patch(IplImage* data);
     ~Patch();
+
     string toString();
+    Patch* clone();
 
     static double computeVariance(Patch* patch);
 

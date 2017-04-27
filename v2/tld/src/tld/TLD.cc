@@ -42,9 +42,9 @@ vector<Box*> TLD::track(Frame* prev, Frame* curr, vector<Box*> prevBoxList) {
     vector<Box*> currentBoxList = tracker->track(prev, curr, prevBoxList);
     printf(GREEN("==== Tracker is completed ====\n"));
 
-    // printf(RED("==== Detector is started ====\n"));
+    printf(RED("==== Detector is started ====\n"));
     vector<ScoredBox*> scoredBoxList = detector->detect(curr);
-    // printf(RED("==== Detector is completed ====\n"));
+    printf(RED("==== Detector is completed ====\n"));
 
     vector<TLDResultSet*> resultSetPerModel = groupResults(currentBoxList, scoredBoxList);
 
@@ -67,6 +67,11 @@ vector<Box*> TLD::track(Frame* prev, Frame* curr, vector<Box*> prevBoxList) {
         delete resultSet;
     }
 
+    int n = (int) scoredBoxList.size();
+    for (int i = 0; i < n; i++) {
+        ScoredBox* sb = scoredBoxList[i];
+        delete sb;
+    }
     return estimatedBoxList;
 }
 
@@ -126,17 +131,17 @@ void display(Frame* frame, vector<ScoredBox*> b1, vector<ScoredBox*> b2, vector<
 }
 
 Option<Box*> TLD::integrate(Frame* frame, Box* oldBox, Box* maybeTrackedBox, vector<ScoredBox*> scoredBoxList, int modelId) {
-    DEBUG(YELLOW("==== Validation is started ====\n"));
+    DEBUG(GREEN("==== Validation is started ====\n"));
     Option<ScoredBox*> maybeScoredBox = validate(frame, oldBox, maybeTrackedBox, modelId);
-    DEBUG(YELLOW("==== Validation is completed ====\n"));
+    DEBUG(GREEN("==== Validation is completed ====\n"));
 
-    DEBUG(YELLOW("==== Partitioning is started ====\n"));
+    DEBUG(RED("==== Partitioning is started ====\n"));
     DetectorResult* detectorResult = partition(scoredBoxList, modelId);
     vector<ScoredBox*> highVarianceBoxList = detectorResult->highVarianceBoxList;
     vector<ScoredBox*> candidateBoxList = detectorResult->candidateBoxList;
     vector<ScoredBox*> detectedBoxList = detectorResult->detectedBoxList;
     vector<ScoredBox*> clusteredBoxList = detectorResult->clusteredBoxList;
-    DEBUG(YELLOW("==== Partitioning is completed ====\n"));
+    DEBUG(RED("==== Partitioning is completed ====\n"));
 
 
     bool shouldLearn = false;
@@ -199,18 +204,17 @@ Option<Box*> TLD::integrate(Frame* frame, Box* oldBox, Box* maybeTrackedBox, vec
     }
 
     // Evaluation
-    // printf(CYAN("==== Evaluate is started ====\n"));
+    printf(CYAN("==== Evaluate is started ====\n"));
     if (maybeFinalBox.isDefined() && maybeFinalBox.get()->isValid) {
         Box* finalBox = maybeFinalBox.get();
         bool evaluateResult = detector->evaluate(frame, finalBox, modelId);
         finalBox->isValid = evaluateResult;
         shouldLearn = evaluateResult;
     }
-    // printf(CYAN("==== Evaluate is completed ====\n"));
+    printf(CYAN("==== Evaluate is completed ====\n"));
 
     // Learning
-    // printf(YELLOW("==== Learner is started ====\n"));
-    // shouldLearn = false;
+    printf(YELLOW("==== Learner is started ====\n"));
     if (shouldLearn) {
         Box* finalBox = maybeFinalBox.get();
         printf("Going to learn %s\n", finalBox->toCharArr());
@@ -219,10 +223,9 @@ Option<Box*> TLD::integrate(Frame* frame, Box* oldBox, Box* maybeTrackedBox, vec
     } else {
         printf("Not going to learn\n");
     }
-    // printf(YELLOW("==== Learner is completed ====\n"));
+    printf(YELLOW("==== Learner is completed ====\n"));
 
     delete detectorResult;
-
     return maybeFinalBox;
 };
 
@@ -238,7 +241,7 @@ Option<ScoredBox*> TLD::validate(Frame* current, Box* oldBox, Box* trackedBox, i
             return none;
         } else {
             trackedBox->isValid = oldBox->isValid;
-            println("TRACKEDBOX >>> %s", trackedBox->toCharArr());
+            println("TRACKEDBOX >>> %s", trackedBox->toString().c_str());
 
             ScoredBox* validatedScoredBox = detector->validate(current, trackedBox, modelId);
             double validatedScore = validatedScoredBox->getScoreValue("nn", modelId);
@@ -272,13 +275,14 @@ DetectorResult* TLD::partition(vector<ScoredBox*> scoredBoxList, int modelId) {
             detectedBoxList.push_back(scoredBox);
         }
     }
-    printf(YELLOW("==== Clustering is started ====\n"));
+    printf(RED("==== Clustering is started ====\n"));
     vector<ScoredBox*> clusteredBoxList = ScoredBox::cluster(detectedBoxList, (int) detectedBoxList.size());
-    printf(YELLOW("==== Clustering is completed ====\n"));
 
     for (int i = 0; i < (int) clusteredBoxList.size(); i++) {
-        printf("CB >> %s, %f\n", clusteredBoxList[i]->box->toCharArr(), clusteredBoxList[i]->getScoreValue("nn", 0));
+        printf("CB >> %s, %f\n", clusteredBoxList[i]->box->toTLDString().c_str(), clusteredBoxList[i]->getScoreValue("nn", 0));
     }
+    printf(RED("==== Clustering is completed ====\n"));
+
 
     return new DetectorResult(scoredBoxList, candidateBoxList, detectedBoxList, clusteredBoxList, modelId);
 }

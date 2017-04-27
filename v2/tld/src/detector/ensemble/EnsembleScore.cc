@@ -29,22 +29,22 @@ CodeVector* EnsembleScore::getCodeVector() {
 
 Score* EnsembleScore::clone() {
     EnsembleScore* clone = new EnsembleScore(this->scores);
-    clone->binaryCodes = this->binaryCodes;
+    CodeVector* codeVector = new CodeVector(this->binaryCodes->codes);
+    clone->binaryCodes = codeVector;
     return clone;
 }
 
 Score* EnsembleScore::sum(Score* other) {
     EnsembleScore* otherEnsembleScore = (EnsembleScore*) other;
-    EnsembleScore* newEnsembleScore = (EnsembleScore*) this->clone();
 
     int n = (int) scores.size();
     for (int i = 0; i < n; i++) {
         float thisScore = scores[i];
         float otherScore = otherEnsembleScore->scores[i];
-        newEnsembleScore->scores[i] = thisScore + otherScore;
+        scores[i] = thisScore + otherScore;
     }
 
-    return newEnsembleScore;
+    return this;
 }
 
 Score* EnsembleScore::divide(int n) {

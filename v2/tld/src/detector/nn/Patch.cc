@@ -37,6 +37,11 @@ Patch::Patch(Frame* frame, Box* box) {
     data = patch;
 }
 
+Patch::Patch(IplImage* data) {
+    id = 0;
+    this->data = data;
+}
+
 Patch::~Patch() {
     cvReleaseImage(&data);
 }
@@ -114,7 +119,7 @@ IplImage* convertToDoubleWithDoubles(IplImage* m, Box* b) {
 
     IplImage* warpedPatch = Warp::warp(m, H, xmin, ymin, xmax, ymax);
     free(H);
-    
+
     for (int i = 0; i < warpedPatch->height; i++) {
         for (int j = 0; j < warpedPatch->width; j++) {
             double pixel = CV_IMAGE_ELEM(warpedPatch, double, i, j);
@@ -166,4 +171,11 @@ double Patch::computeVariance(Patch* patch) {
 
     variance = variance / 224;
     return variance;
+}
+
+
+Patch* Patch::clone() {
+    IplImage* clonedData = cvCloneImage(this->data);
+    Patch* clonedPatch = new Patch(clonedData);
+    return clonedPatch;
 }

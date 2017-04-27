@@ -39,17 +39,17 @@ int main(int argc, char** args) {
         printf("Frame(%d) >> Frame(%d)\n", previous->id, current->id);
 
         vector<Box*> currentCorrectedBoxList = tld->track(previous, current, correctedBoxList);
+        ImageBuilder* builder = new ImageBuilder(current);
 
         Box* box = currentCorrectedBoxList[0];
-        ImageBuilder* builder = new ImageBuilder(current);
         if (box != nullptr) {
             // string boxString = box->toTLDString();
             builder->withBox(box);
-            builder->display(1);
         } else {
             printf("Frame(%d) >> Frame(%d) FAILED\n", previous->id, current->id);
-            builder->display(1);
         }
+
+        builder->display(1);
 
         for (int i = 0; i < 1; i++) {
             delete correctedBoxList[i];

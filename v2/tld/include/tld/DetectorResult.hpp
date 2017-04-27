@@ -9,7 +9,6 @@ using namespace std;
 class DetectorResult {
 public:
     bool isValid;
-    vector<ScoredBox*> allBoxList;
     vector<ScoredBox*> highVarianceBoxList;
     vector<ScoredBox*> candidateBoxList;
     vector<ScoredBox*> detectedBoxList;

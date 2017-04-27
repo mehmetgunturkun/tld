@@ -20,7 +20,7 @@ NNScore::~NNScore() {
 
 Score* NNScore::clone() {
     NNScore* clone = new NNScore();
-    clone->patch = this->patch;
+    clone->patch = this->patch->clone();
     clone->relativeScores =this->relativeScores;
     clone->conservativeScores = this->conservativeScores;
     return clone;
@@ -28,20 +28,19 @@ Score* NNScore::clone() {
 
 Score* NNScore::sum(Score* other) {
     NNScore* otherNNScore = (NNScore*) other;
-    NNScore* newNNScore = (NNScore*) this->clone();
     int nrOfModels = (int) this->relativeScores.size();
 
     for (int i = 0; i < nrOfModels; i++) {
         double thisRelativeScore = relativeScores[i];
         double otherRelativeScore = otherNNScore->relativeScores[i];
-        newNNScore->relativeScores[i] = thisRelativeScore + otherRelativeScore;
+        this->relativeScores[i] = thisRelativeScore + otherRelativeScore;
 
         double thisConervativeScore = conservativeScores[i];
         double otherConservativeScore = otherNNScore->conservativeScores[i];
-        newNNScore->conservativeScores[i] = thisConervativeScore + otherConservativeScore;
+        this->conservativeScores[i] = thisConervativeScore + otherConservativeScore;
     }
 
-    return newNNScore;
+    return this;
 }
 
 Score* NNScore::divide(int n) {
