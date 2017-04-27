@@ -42,6 +42,7 @@ lib2_sources := \
 	src/core/ScoredBox.cc \
 	src/tracker/FBPoint.cc \
 	src/tracker/Tracker.cc \
+	src/tracker/LKTracker.cc \
 	src/tracker/StubbedTracker.cc \
 	src/detector/core/BoxIterator.cc \
 	src/detector/ensemble/EnsembleScore.cc \

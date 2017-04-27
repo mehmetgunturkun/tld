@@ -48,7 +48,6 @@ StubbedTracker::~StubbedTracker() {
 
 vector<Box*> StubbedTracker::track(Frame* prev, Frame* curr, vector<Box*> boxList) {
     int nrOfModels = (int) boxList.size();
-
     Box* inputBox = boxList[0];
     Box* outputBox = mockedBoxList[currentFrame];
 
@@ -62,8 +61,8 @@ vector<Box*> StubbedTracker::track(Frame* prev, Frame* curr, vector<Box*> boxLis
     vector<Box*> nextBoxList;
     printf("TRACKER(OUT): ");
     if (outputBox != NULL) {
-        Box* clonedOutputBox = outputBox->clone();
         for (int i = 0; i < nrOfModels; i++) {
+            Box* clonedOutputBox = outputBox->clone();
             nextBoxList.push_back(clonedOutputBox);
         }
         outputBox->print();

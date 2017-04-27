@@ -4,7 +4,9 @@
 #include "core/ScoredBox.hpp"
 
 #include "tracker/Tracker.hpp"
+#include "tracker/LKTracker.hpp"
 #include "tracker/StubbedTracker.hpp"
+
 #include "detector/Detector.hpp"
 
 #include "tld/TrackerResult.hpp"
@@ -25,7 +27,7 @@ class TLD {
 public:
     int nrOfModels;
 
-    StubbedTracker* tracker;
+    Tracker* tracker;
     Detector* detector;
 
     double trackedBoxValidationScoreThreshold;
@@ -33,7 +35,7 @@ public:
     double minimumOverlapToCombine;
 
     TLD();
-    TLD(StubbedTracker* tracker, Detector* detector);
+    TLD(Tracker* tracker, Detector* detector);
     ~TLD();
 
     vector<Box*> init(Frame* frame, vector<Box*> boxList);

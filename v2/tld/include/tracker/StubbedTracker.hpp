@@ -1,7 +1,5 @@
-
 #ifndef STUBBED_TRACKER_H
 #define STUBBED_TRACKER_H
-
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -22,12 +20,14 @@
 #include "core/Sequence.hpp"
 #include "common/Arguments.hpp"
 
+#include "tracker/Tracker.hpp"
+
 using namespace std;
 using namespace cv;
 
 #define margin 5.0
 
-class StubbedTracker {
+class StubbedTracker: public Tracker {
 public:
     int currentFrame;
     vector<Box*> mockedBoxList;

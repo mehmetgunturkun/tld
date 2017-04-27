@@ -8,7 +8,7 @@ void TLDResultSet::add(ScoredBox* scoredBox) {
 }
 
 TLD::TLD() {
-    this->tracker = (StubbedTracker*) NULL;
+    this->tracker = new LKTracker();
     this->detector = new Detector();
 
     this->trackedBoxValidationScoreThreshold = 0.7;
@@ -16,7 +16,7 @@ TLD::TLD() {
     this->minimumOverlapToCombine = 0.7;
 }
 
-TLD::TLD(StubbedTracker* tracker, Detector* detector) {
+TLD::TLD(Tracker* tracker, Detector* detector) {
     this->tracker = tracker;
     this->detector = detector;
     this->nrOfModels = 0;
