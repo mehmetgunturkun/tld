@@ -11,11 +11,16 @@ ImageBuilder::ImageBuilder(Mat img) {
 
 ImageBuilder::ImageBuilder(Frame* frame) {
     this->title = "Default";
-    this->img = cvarrToMat(cvCloneImage(frame->originalImage));
+
+    IplImage* dest = cvCreateImage(cvGetSize(frame->originalImage), frame->originalImage->depth, 3);
+    cvCvtColor(frame->originalImage, dest, CV_GRAY2RGB);
+    this->img = cvarrToMat(dest);
 }
 
 ImageBuilder ImageBuilder::withFrame(Frame* frame) {
-    this->img = cvarrToMat(cvCloneImage(frame->originalImage));
+    IplImage* dest = cvCreateImage(cvGetSize(frame->originalImage), frame->originalImage->depth, 3);
+    cvCvtColor(frame->originalImage, dest, CV_GRAY2RGB);
+    this->img = cvarrToMat(dest);
     return *this;
 }
 
@@ -33,6 +38,12 @@ ImageBuilder ImageBuilder::withTitle(string title) {
     this->title = title;
     return *this;
 }
+
+ImageBuilder ImageBuilder::withCircle(Point2f* center, int radius) {
+    cv::circle(img, *center, radius, Colors::RED);
+    return *this;
+}
+
 
 void ImageBuilder::display(int delay) {
     cv::imshow(this->title, this->img);
