@@ -1,4 +1,18 @@
-#include "tld/PartTLD.hpp"
+#include "parttld/PartTLD.hpp"
+
+Orientation::Orientation(Box* root, Box* part) {
+    double rootX = (root->x1 + root->x2) / 2;
+    double rootY = (root->y1 + root->y2) / 2;
+
+    double partX = (part->x1 + part->x2) / 2;
+    double partY = (part->y1 + part->y2) / 2;
+
+    double dx = partX - rootX;
+    double dy = partY - rootY;
+
+    this->p = sqrt(dx * dx + dy * dy);
+    this->theta = atan2(dy, dx) * 180.0 / PI;
+}
 
 Point2f* Orientation::computeTheVotingCenter(Box* box) {
     double mid_x = (box->x1 + box->x2) / 2;
@@ -39,6 +53,12 @@ Shape* PartTLD::init(Frame* frame, Box* initBox) {
     nrOfParts = (int) parts.size();
 
     vector<Box*> correctedParts = tld->init(frame, parts);
+    for (int i = 0; i < nrOfParts; i++) {
+        Box* correctedPart = correctedParts[i];
+        Orientation* orientation_i = new Orientation(initBox, correctedPart);
+        orientations[i] = orientation_i;
+    }
+
     Shape* shape0 = new Shape(correctedParts);
     return shape0;
 }
@@ -46,25 +66,37 @@ Shape* PartTLD::init(Frame* frame, Box* initBox) {
 Shape* PartTLD::track(Frame* prev, Frame* current, Shape* shape0) {
     vector<Box*> parts0 = shape0->parts;
     vector<Box*> parts1 = tld->track(prev, current, parts0);
-
     Shape* shape1 = createShape(this->nrOfParts, parts1);
     return shape1;
 }
 
 Shape* PartTLD::createShape(int nrOfParts, vector<Box*> parts) {
     Shape* shape1 = new Shape(parts);
+    VotingSpace* votingSpace = new VotingSpace();
 
     for (int i = 0; i < nrOfParts; i++) {
         Box* part_i = parts[i];
         if (part_i != nullptr) {
             Orientation* orientation_i = orientations[i];
-            voteForShape(shape1, part_i, orientation_i);
+            voteForShape(votingSpace, part_i, orientation_i);
         }
     }
 
+    Point2f* center = votingSpace->result();
+    shape1->center = center;
     return shape1;
 }
 
-void PartTLD::voteForShape(Shape* shape, Box* box, Orientation* orientation) {
+void PartTLD::voteForShape(VotingSpace* votingSpace, Box* box, Orientation* orientation) {
     // Use the correct data structure
+    Point2f* votingCenter = orientation->computeTheVotingCenter(box);
+
+    int x = (int) votingCenter->x;
+    int y = (int) votingCenter->y;
+
+    for (int i = y - 50; i <  y + 50; i++) {
+        for (int j = x - 50; j < x + 50; j++) {
+            votingSpace->vote(j, i, 0);
+        }
+    }
 }

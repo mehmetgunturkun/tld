@@ -62,7 +62,8 @@ lib2_sources := \
 	src/tld/DetectorResult.cc \
 	src/tld/TrackerResult.cc \
 	src/tld/TLD.cc \
-	src/tld/PartTLD.cc
+	src/parttld/VotingSpace.cc \
+	src/parttld/PartTLD.cc
 
 lib2_objects := $(patsubst %.cc,%.o,$(lib2_sources))
 lib2_target  := libtld.a

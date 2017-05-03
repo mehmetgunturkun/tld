@@ -27,6 +27,13 @@ int kd_insert2(struct kdtree *tree, double x, double y, void *data)
 	return kd_insert(tree, buf, data);
 }
 
+struct kdres* kd_nearest_n2(struct kdtree* tree, double x, double y, int num) {
+    double pos[2];
+    pos[0] = x;
+    pos[1] = y;
+    return kd_nearest_n(tree, pos, num);
+}
+
 struct kdres *kd_nearest_range2(struct kdtree *tree, double x, double y, double range)
 {
 	double buf[2];
@@ -48,8 +55,12 @@ int main(int argc, char **argv) {
     kd_insert2(kd, 1, 0, 0);
     kd_insert2(kd, 1, 0, 0);
 
+	kd_insert2(kd, 2, 0, 0);
+	kd_insert2(kd, 2, 1, 0);
+	kd_insert2(kd, 2, 2, 0);
+
 	start = get_msec();
-	set1 = kd_nearest_range2(kd, 0, 0, 1.00000001);
+	set1 = kd_nearest_n2(kd, 0, 0, 10);
 	msec = get_msec() - start;
 	printf("range query returned %d items in %.5f sec\n", kd_res_size(set1), (float)msec / 1000.0);
 	kd_res_free(set1);

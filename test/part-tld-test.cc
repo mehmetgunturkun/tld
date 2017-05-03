@@ -3,7 +3,7 @@
 
 #include "common/Arguments.hpp"
 #include "core/Sequence.hpp"
-#include "tld/PartTLD.hpp"
+#include "parttld/PartTLD.hpp"
 
 int main(int argc, char** args) {
     Arguments arguments = Arguments(argc, args);
@@ -46,6 +46,8 @@ int main(int argc, char** args) {
                 printf("Frame(%d) >> Frame(%d) FAILED\n", previous->id, current->id);
             }
         }
+
+        builder->withCircle(shape1->center, 10);
 
         builder->display(1);
 
