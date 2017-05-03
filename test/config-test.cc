@@ -1,32 +1,25 @@
-#include <cstdlib>
-#include <cstdio>
-#include <cstring>
-#include <string.h>
-#include <iostream>
-#include <fstream>
 
+#include "common/string/StringStream.hpp"
 #include "common/Config.hpp"
 
 int main(int argc, char** argv) {
 
-    Config* config = new Config("resources/tld.json");
+    string path = "object1.field1.field2.attribute1.value1";
+    StringStream stream = StringStream(path, '.');
+    while (stream.hasNext()) {
+        printf("%s\n", stream.next().c_str());
+    }
 
-    string stringVal = config->getString("testString");
-    printf("STR: %s\n", stringVal.c_str());
+    Conf::load("/tmp/test.json");
 
-    int intVal = config->getInt("testInteger", -1);
-    printf("INT: %d\n", intVal);
+    string a = Conf::getString("object.a");
+    printf("object.a: %s\n", a.c_str());
 
-    stringVal = config->getString("testObject.testInnerString");
-    printf("STR: %s\n", stringVal.c_str());
+    string d = Conf::getString("object.c");
+    printf("object.c: %s\n", d.c_str());
 
-    intVal = config->getInt("testObject.testInnerInteger", -1);
-    printf("INT: %d\n", intVal);
-
-    Config* objectConf = config->getConfig("testObject");
-
-    intVal = objectConf->getInt("testInnerInteger", -1);
-    printf("INT: %d\n", intVal);
+    string f = Conf::getString("object.e");
+    printf("object.e: %s\n", f.c_str());
 
     return 0;
 }

@@ -1,39 +1,53 @@
-#ifndef TLD_HPP
-#define TLD_HPP
-
-#include "common/Option.hpp"
-
-#include "core/Frame.hpp"
+#ifndef TLD_H
+#define TLD_H
 #include "core/Box.hpp"
-#include "detector/common/ScoredBox.hpp"
+#include "core/ScoredBox.hpp"
 
-#include "tld/TrackResult.hpp"
 #include "tracker/Tracker.hpp"
-#include "detector/nn/NNClassificationDetails.hpp"
-#include "detector/CascadedSingleDetector.hpp"
+#include "tracker/LKTracker.hpp"
+#include "tracker/StubbedTracker.hpp"
 
+#include "detector/Detector.hpp"
 
-using namespace std;
+#include "tld/TrackerResult.hpp"
+#include "tld/DetectorResult.hpp"
+
+class TLDResultSet {
+public:
+    int modelId;
+    Box* maybeTrackedBox;
+    vector<ScoredBox*> scoredBoxList;
+
+    TLDResultSet(Box* maybeTrackedBox);
+
+    void add(ScoredBox* scoredBox);
+};
 
 class TLD {
-private:
-    double minOverlap;
-    double minValidationScore;
-
-    TrackResult* validate(Frame* current, Option<Box>* trackResult);
-    Option<Box>* integrate(Frame* current, TrackResult* trackResult, DetectResult* detectResult);
-    Box* combineClosestBoxes(TrackResult* trackResult, DetectResult* detectResult);
-    bool isThereMoreConfidentOneBox(TrackResult* trackResult, DetectResult* detectResult);
 public:
-    Tracker* tracker;
-    CascadedSingleDetector* detector;
+    int nrOfModels;
 
-    TLD(Tracker* t, CascadedSingleDetector* d);
-    TLD(Frame* f, Box* b);
-    void init(Frame* firstFrame, Box* firstBox);
-    TrackResult* track(Frame* prev, Frame* current, Option<Box>* maybePrevBox);
-    void learn(Frame* current, Box* trackedBox, DetectResult* detectResult);
-    DetectResult* detect(Frame* current);
-    Option<Box>* process(Frame* prev, Frame* current, Option<Box>* maybePrevBox);
-};
+    Tracker* tracker;
+    Detector* detector;
+
+    double trackedBoxValidationScoreThreshold;
+    double moreConfidentBoxOverlapThreshold;
+    double minimumOverlapToCombine;
+
+    TLD();
+    TLD(Tracker* tracker, Detector* detector);
+    ~TLD();
+
+    vector<Box*> init(Frame* frame, vector<Box*> boxList);
+
+    vector<Box*> track(Frame* prev, Frame* current, vector<Box*> prevBoxList);
+    vector<TLDResultSet*> groupResults(vector<Box*> boxList, vector<ScoredBox*> scoredBoxList);
+    Option<Box*> integrate(Frame* frame, Box* oldBox, Box* maybeTrackedBox, vector<ScoredBox*> scoredBoxList, int modelId);
+
+    Option<ScoredBox*> validate(Frame* current, Box* oldBox, Box* trackedBox, int modelId);
+    DetectorResult* partition(vector<ScoredBox*> scoredBoxList, int modelId);
+
+    vector<ScoredBox*> getMoreConfidentBoxList(ScoredBox* trackScoredBox, vector<ScoredBox*> detectedBoxes, int modelId);
+    Box* combineClosestBoxes(ScoredBox* trackScoredBox, vector<ScoredBox*> detectedBoxes);};
+
 #endif

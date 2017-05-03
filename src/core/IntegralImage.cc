@@ -1,49 +1,63 @@
 #include "core/IntegralImage.hpp"
-MeanVariance::MeanVariance(double m, double v) {
-        mean = m;
-        variance = v;
+MeanVariance::MeanVariance(float m, float v) {
+    this->mean = m;
+    this->variance = v;
 }
 
-IntegralImage::IntegralImage(Mat* img) {
-    step = img->cols;
-    width = img->cols;
-    height = img->rows;
+IntegralImage::IntegralImage(IplImage* img) {
+    step = img->width;
+    width = img->width;
+    height = img->height;
     integralImage = computeIntegralImage(img);
     integralSquaredImage = computeSquaredIntegralImage(img);
 }
 
-int* IntegralImage::computeIntegralImage(Mat* img) {
-    return computeIntegralImage(img, [](int pixel) {return pixel;});
+IntegralImage::~IntegralImage() {
+    free(integralImage);
+    free(integralSquaredImage);
 }
 
-int* IntegralImage::computeSquaredIntegralImage(Mat* img) {
-    return computeIntegralImage(img, [](int pixel) {return pixel * pixel;});
+int* IntegralImage::computeIntegralImage(IplImage* img) {
+    return computeIntegralImage(img, [](int pixel) { return pixel; });
 }
 
+int* IntegralImage::computeSquaredIntegralImage(IplImage* img) {
+    return computeIntegralImage(img, [](int pixel) { return pixel * pixel; });
+}
 
-int* IntegralImage::computeIntegralImage(Mat* img, int (f)(int)) {
+int* IntegralImage::computeIntegralImage(IplImage* img, int (f)(int)) {
     int* integral = (int*) malloc(sizeof(int) * width * height);
-    for ( int i = 0; i < height; i++) {
-            for( int j = 0; j < width; j++) {
-                    int left = 0;
-                    int up = 0;
-                    int left_up = 0;
+    for (int i = 0; i < height; i++) {
+        for(int j = 0; j < width; j++) {
+            int left = 0;
+            int up = 0;
+            int left_up = 0;
 
-                    if (i > 0) {
-                            up = integral[((i-1)*width) + j];
-                    }
-                    if ( j > 0) {
-                            left = integral[(i*width) +j-1];
-                    }
-
-                    if ( i > 0 && j > 0) {
-                            left_up = integral[(i-1)*width + j-1];
-                    }
-                    int sum = up + left - left_up + f(img->data[i*width+j]);
-                    integral[(i*width) + j] = sum;
+            if (i > 0) {
+                    up = integral[((i-1)*width) + j];
             }
+            if ( j > 0) {
+                    left = integral[(i*width) +j-1];
+            }
+
+            if ( i > 0 && j > 0) {
+                    left_up = integral[(i-1)*width + j-1];
+            }
+
+            int pixel = (int) CV_IMAGE_ELEM(img, uchar, i, j);
+            int sum = up + left - left_up + f(pixel);
+            integral[(i*width) + j] = sum;
+        }
     }
     return integral;
+}
+
+MeanVariance* IntegralImage::computeMeanVariance(Box* b) {
+    return computeMeanVariance(
+        (int) b->x1,
+        (int) b->y1,
+        (int) b->width,
+        (int) b->height);
 }
 
 MeanVariance* IntegralImage::computeMeanVariance(int x, int y, int w, int h) {
@@ -56,7 +70,7 @@ MeanVariance* IntegralImage::computeMeanVariance(int x, int y, int w, int h) {
     float variance = (float) squaredMean - (mean*mean);
 
     if (windowSum < 0 || squaredWindowSum < 0) {
-        printf("X: %d, Y: %d, SUM: %d, SQUARED-SUM: %d, AREA: %d, VAR: %f\n",x, y, windowSum, squaredWindowSum, area, variance);
+        printf("X: %d, Y: %d, W: %d, H: %d, SUM: %d, SQUARED-SUM: %d, AREA: %d, VAR: %f\n",x, y, w, h, windowSum, squaredWindowSum, area, variance);
     }
 
     MeanVariance* meanVariance = new MeanVariance(mean, variance);
@@ -66,9 +80,9 @@ MeanVariance* IntegralImage::computeMeanVariance(int x, int y, int w, int h) {
 int IntegralImage::computeSubWindow(int row, int col, int pWidth, int pHeight, bool isSquared) {
         int* data = NULL;
         if (!isSquared) {
-                data = integralImage;
+            data = integralImage;
         } else {
-                data = integralSquaredImage;
+            data = integralSquaredImage;
         }
 
         int topLeft = 0;
@@ -77,15 +91,15 @@ int IntegralImage::computeSubWindow(int row, int col, int pWidth, int pHeight, b
         int bottomRight = 0;
 
         if (col > 0) {
-                bottomLeft = data[(row+pHeight-1)*width + col-1];
+            bottomLeft = data[(row+pHeight-1)*width + col - 1 ];
         }
 
         if (row > 0) {
-                topRight = data[(row-1)*width + col + pWidth-1];
+            topRight = data[(row - 1)*width + col + pWidth-1];
         }
 
         if (row > 0 && col > 0) {
-                topLeft = data[(row-1)*width + col-1];
+            topLeft = data[(row - 1)*width + col - 1];
         }
 
         bottomRight = data[(row+pHeight-1)*width + col + pWidth-1];

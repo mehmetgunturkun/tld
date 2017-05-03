@@ -5,6 +5,11 @@ PixelComparison::PixelComparison(Point2f* f, Point2f* t) {
     to = t;
 }
 
+PixelComparison::~PixelComparison() {
+    delete from;
+    delete to;
+}
+
 Point2f* PixelComparison::normalize(Point2f* point, Box* box) {
     Point2f* normPoint = new Point2f(
         box->x1 + floor(point->x * (box->width - 1) + 0.5),
@@ -15,9 +20,26 @@ Point2f* PixelComparison::normalize(Point2f* point, Box* box) {
 
 bool PixelComparison::compare(Frame* frame, Box* box) {
     Point2f* normFrom = normalize(from, box);
-    Point2f* normTo = normalize(to, box);
+    int fromPixel = frame->get(normFrom);
 
-    int fromPixel = frame->get(normFrom, CV_LOAD_IMAGE_GAUSSIAN);
-    int toPixel = frame->get(normTo, CV_LOAD_IMAGE_GAUSSIAN);
+    Point2f* normTo = normalize(to, box);
+    int toPixel = frame->get(normTo);
+
+    delete normFrom;
+    delete normTo;
+
     return fromPixel > toPixel;
+}
+
+string PixelComparison::toString() {
+    stringstream ss;
+    ss  << "PC("
+        << "P1("
+        << from->x << ", "
+        << from->y << ")"
+        << " -> "
+        << "P2("
+        << to->x << ", "
+        << to->y << ")";
+    return ss.str();
 }

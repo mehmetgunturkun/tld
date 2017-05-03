@@ -1,43 +1,31 @@
 #ifndef BASE_CLASSIFIER_H
 #define BASE_CLASSIFIER_H
 
-#include "core/Frame.hpp"
-#include "core/Box.hpp"
-#include "detector/common/ScoredBox.hpp"
-
-#include "detector/ensemble/Leaf.hpp"
+#include "detector/ensemble/EnsembleScore.hpp"
 #include "detector/ensemble/PixelComparison.hpp"
-#include "detector/ensemble/EnsembleClassificationDetails.hpp"
+#include "detector/ensemble/CodeGenerator.hpp"
+#include "detector/ensemble/DecisionTree.hpp"
 
-using namespace std;
 
 class BaseClassifier {
-private:
-    vector<PixelComparison*> pixelComparisons;
-    int nrOfComparisons;
-    vector<Leaf*> decisionTree;
+    CodeGenerator* codeGen;
+    DecisionTree* decTree;
 public:
     int id;
-    BaseClassifier(int i, vector<PixelComparison*> comparisons);
-    void init(Frame* frame, Box* box, bool label);
-    double score(Frame* frame, Box* box);
-    void update(Frame* frame, ScoredBox* box, bool label);
-    void dumpDecisionTree();
-    int generateBinaryCode(Frame* frame, Box* box);
-    double getProbability(int binaryCode);
 
-    string toString() {
-        stringstream ss;
-        ss << "BC(id = " << id << ")\n";
-        for (int i = 0; i < nrOfComparisons; i++) {
-            println("PC(%d)", i);
-            PixelComparison* pc = pixelComparisons[i];
-            ss << "\t"
-               << pc->toString()
-               << "\n";
-        }
-        return ss.str();
-    }
+    BaseClassifier(int i, vector<PixelComparison*> comparisons, int nrOfModels);
+    ~BaseClassifier();
+
+    int generateBinaryCode(Frame* frame, Box* box);
+    double getProbability(int binaryCode, int modelId);
+    void train(int binaryCode, int modelId, bool label);
+
+    double score(Frame* frame, Box* box, EnsembleScore* score, int modelId);
+    vector<double> score(Frame* frame, Box* box, EnsembleScore* score);
+
+    int generateBinaryCode(Frame* frame, Box* box, EnsembleScore* score);
+    void dumpBaseClassifier();
+
 };
 
 #endif

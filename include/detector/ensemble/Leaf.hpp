@@ -1,7 +1,11 @@
 #ifndef LEAF_H
 #define LEAF_H
+
 #include <string>
 #include <sstream>
+#include <vector>
+
+#include "common/Logging.hpp"
 
 using namespace std;
 
@@ -15,12 +19,7 @@ public:
 
     void incrementPositive();
     void incrementNegative();
-    string toString() {
-        stringstream ss;
-        ss << "Leaf("
-           << "#p = " << nrOfPositives << ", "
-           << "#n = " << nrOfNegatives << ")";
-        return ss.str();
-    }
+    string toString();
 };
+
 #endif

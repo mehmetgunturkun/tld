@@ -2,7 +2,7 @@
 #define TRAINING_SET_H
 #include <stddef.h>
 #include <vector>
-#include "util/Util.h"
+
 #include "core/Frame.hpp"
 
 using namespace std;
@@ -10,19 +10,25 @@ using namespace std;
 template <typename Type>
 class Labelled {
 public:
-    Frame* frame;
     Type* item;
     int label;
-    Labelled(Frame* frame, Type* item, int l) {
-        this->frame = frame;
+    bool added;
+
+    Labelled(Type* item, int label) {
         this->item = item;
-        this->label = l;
+        this->label = label;
+        this->added = false;
+    }
+
+    ~Labelled() {
+        //delete item;
     }
 };
 
 template <typename Type>
 class TrainingSet {
 public:
+    string title;
     Frame* frame;
     int nrOfPositiveSamples;
     vector<Type*> positiveSamples;
@@ -31,44 +37,25 @@ public:
     vector<Type*> negativeSamples;
 
     int nrOfSamples;
-    TrainingSet(Frame* f, vector<Type*> p, vector<Type*> n) {
-        frame = f;
-        positiveSamples = p;
-        nrOfPositiveSamples = (int) p.size();
+    int nrOfBootstrap;
 
-        negativeSamples = n;
-        nrOfNegativeSamples = (int) n.size();
+    bool shouldShuffle;
 
-        nrOfSamples = nrOfPositiveSamples + nrOfNegativeSamples;
+    TrainingSet(Frame* f, vector<Type*> p, vector<Type*> n, int nrOfBootstrap = 1, bool shuffle = false) {
+        construct(f, p, n, nrOfBootstrap);
+        this->shouldShuffle = shuffle;
     }
 
-    vector<Labelled<Type>> getLabelledSamples() {
-        vector<Labelled<Type>> labelledSamples;
-        Mat* gaussian = frame->gaussian;
+    void construct(Frame* f, vector<Type*> p, vector<Type*> n, int nrOfBootstrap = 1) {
+        this->frame = f;
+        this->positiveSamples = p;
+        this->nrOfPositiveSamples = (int) p.size();
 
-        Mat* img = gaussian;
-        Frame* f = frame;
+        this->negativeSamples = n;
+        this->nrOfNegativeSamples = (int) n.size();
 
-        for (int i = 0; i < nrOfNegativeSamples; i++) {
-            Type* sample = negativeSamples[i];
-            Labelled<Type> negativeSample = Labelled<Type>(f, sample, 0);
-            labelledSamples.push_back(negativeSample);
-        }
-
-        int warpNo = 0;
-        do {
-            for (int i = 0; i < nrOfPositiveSamples; i++) {
-                Type* sample = positiveSamples[i];
-                Labelled<Type> positiveSample = Labelled<Type>(f, sample, 1);
-                labelledSamples.push_back(positiveSample);
-            }
-
-            img = Image::warp(gaussian);
-            f = new Frame(img, f->grayscale);
-            warpNo += 1;
-        } while (warpNo < 20);
-        std::random_shuffle(labelledSamples.begin(), labelledSamples.end());
-        return labelledSamples;
+        this->nrOfSamples = nrOfPositiveSamples + nrOfNegativeSamples;
+        this->nrOfBootstrap = nrOfBootstrap;
     }
 };
 #endif

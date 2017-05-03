@@ -1,14 +1,18 @@
 #ifndef OPTION_H
 #define OPTION_H
+
 #include <stddef.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+using namespace std;
 
 template <typename Type>
-
 class Option {
-    Type* item;
+    Type item;
     bool empty;
 public:
-    Option(Type* _item) {
+    Option(Type _item) {
         item = _item;
         empty = false;
     }
@@ -20,11 +24,12 @@ public:
     bool isEmpty() {
         return empty;
     }
+
     bool isDefined() {
         return !isEmpty();
     }
 
-    Type* get() {
+    Type get() {
         if (!empty) {
             return item;
         } else {

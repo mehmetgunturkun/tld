@@ -1,69 +1,54 @@
 #include "detector/ensemble/BaseClassifier.hpp"
 
-BaseClassifier::BaseClassifier(int id, vector<PixelComparison*> comparisons) {
+BaseClassifier::BaseClassifier(int id, vector<PixelComparison*> comparisons, int nrOfModels) {
     this->id = id;
-    pixelComparisons = comparisons;
-    nrOfComparisons = (int) comparisons.size();
-    decisionTree.resize(pow(2, nrOfComparisons));
-    for (int i = 0; i < pow(2, nrOfComparisons); i++) {
-        decisionTree[i] = new Leaf();
-    }
+    this->codeGen = new CodeGenerator(comparisons);
+    this->decTree = new DecisionTree(nrOfModels);
 }
 
-double BaseClassifier::score(Frame* frame, Box* box) {
-    int binaryCode = generateBinaryCode(frame, box);
-    double score = getProbability(binaryCode);
-    return score;
+BaseClassifier::~BaseClassifier() {
+    delete codeGen;
+    delete decTree;
 }
 
 int BaseClassifier::generateBinaryCode(Frame* frame, Box* box) {
-    int binaryCode = 0;
-    for (int i = 0 ; i < nrOfComparisons; i++) {
-        binaryCode <<= 1;
-        PixelComparison* comparison = pixelComparisons[i];
-        bool bit = comparison->compare(frame, box);
-        if (bit) {
-            binaryCode |= 1;
-        }
-    }
+    int binaryCode = codeGen->generateBinaryCode(frame, box);
     return binaryCode;
 }
 
-double BaseClassifier::getProbability(int binaryCode) {
-    Leaf* leaf = decisionTree[binaryCode];
-    return leaf->probability;
+double BaseClassifier::getProbability(int binaryCode, int modelId) {
+    return decTree->getProbability(binaryCode, modelId);
 }
 
-void BaseClassifier::init(Frame* frame, Box* box, bool label) {
-    int binaryCode = generateBinaryCode(frame, box);
-    Leaf* leaf = decisionTree[binaryCode];
-    if (label) {
-        leaf->incrementPositive();
-    } else {
-        leaf->incrementNegative();
-    }
+void BaseClassifier::train(int binaryCode, int modelId, bool label) {
+    decTree->update(binaryCode, modelId, label);
 }
 
-void BaseClassifier::update(Frame* frame, ScoredBox* box, bool label) {
-    EnsembleClassificationDetails* detail = (EnsembleClassificationDetails*) box->getDetail("ensemble");
-    int binaryCode = detail->getBinaryCode(this->id);
-    double score = getProbability(binaryCode);
-    if (label == true && score < 0.8) {
-        Leaf* leaf = decisionTree[binaryCode];
-        leaf->incrementPositive();
-    }
-
-    if (label == false && score > 0.5) {
-        Leaf* leaf = decisionTree[binaryCode];
-        leaf->incrementNegative();
-    }
+vector<double> BaseClassifier::score(Frame* frame, Box* box, EnsembleScore* score) {
+    int binaryCode = codeGen->generateBinaryCode(frame, box);
+    score->setBinaryCode(id, binaryCode);
+    vector<double> probabilities = decTree->getProbabilities(binaryCode);
+    return probabilities;
 }
 
-void  BaseClassifier::dumpDecisionTree() {
-    for (int i = 0; i < 8192; i++) {
-        Leaf* leaf = decisionTree[i];
-        if (leaf->nrOfPositives > 0 || leaf->nrOfNegatives > 0) {
-            println("%s", leaf->toString().c_str());
-        }
-    }
+double BaseClassifier::score(Frame* frame, Box* box, EnsembleScore* score, int modelId) {
+    int binaryCode = codeGen->generateBinaryCode(frame, box);
+    score->setBinaryCode(id, binaryCode);
+    double probability = decTree->getProbability(binaryCode, modelId);
+    return probability;
+}
+
+int BaseClassifier::generateBinaryCode(Frame* frame, Box* box, EnsembleScore* score) {
+    int binaryCode = this->generateBinaryCode(frame, box);
+    score->setBinaryCode(id, binaryCode);
+    return binaryCode;
+}
+
+void BaseClassifier::dumpBaseClassifier() {
+    println("===== BaseClassifier(%2d) =====", this->id);
+    println("------------- CG --------------");
+    codeGen->dumpCodeGeneration();
+    println("------------- DT --------------");
+    decTree->dumpDecisionTree();
+    println("===============================");
 }

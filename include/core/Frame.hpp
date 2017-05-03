@@ -1,39 +1,42 @@
-#ifndef FRAME_HPP
-#define FRAME_HPP
+#ifndef FRAME_H
+#define FRAME_H
+
+#include <string>
+
+#include "common/Random.hpp"
+#include "common/Option.hpp"
 
 #include "core/Image.hpp"
 #include "core/IntegralImage.hpp"
+#include "core/Box.hpp"
+#include "core/Gaussian.hpp"
 
 class Frame {
 public:
+    int id;
     string name;
 
     int width;
     int height;
 
-    Mat* colored;
-    Mat* grayscale;
-    Mat* gaussian;
-    IntegralImage* integral;
+    IplImage* originalImage;
+    IplImage* grayscale;
+    IplImage* gaussian;
 
-    vector<Mat> flowPyramid;
+    IntegralImage* integralImage;
 
-    Frame(string fileName);
-    Frame(Mat* grayscale, Mat* gaussian);
+    Frame(int id, string name, IplImage* originalImage, IplImage* grayscale, IplImage* gaussian);
+    ~Frame();
 
-    int get(Point2f* point, int imageType = CV_LOAD_IMAGE_GAUSSIAN);
-    int get(int x, int y, int imageType = CV_LOAD_IMAGE_GAUSSIAN);
+    int get(Point2f* point);
+    Frame* clone();
 
-    string toString() {
-        stringstream ss;
-        ss  << "Frame("
-            << name
-            << ", "
-            << width
-            << ", "
-            << height
-            << ")";
-        return ss.str();
-    }
+    static Frame* warp(Frame* frame,
+        Box* boxHull,
+        double angle,
+        double scale,
+        double shift);
+    static Option<Frame*> fromFile(int id, string fileName);
 };
+
 #endif

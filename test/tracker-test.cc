@@ -1,33 +1,47 @@
-#include "core/FrameView.hpp"
-#include "util/Dataset.hpp"
+#include "common/Arguments.hpp"
+#include "core/Frame.hpp"
+#include "core/Sequence.hpp"
+
 #include "tracker/Tracker.hpp"
 
-int main(int argc, char** argv) {
-    Dataset* dataset = new Dataset("car");
+int run(Arguments args);
 
-    Frame* firstFrame = dataset->next();
-    Box* firstBox = dataset->initBox;
+int main(int argc, char** argv) {
+    Arguments args = Arguments(argc, argv);
+    for (int i = 0; i < 1; i++) {
+        run(args);
+    }
+}
+
+int run(Arguments args) {
+    string sequenceKey = args.getString("sequence");
+    Sequence sequence = Sequence(sequenceKey);
+
+    Frame* prevFrame = sequence.next();
+    Box* initBox = sequence.initBox;
+    vector<Box*> boxList = { initBox };
 
     Tracker* tracker = new Tracker();
-    int frameNo = 1;
-    while(dataset->hasNext()) {
 
-        FrameView* view = new FrameView(firstFrame);
-        view->addBox(firstBox, FrameView::BLUE);
-        Image::imshow("tracker", view->underlying, 1);
+    int no = 1;
+    while (sequence.hasNext()) {
+        Frame* currentFrame = sequence.next();
+        // println("%s is going to be processed", currentFrame->name.c_str());
 
-        Frame* secondFrame = dataset->next();
-        printf("---  #%3d. %s. Frame ---\n", frameNo, secondFrame->name.c_str());
-        Option<Box>* trackResult = tracker->track(firstFrame, secondFrame, firstBox);
-        if (trackResult->isEmpty()) {
-            println("Failed!");
-            return EXIT_FAILURE;
-        } else {
-            firstBox = trackResult->get();
-            firstFrame = secondFrame;
+        boxList = tracker->track(prevFrame, currentFrame, boxList);
+        if (boxList[0] == nullptr) {
+          println(RED("Tracker stopped processing"));
+          return 1;
         }
-        frameNo += 1;
-        printf("-------------------\n");
+
+        //println("%s", boxList[0]->toCharArr());
+        delete prevFrame;
+        // delete oldBox;
+        prevFrame = currentFrame;
+        no += 1;
     }
-    return EXIT_SUCCESS;
+
+    delete prevFrame;
+    delete tracker;
+    return 0;
 }

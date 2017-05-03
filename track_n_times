@@ -1,0 +1,19 @@
+from=$1
+to=$2
+limit=$3
+for run in $(eval echo {$from..$to});
+do
+# echo $limit
+echo "Running for trial: "$run
+# mkdir -p /tmp/mtld/deneme/$limit
+# file=/tmp/mtld/deneme/$limit/$run
+# ./target/tld-one-test-app --sequence 04_pedestrian2 --limit $limit > $file
+
+# ./target/tracker-test-app --sequence 04_pedestrian2 | grep ""
+./target/tracker-test-app | grep "P(0x1.2137bcp+7, 0x1.1dec64p+7)"
+# | grep "P(0x1.2137bcp+7, 0x1.1dec64p+7)"
+
+# lines=`wc -l $file`
+# echo $lines
+
+done

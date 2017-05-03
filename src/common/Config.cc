@@ -1,5 +1,4 @@
 #include "common/Config.hpp"
-#include "common/Option.hpp"
 
 Config::Config(string fileName) {
     Json::Reader reader;
@@ -7,41 +6,66 @@ Config::Config(string fileName) {
     reader.parse(file, root, false );
 }
 
-Config::Config(Json::Value* json) {
-    root = *json;
+Config::Config(Json::Value* jValue) {
+    root = *jValue;
 }
 
-Json::Value Config::getJsonValue(string key) {
-    vector<string> keys = StringUtils::split(key, '.');
-    Json::Value valuePtr = root[keys[0]];
-    for (int i = 1; i < (int) keys.size(); i++) {
-        valuePtr = valuePtr[keys[i]];
+vector<string> split(const std::string &s, char delim) {
+    vector<string> elems;
+    stringstream ss(s);
+    string item;
+    while (getline(ss, item, delim)) {
+        elems.push_back(item);
     }
+    return elems;
+}
+
+
+Json::Value getJsonValue(Json::Value root, string key) {
+    StringStream stream = StringStream(key, '.');
+
+    Json::Value valuePtr = root;
+    while (stream.hasNext()) {
+        string subKey = stream.next();
+        valuePtr = valuePtr[subKey];
+    }
+
     return valuePtr;
 }
 
-string Config::getString(string key, string defaultVal) {
-    Json::Value jsonValue = getJsonValue(key);
+string Config::getString(string key) {
+    Json::Value jsonValue = getJsonValue(root, key);
     string value = jsonValue.asString();
     return value;
 }
 
-int Config::getInt(string key, int defaultVal) {
-    Json::Value jsonValue = getJsonValue(key);
+int Config::getInt(string key) {
+    Json::Value jsonValue = getJsonValue(root, key);
     int value = jsonValue.asInt();
     return value;
 }
 
-double Config::getDouble(string key, double defaultVal) {
-    Json::Value jsonValue = getJsonValue(key);
+double Config::getDouble(string key) {
+    Json::Value jsonValue = getJsonValue(root, key);
     double value = jsonValue.asDouble();
     return value;
 }
 
-Config* Config::getConfig(string key) {
-    Json::Value jsonValue = getJsonValue(key);
-    Config* config = new Config(&jsonValue);
-    return config;
+Config* root = (Config*) NULL;
+
+
+void Conf::load(string fileName) {
+    root = new Config(fileName);
 }
 
-Config* Conf::root = (Config*) NULL;
+string Conf::getString(string key) {
+    return root->getString(key);
+}
+
+int Conf::getInt(string key) {
+    return root->getInt(key);
+}
+
+double Conf::getDouble(string key) {
+    return root->getDouble(key);
+}

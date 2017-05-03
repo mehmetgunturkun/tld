@@ -5,14 +5,27 @@
 
 #include "core/Frame.hpp"
 #include "core/Box.hpp"
+#include "core/Image.hpp"
+#include "core/Warp.hpp"
+
+using namespace std;
 
 class Patch {
 public:
     static int WIDTH;
     static int HEIGHT;
 
-    Patch(Mat* data);
+    int id;
+    IplImage* data;
+
     Patch(Frame* frame, Box* box);
-    Mat* data;
+    Patch(IplImage* data);
+    ~Patch();
+
+    string toString();
+    Patch* clone();
+
+    static double computeVariance(Patch* patch);
+
 };
 #endif

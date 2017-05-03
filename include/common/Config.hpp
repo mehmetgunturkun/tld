@@ -8,43 +8,29 @@
 #include <json/json.h>
 #include <json/value.h>
 
-#include "common/StringUtils.hpp"
-#include "util/Util.h"
+#include "common/string/StringStream.hpp"
 
 using namespace std;
 
 class Config {
 private:
     Json::Value root;
-    Json::Value getJsonValue(string key);
 public:
     Config(string fileName);
-    Config(Json::Value* json);
+    Config(Json::Value* root);
 
-    string getString(string key,  string defaultVal = "__NAN__");
-    int getInt(string key,  int defaultVal);
-    double getDouble(string key, double defaultVal);
-    Config* getConfig(string key);
+    string getString(string key);
+    int getInt(string key);
+    double getDouble(string key);
 };
+
 
 class Conf {
-private:
-    static Config* root;
 public:
-    static void load(string fileName) {
-        root = new Config(fileName);
-    }
-
-    static string getString(string key,  string defaultVal = "__NAN__") {
-        return root->getString(key, defaultVal);
-    }
-
-    static int getInt(string key,  int defaultVal) {
-        return root->getInt(key, defaultVal);
-    }
-
-    static double getDouble(string key, double defaultVal) {
-        return root->getDouble(key, defaultVal);;
-    }
+    static void load(string fileName);
+    static string getString(string key);
+    static int getInt(string key);
+    static double getDouble(string key);
 };
+
 #endif
