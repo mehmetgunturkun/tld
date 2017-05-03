@@ -40,19 +40,23 @@ vector<Box*> Detector::init(Frame* frame, vector<Box*> boxList) {
     //TODO Assuming all boxes are in the same scale
     firstBox = boxList[0];
     nrOfModels = (int) boxList.size();
-
     initVarianceThresholds(frame, boxList);
 
     eClassifier->init(frame, boxList);
+    printf("mc2000\n");
     nnClassifier->init(frame, boxList);
+    printf("mc2100\n");
 
     int nrOfBoxes = (int) boxList.size();
+    printf("mc2200\n");
+
     vector<Box*> correctedBoxList;
 
     for (int i = 0; i < nrOfBoxes; i++) {
-            Box* box = boxList[i];
-            Box* correctedBox = this->init(frame, box, i);
-            correctedBoxList.push_back(correctedBox);
+        printf("Init: %d\n", i);
+        Box* box = boxList[i];
+        Box* correctedBox = this->init(frame, box, i);
+        correctedBoxList.push_back(correctedBox);
     }
     return correctedBoxList;
 }

@@ -12,8 +12,9 @@ OPENCV_CFLAGS := -I/home/gunturkun/bin/opencv/2.2.0/include/opencv -I/home/guntu
 OPENCV_LIBS := /home/gunturkun/bin/opencv/2.2.0/lib/ -lopencv_highgui -lopencv_core -lopencv_imgproc -lopencv_video
 
 JSON_LIB := /home/gunturkun/bin/jsoncpp/lib/libjsoncpp.a
+KD_TREE_LIB := /home/gunturkun/bin/kdtree/lib/libkdtree.a
 
-CPPFLAGS += -Iinclude $(OPENCV_CFLAGS) -I/home/gunturkun/bin/jsoncpp/include
+CPPFLAGS += -Iinclude $(OPENCV_CFLAGS) -I/home/gunturkun/bin/jsoncpp/include -I/home/gunturkun/bin/kdtree/include
 CCFLAGS = -g -Wall --std=c99
 # CXXFLAGS = -g -Wall --std=c++11
 CXXFLAGS = -g -O3 -Wall --std=c++11
@@ -60,7 +61,8 @@ lib2_sources := \
 	src/detector/Detector.cc \
 	src/tld/DetectorResult.cc \
 	src/tld/TrackerResult.cc \
-	src/tld/TLD.cc
+	src/tld/TLD.cc \
+	src/tld/PartTLD.cc
 
 lib2_objects := $(patsubst %.cc,%.o,$(lib2_sources))
 lib2_target  := libtld.a
@@ -91,7 +93,7 @@ $(lib2_target) : $(lib2_objects) Makefile
 	@echo ----------------------------------------
 
 $(tool2_targets): $(test_target)/%-app: test/%.o $(lib2_target) Makefile
-	$(CXX) $(CXXFLAGS) -I$(OPENCV_CFLAGS) $< $(lib2_target) $(JSON_LIB) $(lib_target) -L$(LDFLAGS) -o $@
+	$(CXX) $(CXXFLAGS) -I$(OPENCV_CFLAGS) $< $(lib2_target) $(JSON_LIB) $(KD_TREE_LIB) $(lib_target) -L$(LDFLAGS) -o $@
 	@echo ----------------------------------------
 	@echo ... Built $@ ...
 	@echo ----------------------------------------
