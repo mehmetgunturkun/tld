@@ -39,7 +39,7 @@ ImageBuilder ImageBuilder::withTitle(string title) {
     return *this;
 }
 
-ImageBuilder ImageBuilder::withCircle(Point2f* center, int radius) {
+ImageBuilder ImageBuilder::withCircle(Point2f* center, double radius) {
     cv::circle(img, *center, radius, Colors::RED);
     return *this;
 }

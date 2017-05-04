@@ -47,7 +47,8 @@ Shape* PartTLD::init(Frame* frame, Box* initBox) {
         new Box(0, x1, y1, mid_x, mid_y),
         new Box(1, mid_x, y1, x2, mid_y),
         new Box(2, x1, mid_y, mid_x, y2),
-        new Box(3, mid_x, mid_y, x2, y2)
+        new Box(3, mid_x, mid_y, x2, y2),
+        new Box(4, (x1 + mid_x) / 2, (y1 + mid_y) / 2, (x2 + mid_x) / 2, (y2 + mid_x) / 2)
     };
 
     nrOfParts = (int) parts.size();

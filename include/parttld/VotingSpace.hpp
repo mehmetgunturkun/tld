@@ -4,6 +4,9 @@
 #include "opencv2/core/core.hpp"
 #include "kdtree.h"
 
+#include "core/Frame.hpp"
+#include "core/util/ImageBuilder.hpp"
+
 using namespace std;
 using namespace cv;
 

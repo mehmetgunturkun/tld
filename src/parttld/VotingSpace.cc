@@ -19,16 +19,18 @@ void VotingSpace::vote(double x, double y, double vote) {
 }
 
 Point2f* VotingSpace::result() {
-    Point2f* point = new Point2f(10.0, 10.0);
-    Point2f* center = computeTheCenter(point);
+    double pos[2];
+    struct kdres* random = kd_nearest_n2(kd, 0, 0, 1);
+    kd_res_item(random, pos);
+    Point2f* randomPoint = new Point2f(pos[0], pos[1]);
 
+    Point2f* center = computeTheCenter(point);
     return center;
 }
 
 Point2f* VotingSpace::computeTheCenter(Point2f* currentPoint) {
     Point2f* nextCenter = computeNextCenter(currentPoint);
     double distance = euclidian(nextCenter, currentPoint);
-    printf("Distance: %4.3f\n", distance);
     if (distance < MEAN_SHIFT_THRESHOLD) {
         return nextCenter;
     } else {
@@ -37,7 +39,7 @@ Point2f* VotingSpace::computeTheCenter(Point2f* currentPoint) {
 }
 
 Point2f* VotingSpace::computeNextCenter(Point2f* point) {
-    struct kdres* neighbours = kd_nearest_n2(kd, point->x, point->y, 20);
+    struct kdres* neighbours = kd_nearest_range2(kd, point->x, point->y, 100);
     double pos[2];
 
     double meanX = 0.0;
@@ -45,13 +47,11 @@ Point2f* VotingSpace::computeNextCenter(Point2f* point) {
     int nrOfNeighbours = kd_res_size(neighbours);
 
     while( !kd_res_end( neighbours ) ) {
-      kd_res_item(neighbours, pos);
-
-      meanX += pos[0];
-      meanY += pos[1];
-
-      kd_res_next( neighbours );
-  }
+        kd_res_item(neighbours, pos);
+        meanX += pos[0];
+        meanY += pos[1];
+        kd_res_next( neighbours );
+    }
 
     Point2f* newPoint = new Point2f(meanX / nrOfNeighbours, meanY / nrOfNeighbours);
 

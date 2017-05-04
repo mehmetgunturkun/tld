@@ -17,7 +17,7 @@ public:
     ImageBuilder(Frame* frame);
     ImageBuilder withFrame(Frame* frame);
     ImageBuilder withBox(Box* box, Scalar color = Colors::RED);
-    ImageBuilder withCircle(Point2f* center, int radius);
+    ImageBuilder withCircle(Point2f* center, double radius);
     ImageBuilder withTitle(string title);
     void display(int delay = 0);
 };
